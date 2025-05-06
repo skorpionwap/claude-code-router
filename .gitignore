@@ -1,3 +1,5 @@
 node_modules
 .env
 log.txt
+.DS_Store
+pnpm-lock.yaml
