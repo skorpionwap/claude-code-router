@@ -2,6 +2,9 @@
 
 > This is a tool for routing Claude Code requests to different models, and you can customize any request.
 
+
+![](screenshoots/claude-code.png)
+
 ## Usage
 
 1. Install Claude Code
