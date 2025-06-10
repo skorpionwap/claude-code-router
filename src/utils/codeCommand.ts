@@ -8,6 +8,7 @@ export async function executeCodeCommand(args: string[] = []) {
     const env = {
         ...process.env,
         DISABLE_PROMPT_CACHING: '1',
+        ANTHROPIC_AUTH_TOKEN: 'test',
         ANTHROPIC_BASE_URL: 'http://127.0.0.1:3456',
         API_TIMEOUT_MS: '600000'
     };
