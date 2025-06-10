@@ -1,19 +1,33 @@
 {
-  "name": "claude-code-router",
+  "name": "@musistudio/claude-code-router",
   "version": "1.0.0",
-  "description": "You can switch the API endpoint by modifying the ANTHROPIC_BASE_URL environment variable.",
-  "main": "index.mjs",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.mjs"
+  "description": "Use Claude Code without an Anthropics account and route it to another LLM provider",
+  "bin": {
+    "ccr": "./dist/cli.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js"
+  },
+  "keywords": ["claude", "code", "router", "llm", "anthropic"],
+  "author": "musistudio",
+  "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "https-proxy-agent": "^7.0.6",
     "openai": "^4.85.4"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "esbuild": "^0.25.1",
+    "typescript": "^5.8.2"
+  },
+  "publishConfig": {
+    "ignore": [
+      "!build/",
+      "src/",
+      "screenshots/"
+    ]
   }
 }
