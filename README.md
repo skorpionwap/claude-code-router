@@ -1,6 +1,6 @@
 # Claude Code Router
 
-> This is a repository for testing routing Claude Code requests to different models.
+> This is a tool for routing Claude Code requests to different models, and you can customize any request.
 
 ## Usage
 
@@ -23,7 +23,7 @@ ccr code
 ```
 
 
-## Plugin
+## Plugin[Beta]
 
 The plugin allows users to rewrite Claude Code prompt and custom router. The plugin path is in `$HOME/.claude-code-router/plugins`. Currently, there are two demos available: 
 1. [custom router](https://github.com/musistudio/claude-code-router/blob/dev/custom-prompt/plugins/deepseek.js)
@@ -44,7 +44,7 @@ You need to move them to the `$HOME/.claude-code-router/plugins` directory and c
 ## Features
 - [x] Plugins
 - [ ] Support change models
-- [ ] Suport scheduled tasks
+- [ ] Support scheduled tasks
 
 
 ## Some tips:
@@ -52,6 +52,6 @@ If you’re using the DeepSeek API provided by the official website, you might e
 
 Note: claude code consumes a huge amount of tokens, but thanks to DeepSeek’s low cost, you can use claude code at a fraction of Claude’s price, and you don’t need to subscribe to the Claude Max plan.
 
-Some interesting points: In my testing, providing absolute context information can help bridge the gap between these models. For example, when I used Claude 4 in VS Code Copilot to handle a Flutter issue, after three rounds of conversation it kept messing up the files, and I had to roll back in the end. But when I switched to claude code using DeepSeek, after three or four rounds of conversation, I finally completed my task—and the cost was less than 1 RMB!
+Some interesting points: Based on my testing, including a lot of context information can help narrow the performance gap between these LLM models. For instance, when I used Claude-4 in VSCode Copilot to handle a Flutter issue, it messed up the files in three rounds of conversation, and I had to roll everything back. However, when I used claude code with DeepSeek, after three or four rounds of conversation, I finally managed to complete my task—and the cost was less than 1 RMB!
 
 
