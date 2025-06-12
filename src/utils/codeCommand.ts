@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
-import { isServiceRunning } from './processCheck';
+import { isServiceRunning, incrementReferenceCount, decrementReferenceCount } from './processCheck';
+import { closeService } from './close';
 
 export async function executeCodeCommand(args: string[] = []) {
     // Service check is now handled in cli.ts
@@ -13,6 +14,9 @@ export async function executeCodeCommand(args: string[] = []) {
         API_TIMEOUT_MS: '600000'
     };
 
+    // Increment reference count when command starts
+    incrementReferenceCount();
+
     // Execute claude command
     const claudeProcess = spawn('claude', args, {
         env,
@@ -23,10 +27,13 @@ export async function executeCodeCommand(args: string[] = []) {
     claudeProcess.on('error', (error) => {
         console.error('Failed to start claude command:', error.message);
         console.log('Make sure Claude Code is installed: npm install -g @anthropic-ai/claude-code');
+        decrementReferenceCount();
         process.exit(1);
     });
 
     claudeProcess.on('close', (code) => {
+        decrementReferenceCount();
+        closeService()
         process.exit(code || 0);
     });
 }

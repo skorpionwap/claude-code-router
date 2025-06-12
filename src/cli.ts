@@ -43,10 +43,12 @@ async function waitForService(
   return false;
 }
 
+import { spawn } from "child_process";
+
 async function main() {
   switch (command) {
     case "start":
-      await run({ daemon: true });
+      run();
       break;
     case "stop":
       await closeService();
@@ -57,8 +59,10 @@ async function main() {
     case "code":
       if (!isServiceRunning()) {
         console.log("Service not running, starting service...");
-        await run({ daemon: true });
-        // Wait for service to start, exit with error if timeout
+        spawn("ccr", ["start"], {
+          detached: true,
+          stdio: "ignore",
+        }).unref();
         if (await waitForService()) {
           executeCodeCommand(process.argv.slice(3));
         } else {

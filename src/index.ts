@@ -6,8 +6,8 @@ import { formatRequest } from "./middlewares/formatRequest";
 import { rewriteBody } from "./middlewares/rewriteBody";
 import OpenAI from "openai";
 import { streamOpenAIResponse } from "./utils/stream";
-import { isServiceRunning, savePid } from "./utils/processCheck";
-import { fork } from "child_process";
+import { cleanupPidFile, isServiceRunning, savePid } from "./utils/processCheck";
+
 
 async function initializeClaudeConfig() {
   const homeDir = process.env.HOME;
@@ -31,7 +31,6 @@ async function initializeClaudeConfig() {
 
 interface RunOptions {
   port?: number;
-  daemon?: boolean;
 }
 
 async function run(options: RunOptions = {}) {
@@ -49,6 +48,19 @@ async function run(options: RunOptions = {}) {
 
   // Save the PID of the background process
   savePid(process.pid);
+
+  // Handle SIGINT (Ctrl+C) to clean up PID file
+  process.on('SIGINT', () => {
+    console.log("Received SIGINT, cleaning up...");
+    cleanupPidFile();
+    process.exit(0);
+  });
+
+  // Handle SIGTERM to clean up PID file
+  process.on('SIGTERM', () => {
+    cleanupPidFile();
+    process.exit(0);
+  });
 
   // Use port from environment variable if set (for background process)
   const servicePort = process.env.SERVICE_PORT

@@ -1,6 +1,32 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { PID_FILE } from '../constants';
 
+const REFERENCE_COUNT_FILE = '/tmp/claude-code-reference-count.txt';
+
+export function incrementReferenceCount() {
+    let count = 0;
+    if (existsSync(REFERENCE_COUNT_FILE)) {
+        count = parseInt(readFileSync(REFERENCE_COUNT_FILE, 'utf-8')) || 0;
+    }
+    count++;
+    writeFileSync(REFERENCE_COUNT_FILE, count.toString());
+}
+
+export function decrementReferenceCount() {
+    let count = 0;
+    if (existsSync(REFERENCE_COUNT_FILE)) {
+        count = parseInt(readFileSync(REFERENCE_COUNT_FILE, 'utf-8')) || 0;
+    }
+    count = Math.max(0, count - 1);
+    writeFileSync(REFERENCE_COUNT_FILE, count.toString());
+}
+
+export function getReferenceCount(): number {
+    if (!existsSync(REFERENCE_COUNT_FILE)) {
+        return 0;
+    }
+    return parseInt(readFileSync(REFERENCE_COUNT_FILE, 'utf-8')) || 0;
+}
 
 export function isServiceRunning(): boolean {
     if (!existsSync(PID_FILE)) {
@@ -55,6 +81,7 @@ export function getServiceInfo() {
         pid,
         port: 3456,
         endpoint: 'http://127.0.0.1:3456',
-        pidFile: PID_FILE
+        pidFile: PID_FILE,
+        referenceCount: getReferenceCount()
     };
 }
