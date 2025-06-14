@@ -6,7 +6,7 @@ interface Server {
   start: () => void;
 }
 
-export const createServer = (port: number): Server => {
+export const createServer = async (port: number): Promise<Server> => {
   const app = express();
   app.use(express.json({ limit: "500mb" }));
   return {

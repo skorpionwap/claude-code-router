@@ -1,39 +1,42 @@
-import { spawn } from 'child_process';
-import { isServiceRunning, incrementReferenceCount, decrementReferenceCount } from './processCheck';
-import { closeService } from './close';
+import { spawn } from "child_process";
+import {
+  incrementReferenceCount,
+  decrementReferenceCount,
+} from "./processCheck";
+import { closeService } from "./close";
 
 export async function executeCodeCommand(args: string[] = []) {
-    // Service check is now handled in cli.ts
+  // Set environment variables
+  const env = {
+    ...process.env,
+    DISABLE_PROMPT_CACHING: "1",
+    ANTHROPIC_AUTH_TOKEN: "test",
+    ANTHROPIC_BASE_URL: `http://127.0.0.1:3456`,
+    API_TIMEOUT_MS: "600000",
+  };
 
-    // Set environment variables
-    const env = {
-        ...process.env,
-        DISABLE_PROMPT_CACHING: '1',
-        ANTHROPIC_AUTH_TOKEN: 'test',
-        ANTHROPIC_BASE_URL: 'http://127.0.0.1:3456',
-        API_TIMEOUT_MS: '600000'
-    };
+  // Increment reference count when command starts
+  incrementReferenceCount();
 
-    // Increment reference count when command starts
-    incrementReferenceCount();
+  // Execute claude command
+  const claudeProcess = spawn("claude", args, {
+    env,
+    stdio: "inherit",
+    shell: true,
+  });
 
-    // Execute claude command
-    const claudeProcess = spawn('claude', args, {
-        env,
-        stdio: 'inherit',
-        shell: true
-    });
+  claudeProcess.on("error", (error) => {
+    console.error("Failed to start claude command:", error.message);
+    console.log(
+      "Make sure Claude Code is installed: npm install -g @anthropic-ai/claude-code"
+    );
+    decrementReferenceCount();
+    process.exit(1);
+  });
 
-    claudeProcess.on('error', (error) => {
-        console.error('Failed to start claude command:', error.message);
-        console.log('Make sure Claude Code is installed: npm install -g @anthropic-ai/claude-code');
-        decrementReferenceCount();
-        process.exit(1);
-    });
-
-    claudeProcess.on('close', (code) => {
-        decrementReferenceCount();
-        closeService()
-        process.exit(code || 0);
-    });
+  claudeProcess.on("close", (code) => {
+    decrementReferenceCount();
+    closeService();
+    process.exit(code || 0);
+  });
 }

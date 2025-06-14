@@ -3,7 +3,7 @@ import { run } from "./index";
 import { closeService } from "./utils/close";
 import { showStatus } from "./utils/status";
 import { executeCodeCommand } from "./utils/codeCommand";
-import { isServiceRunning } from "./utils/processCheck";
+import { cleanupPidFile, isServiceRunning } from "./utils/processCheck";
 import { version } from "../package.json";
 
 const command = process.argv[2];
@@ -44,6 +44,8 @@ async function waitForService(
 }
 
 import { spawn } from "child_process";
+import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
+import { existsSync, readFileSync } from "fs";
 
 async function main() {
   switch (command) {
@@ -51,7 +53,26 @@ async function main() {
       run();
       break;
     case "stop":
-      await closeService();
+      try {
+        const pid = parseInt(readFileSync(PID_FILE, "utf-8"));
+        process.kill(pid);
+        cleanupPidFile();
+        if (existsSync(REFERENCE_COUNT_FILE)) {
+          try {
+            require("fs").unlinkSync(REFERENCE_COUNT_FILE);
+          } catch (e) {
+            // Ignore cleanup errors
+          }
+        }
+        console.log(
+          "claude code router service has been successfully stopped."
+        );
+      } catch (e) {
+        console.log(
+          "Failed to stop the service. It may have already been stopped."
+        );
+        cleanupPidFile();
+      }
       break;
     case "status":
       showStatus();

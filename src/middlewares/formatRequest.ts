@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { ContentBlockParam } from "@anthropic-ai/sdk/resources";
 import { MessageCreateParamsBase } from "@anthropic-ai/sdk/resources/messages";
 import OpenAI from "openai";
 import { streamOpenAIResponse } from "../utils/stream";
@@ -181,6 +180,7 @@ export const formatRequest = async (
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
     req.body = data;
+    console.log(JSON.stringify(data.messages, null, 2));
   } catch (error) {
     console.error("Error in request processing:", error);
     const errorCompletion: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk> =
@@ -189,7 +189,7 @@ export const formatRequest = async (
           yield {
             id: `error_${Date.now()}`,
             created: Math.floor(Date.now() / 1000),
-            model: "gpt-3.5-turbo",
+            model,
             object: "chat.completion.chunk",
             choices: [
               {

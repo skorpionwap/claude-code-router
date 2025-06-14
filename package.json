@@ -6,9 +6,16 @@
     "ccr": "./dist/cli.js"
   },
   "scripts": {
-    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js"
+    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js",
+    "buildserver": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js"
   },
-  "keywords": ["claude", "code", "router", "llm", "anthropic"],
+  "keywords": [
+    "claude",
+    "code",
+    "router",
+    "llm",
+    "anthropic"
+  ],
   "author": "musistudio",
   "license": "MIT",
   "dependencies": {
@@ -16,7 +23,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "https-proxy-agent": "^7.0.6",
-    "openai": "^4.85.4"
+    "lru-cache": "^11.1.0",
+    "openai": "^4.85.4",
+    "tiktoken": "^1.0.21",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

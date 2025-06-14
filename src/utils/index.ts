@@ -13,6 +13,8 @@ export function getOpenAICommonOptions(): ClientOptions {
   const options: ClientOptions = {};
   if (process.env.PROXY_URL) {
     options.httpAgent = new HttpsProxyAgent(process.env.PROXY_URL);
+  } else if (process.env.HTTPS_PROXY) {
+    options.httpAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   }
   return options;
 }
@@ -78,6 +80,7 @@ export const writeConfigFile = async (config: any) => {
 export const initConfig = async () => {
   const config = await readConfigFile();
   Object.assign(process.env, config);
+  return config;
 };
 
 export const createClient = (options: ClientOptions) => {

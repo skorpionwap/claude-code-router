@@ -9,6 +9,8 @@ export const PLUGINS_DIR = `${HOME_DIR}/plugins`;
 
 export const PID_FILE = path.join(HOME_DIR, '.claude-code-router.pid');
 
+export const REFERENCE_COUNT_FILE = '/tmp/claude-code-reference-count.txt';
+
 
 export const DEFAULT_CONFIG = {
   log: false,

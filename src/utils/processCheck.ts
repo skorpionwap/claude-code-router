@@ -1,7 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { PID_FILE } from '../constants';
-
-const REFERENCE_COUNT_FILE = '/tmp/claude-code-reference-count.txt';
+import { PID_FILE, REFERENCE_COUNT_FILE } from '../constants';
 
 export function incrementReferenceCount() {
     let count = 0;

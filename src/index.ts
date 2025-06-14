@@ -4,10 +4,16 @@ import { getOpenAICommonOptions, initConfig, initDir } from "./utils";
 import { createServer } from "./server";
 import { formatRequest } from "./middlewares/formatRequest";
 import { rewriteBody } from "./middlewares/rewriteBody";
+import { router } from "./middlewares/router";
 import OpenAI from "openai";
 import { streamOpenAIResponse } from "./utils/stream";
-import { cleanupPidFile, isServiceRunning, savePid } from "./utils/processCheck";
-
+import {
+  cleanupPidFile,
+  isServiceRunning,
+  savePid,
+} from "./utils/processCheck";
+import { LRUCache } from "lru-cache";
+import { log } from "./utils/log";
 
 async function initializeClaudeConfig() {
   const homeDir = process.env.HOME;
@@ -33,9 +39,14 @@ interface RunOptions {
   port?: number;
 }
 
-async function run(options: RunOptions = {}) {
-  const port = options.port || 3456;
+interface ModelProvider {
+  name: string;
+  api_base_url: string;
+  api_key: string;
+  models: string[];
+}
 
+async function run(options: RunOptions = {}) {
   // Check if service is already running
   if (isServiceRunning()) {
     console.log("✅ Service is already running in the background.");
@@ -44,20 +55,67 @@ async function run(options: RunOptions = {}) {
 
   await initializeClaudeConfig();
   await initDir();
-  await initConfig();
+  const config = await initConfig();
+
+  const Providers = new Map<string, ModelProvider>();
+  const providerCache = new LRUCache<string, OpenAI>({
+    max: 10,
+    ttl: 2 * 60 * 60 * 1000,
+  });
+
+  function getProviderInstance(providerName: string): OpenAI {
+    const provider: ModelProvider | undefined = Providers.get(providerName);
+    if (provider === undefined) {
+      throw new Error(`Provider ${providerName} not found`);
+    }
+    let openai = providerCache.get(provider.name);
+    if (!openai) {
+      openai = new OpenAI({
+        baseURL: provider.api_base_url,
+        apiKey: provider.api_key,
+        ...getOpenAICommonOptions(),
+      });
+      providerCache.set(provider.name, openai);
+    }
+    return openai;
+  }
+
+  if (Array.isArray(config.Providers)) {
+    config.Providers.forEach((provider) => {
+      try {
+        Providers.set(provider.name, provider);
+      } catch (error) {
+        console.error("Failed to parse model provider:", error);
+      }
+    });
+  }
+
+  if (config.OPENAI_API_KEY && config.OPENAI_BASE_URL && config.OPENAI_MODEL) {
+    const defaultProvider = {
+      name: "default",
+      api_base_url: config.OPENAI_BASE_URL,
+      api_key: config.OPENAI_API_KEY,
+      models: [config.OPENAI_MODEL],
+    };
+    Providers.set("default", defaultProvider);
+  } else if (Providers.size > 0) {
+    const defaultProvider = Providers.values().next().value!;
+    Providers.set("default", defaultProvider);
+  }
+  const port = options.port || 3456;
 
   // Save the PID of the background process
   savePid(process.pid);
 
   // Handle SIGINT (Ctrl+C) to clean up PID file
-  process.on('SIGINT', () => {
+  process.on("SIGINT", () => {
     console.log("Received SIGINT, cleaning up...");
     cleanupPidFile();
     process.exit(0);
   });
 
   // Handle SIGTERM to clean up PID file
-  process.on('SIGTERM', () => {
+  process.on("SIGTERM", () => {
     cleanupPidFile();
     process.exit(0);
   });
@@ -67,21 +125,27 @@ async function run(options: RunOptions = {}) {
     ? parseInt(process.env.SERVICE_PORT)
     : port;
 
-  const server = createServer(servicePort);
-  server.useMiddleware(formatRequest);
-  server.useMiddleware(rewriteBody);
-
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
-    ...getOpenAICommonOptions(),
+  const server = await createServer(servicePort);
+  server.useMiddleware((req, res, next) => {
+    console.log("Middleware triggered for request:", req.body.model);
+    req.config = config;
+    next();
   });
+  if (
+    config.Router?.background &&
+    config.Router?.think &&
+    config?.Router?.longContext
+  ) {
+    log("Using custom router middleware");
+    server.useMiddleware(router);
+  }
+  server.useMiddleware(rewriteBody);
+  server.useMiddleware(formatRequest);
+
   server.app.post("/v1/messages", async (req, res) => {
     try {
-      if (process.env.OPENAI_MODEL) {
-        req.body.model = process.env.OPENAI_MODEL;
-      }
-      const completion: any = await openai.chat.completions.create(req.body);
+      const provider = getProviderInstance(req.provider || "default");
+      const completion: any = await provider.chat.completions.create(req.body);
       await streamOpenAIResponse(res, completion, req.body.model, req.body);
     } catch (e) {
       console.error("Error in OpenAI API call:", e);
@@ -92,3 +156,4 @@ async function run(options: RunOptions = {}) {
 }
 
 export { run };
+// run();
