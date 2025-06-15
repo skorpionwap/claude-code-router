@@ -131,15 +131,14 @@ async function run(options: RunOptions = {}) {
     req.config = config;
     next();
   });
+  server.useMiddleware(rewriteBody);
   if (
     config.Router?.background &&
     config.Router?.think &&
     config?.Router?.longContext
   ) {
-    log("Using custom router middleware");
     server.useMiddleware(router);
   }
-  server.useMiddleware(rewriteBody);
   server.useMiddleware(formatRequest);
 
   server.app.post("/v1/messages", async (req, res) => {

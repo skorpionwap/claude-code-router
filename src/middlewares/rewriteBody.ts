@@ -28,16 +28,18 @@ export const rewriteBody = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!process.env.usePlugin) {
+  if (!req.config.usePlugins) {
     return next();
   }
-  const pluginPath = path.join(PLUGINS_DIR, `${process.env.usePlugin}.js`);
-  try {
-    await access(pluginPath);
-    const rewritePlugin = require(pluginPath);
-    rewritePlugin(req, res, next);
-  } catch (e) {
-    console.error(e);
-    next();
+  for (const plugin of req.config.usePlugins) {
+    const pluginPath = path.join(PLUGINS_DIR, `${plugin.trim()}.js`);
+    try {
+      await access(pluginPath);
+      const rewritePlugin = require(pluginPath);
+      await rewritePlugin(req, res);
+    } catch (e) {
+      console.error(e);
+    }
   }
+  next();
 };
