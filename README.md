@@ -25,7 +25,7 @@ npm install -g @musistudio/claude-code-router
 ccr code
 ```
 
-4. Configure routing[optional]
+4. Configure routing[optional]    
 Set up your `~/claude-code-router/config.json` file like this:
 ```json
 {

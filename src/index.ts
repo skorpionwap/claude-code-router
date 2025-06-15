@@ -138,6 +138,12 @@ async function run(options: RunOptions = {}) {
     config?.Router?.longContext
   ) {
     server.useMiddleware(router);
+  } else {
+    server.useMiddleware((req, res, next) => {
+      req.provider = "default";
+      req.body.model = config.OPENAI_MODEL;
+      next();
+    });
   }
   server.useMiddleware(formatRequest);
 

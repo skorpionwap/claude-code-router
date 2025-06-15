@@ -18,13 +18,13 @@ export async function executeCodeCommand(args: string[] = []) {
   // Increment reference count when command starts
   incrementReferenceCount();
 
-    // Execute claude command
-    const claudePath = process.env.CLAUDE_PATH || "claude";
-    const claudeProcess = spawn(claudePath, args, {
-        env,
-        stdio: "inherit",
-        shell: true
-    });
+  // Execute claude command
+  const claudePath = process.env.CLAUDE_PATH || "claude";
+  const claudeProcess = spawn(claudePath, args, {
+    env,
+    stdio: "inherit",
+    shell: true
+  });
 
   claudeProcess.on("error", (error) => {
     console.error("Failed to start claude command:", error.message);
