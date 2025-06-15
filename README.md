@@ -26,7 +26,7 @@ ccr code
 ```
 
 4. Configure routing[optional]    
-Set up your `~/claude-code-router/config.json` file like this:
+Set up your `~/.claude-code-router/config.json` file like this:
 ```json
 {
   "OPENAI_API_KEY": "sk-xxx",
