@@ -6,8 +6,7 @@
     "ccr": "./dist/cli.js"
   },
   "scripts": {
-    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js",
-    "buildserver": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js"
+    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js && cp node_modules/tiktoken/tiktoken_bg.wasm dist/tiktoken_bg.wasm"
   },
   "keywords": [
     "claude",
