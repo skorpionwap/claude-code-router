@@ -102,7 +102,7 @@ Note: claude code consumes a huge amount of tokens, but thanks to DeepSeek’s l
 Some interesting points: Based on my testing, including a lot of context information can help narrow the performance gap between these LLM models. For instance, when I used Claude-4 in VSCode Copilot to handle a Flutter issue, it messed up the files in three rounds of conversation, and I had to roll everything back. However, when I used claude code with DeepSeek, after three or four rounds of conversation, I finally managed to complete my task—and the cost was less than 1 RMB!
 
 ## Some articles:
-1. [Project Motivation and Principles](blog/en/project-motivation-and-how-it-works.md)  ([中文版看这里](blog/zh/project-motivation-and-how-it-works.md))
+1. [Project Motivation and Principles](blog/en/project-motivation-and-how-it-works.md)  ([中文版看这里](blog/zh/项目初衷及原理.md))
 
 ## Buy me a coffee
 If you find this project helpful, you can choose to sponsor the author with a cup of coffee.
