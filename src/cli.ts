@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 import { run } from "./index";
-import { closeService } from "./utils/close";
 import { showStatus } from "./utils/status";
 import { executeCodeCommand } from "./utils/codeCommand";
 import { cleanupPidFile, isServiceRunning } from "./utils/processCheck";
 import { version } from "../package.json";
+import { spawn } from "child_process";
+import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
+import { existsSync, readFileSync } from "fs";
 
 const command = process.argv[2];
 
 const HELP_TEXT = `
-Usage: claude-code [command]
+Usage: ccr [command]
 
 Commands:
   start         Start service 
@@ -20,8 +22,8 @@ Commands:
   -h, help      Show help information
 
 Example:
-  claude-code start
-  claude-code code "Write a Hello World"
+  ccr start
+  ccr code "Write a Hello World"
 `;
 
 async function waitForService(
@@ -42,10 +44,6 @@ async function waitForService(
   }
   return false;
 }
-
-import { spawn } from "child_process";
-import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
-import { existsSync, readFileSync } from "fs";
 
 async function main() {
   switch (command) {
@@ -80,15 +78,23 @@ async function main() {
     case "code":
       if (!isServiceRunning()) {
         console.log("Service not running, starting service...");
-        spawn("ccr", ["start"], {
+        const startProcess = spawn("ccr", ["start"], {
           detached: true,
           stdio: "ignore",
-        }).unref();
+        });
+
+        startProcess.on("error", (error) => {
+          console.error("Failed to start service:", error);
+          process.exit(1);
+        });
+
+        startProcess.unref();
+
         if (await waitForService()) {
           executeCodeCommand(process.argv.slice(3));
         } else {
           console.error(
-            "Service startup timeout, please manually run claude-code start to start the service"
+            "Service startup timeout, please manually run `ccr start` to start the service"
           );
           process.exit(1);
         }
@@ -98,7 +104,7 @@ async function main() {
       break;
     case "-v":
     case "version":
-      console.log(`claude-code version: ${version}`);
+      console.log(`claude-code-router version: ${version}`);
       break;
     case "-h":
     case "help":
