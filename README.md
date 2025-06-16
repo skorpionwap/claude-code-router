@@ -107,3 +107,8 @@ Some interesting points: Based on my testing, including a lot of context informa
 ## Buy me a coffee
 If you find this project helpful, you can choose to sponsor the author with a cup of coffee.
 [Buy me a coffee](http://paypal.me/musistudio1999)
+
+## Sponsors
+Thanks to the following sponsors:
+
+@Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)
