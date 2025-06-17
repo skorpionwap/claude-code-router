@@ -6,6 +6,14 @@ import { log } from "../utils/log";
 const enc = get_encoding("cl100k_base");
 
 const getUseModel = (req: Request, tokenCount: number) => {
+  const [provider, model] = req.body.model.split(",");
+  if (provider && model) {
+    return {
+      provider,
+      model,
+    };
+  }
+
   // if tokenCount is greater than 32K, use the long context model
   if (tokenCount > 1000 * 32) {
     log("Using long context model due to token count:", tokenCount);
@@ -28,13 +36,6 @@ const getUseModel = (req: Request, tokenCount: number) => {
   if (req.body.thinking) {
     log("Using think model for ", req.body.thinking);
     const [provider, model] = req.config.Router!.think.split(",");
-    return {
-      provider,
-      model,
-    };
-  }
-  const [provider, model] = req.body.model.split(",");
-  if (provider && model) {
     return {
       provider,
       model,
