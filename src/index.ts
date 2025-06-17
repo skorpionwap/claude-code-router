@@ -127,7 +127,6 @@ async function run(options: RunOptions = {}) {
 
   const server = await createServer(servicePort);
   server.useMiddleware((req, res, next) => {
-    console.log("Middleware triggered for request:", req.body.model);
     req.config = config;
     next();
   });
@@ -153,7 +152,7 @@ async function run(options: RunOptions = {}) {
       const completion: any = await provider.chat.completions.create(req.body);
       await streamOpenAIResponse(res, completion, req.body.model, req.body);
     } catch (e) {
-      console.error("Error in OpenAI API call:", e);
+      log("Error in OpenAI API call:", e);
     }
   });
   server.start();
