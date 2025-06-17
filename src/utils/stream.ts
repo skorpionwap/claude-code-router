@@ -58,15 +58,26 @@ export async function streamOpenAIResponse(
       type: "message",
       role: "assistant",
       // @ts-ignore
-      content: completion.choices[0].message.content || completion.choices[0].message.tool_calls?.map((item) => {
-        return {
-          type: 'tool_use',
-          id: item.id,
-          name: item.function?.name,
-          input: item.function?.arguments ? JSON.parse(item.function.arguments) : {},
-        };
-      }) || '',
-      stop_reason: completion.choices[0].finish_reason === 'tool_calls' ? "tool_use" : "end_turn",
+      content: completion.choices[0].message.content ||
+        completion.choices[0].message.tool_calls?.map((item) => {
+          return {
+            type: "tool_use",
+            id: item.id,
+            name: item.function?.name,
+            input: item.function?.arguments
+              ? JSON.parse(item.function.arguments)
+              : {},
+          };
+        }) || [
+          {
+            type: "text",
+            text: "",
+          },
+        ],
+      stop_reason:
+        completion.choices[0].finish_reason === "tool_calls"
+          ? "tool_use"
+          : "end_turn",
       stop_sequence: null,
       usage: {
         input_tokens: 100,
