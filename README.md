@@ -96,7 +96,7 @@ To use a plugin, place it in the ~/.claude-code-router/plugins/ directory and sp
 // ~/.claud-code-router/config.json
 {
   ...,
-  "usePlugins": ["notebook-tools-filter", "toolcall-improvement*"]
+  "usePlugins": ["notebook-tools-filter", "toolcall-improvement"]
 }
 ```
 
@@ -135,8 +135,9 @@ Some interesting points: Based on my testing, including a lot of context informa
 
 ## Buy me a coffee
 
-If you find this project helpful, you can choose to sponsor the author with a cup of coffee.
-[Buy me a coffee](https://ko-fi.com/musistudio)
+If you find this project helpful, you can choose to sponsor the author with a cup of coffee.    
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/musistudio)
 
 <div style="display: flex; justify-content: space-between;gap:10px;">
   <img src="blog/images/alipay.jpg" alt="alipay" style="width:48%" />
@@ -147,4 +148,5 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 
 Thanks to the following sponsors:
 
-@Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)
+@Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)    
+[@duanshuaimin](https://github.com/duanshuaimin)
