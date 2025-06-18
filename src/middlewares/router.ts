@@ -68,7 +68,11 @@ export const router = async (
                 JSON.stringify(contentPart.input)
               ).length;
             } else if (contentPart.type === "tool_result") {
-              tokenCount += enc.encode(contentPart.content || "").length;
+              tokenCount += enc.encode(
+                typeof contentPart.content === "string"
+                  ? contentPart.content
+                  : JSON.stringify(contentPart.content)
+              ).length;
             }
           });
         }
