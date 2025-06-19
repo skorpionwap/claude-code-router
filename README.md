@@ -86,7 +86,7 @@ ccr code
 
 - [x] Plugins
 - [x] Support change models
-- [ ] Support scheduled tasks
+- [x] Github Actions
 
 ## Plugins
 You can modify or enhance Claude Code’s functionality by installing plugins. The mechanism works by using middleware to modify request parameters — this allows you to rewrite prompts or add/remove tools.
@@ -115,6 +115,79 @@ This plugin simply adds the following system prompt. If you have a better prompt
 You must use tools as frequently and accurately as possible to help the user solve their problem.  
 Prioritize tool usage whenever it can enhance accuracy, efficiency, or the quality of the response.
 ```
+
+
+## Github Actions
+You just need to install `Claude Code Actions` in your repository according to the [official documentation](https://docs.anthropic.com/en/docs/claude-code/github-actions). For `ANTHROPIC_API_KEY`, you can use any string. Then, modify your `.github/workflows/claude.yaml` file to include claude-code-router, like this:
+```yaml
+name: Claude Code
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Prepare Environment
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          mkdir -p $HOME/.claude-code-router
+          cat << 'EOF' > $HOME/.claude-code-router/config.json
+          {
+            "log": true,
+            "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
+            "OPENAI_BASE_URL": "https://api.deepseek.com",
+            "OPENAI_MODEL": "deepseek-chat"
+          }
+          EOF
+        shell: bash
+        
+      - name: Start Claude Code Router
+        run: |
+          nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.8 start &
+        shell: bash
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        env:
+          ANTHROPIC_BASE_URL: http://localhost:3456
+        with:
+          anthropic_api_key: "test"
+```
+You can modify the contents of `$HOME/.claude-code-router/config.json` as needed.
+GitHub Actions support allows you to trigger Claude Code at specific times, which opens up some interesting possibilities.
+
+For example, between 00:30 and 08:30 Beijing Time, using the official DeepSeek API:
+
+- The cost of the `deepseek-v3` model is only 50% of the normal time.
+
+- The `deepseek-r1` model is just 25% of the normal time.
+
+So maybe in the future, I’ll describe detailed tasks for Claude Code ahead of time and let it run during these discounted hours to reduce costs?
 
 
 ## Some tips:
