@@ -135,13 +135,13 @@ Some interesting points: Based on my testing, including a lot of context informa
 
 ## Buy me a coffee
 
-If you find this project helpful, you can choose to sponsor the author with a cup of coffee.    
+If you find this project helpful, you can choose to sponsor the author with a cup of coffee. Please provide your GitHub information so I can add you to the sponsor list below.  
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/musistudio)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F31GN2GM)
 
 <div style="display: flex; justify-content: space-between;gap:10px;">
-  <img src="blog/images/alipay.jpg" alt="alipay" style="width:48%" />
-  <img src="blog/images/wechat.jpg" alt="wechat" style="width:48%"/>
+  <img src="blog/images/alipay.jpg" alt="alipay" style=" max-height: 300px;" />
+  <img src="blog/images/wechat.jpg" alt="wechat" style=" max-height: 300px;"/>
 </div>
 
 ## Sponsors
@@ -149,4 +149,6 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 Thanks to the following sponsors:
 
 @Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)    
-[@duanshuaimin](https://github.com/duanshuaimin)
+[@duanshuaimin](https://github.com/duanshuaimin)     
+[@vrgitadmin](https://github.com/vrgitadmin)     
+@*o(看到后可通过主页邮箱联系我修改github用户名)
