@@ -84,9 +84,10 @@ ccr code
 
 ## Features
 
-- [x] Plugins
 - [x] Support change models
 - [x] Github Actions
+- [ ] More robust plugin support
+- [ ] More detailed logs
 
 ## Plugins
 You can modify or enhance Claude Code’s functionality by installing plugins. The mechanism works by using middleware to modify request parameters — this allows you to rewrite prompts or add/remove tools.
@@ -212,10 +213,8 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F31GN2GM)
 
-<div style="display: flex; justify-content: space-between;gap:10px;">
-  <img src="blog/images/alipay.jpg" alt="alipay" style=" max-height: 300px;" />
-  <img src="blog/images/wechat.jpg" alt="wechat" style=" max-height: 300px;"/>
-</div>
+| ![alipay](/blog/images/alipay.jpg) | ![wechat](/blog/images/wechat.jpg) |
+|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
 
 ## Sponsors
 
