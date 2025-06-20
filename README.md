@@ -213,8 +213,12 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F31GN2GM)
 
-| ![alipay](/blog/images/alipay.jpg) | ![wechat](/blog/images/wechat.jpg) |
-|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+<table>
+  <tr>
+    <td><img src="/blog/images/alipay.jpg" width="200" /></td>
+    <td><img src="/blog/images/wechat.jpg" width="200" /></td>
+  </tr>
+</table>
 
 ## Sponsors
 
@@ -223,4 +227,7 @@ Thanks to the following sponsors:
 @Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)    
 [@duanshuaimin](https://github.com/duanshuaimin)     
 [@vrgitadmin](https://github.com/vrgitadmin)     
-@*o(看到后可通过主页邮箱联系我修改github用户名)
+@*o   (可通过主页邮箱联系我修改github用户名)     
+@**聪 (可通过主页邮箱联系我修改github用户名)     
+@*说  (可通过主页邮箱联系我修改github用户名)     
+@*更  (可通过主页邮箱联系我修改github用户名)     
