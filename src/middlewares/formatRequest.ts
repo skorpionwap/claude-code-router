@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { MessageCreateParamsBase } from "@anthropic-ai/sdk/resources/messages";
 import OpenAI from "openai";
-import { streamOpenAIResponse } from "../utils/stream";
 import { log } from "../utils/log";
 
 export const formatRequest = async (
@@ -19,7 +18,7 @@ export const formatRequest = async (
     tools,
     stream,
   }: MessageCreateParamsBase = req.body;
-  log("formatRequest: ", req.body);
+  log("beforeTransformRequest: ", req.body);
   try {
     // @ts-ignore
     const openAIMessages = Array.isArray(messages)
@@ -50,6 +49,7 @@ export const formatRequest = async (
 
             anthropicMessage.content.forEach((contentPart) => {
               if (contentPart.type === "text") {
+                if (contentPart.text.includes("(no content)")) return;
                 textContent +=
                   (typeof contentPart.text === "string"
                     ? contentPart.text
@@ -112,17 +112,18 @@ export const formatRequest = async (
             });
 
             const trimmedUserText = userTextMessageContent.trim();
+            // @ts-ignore
+            openAiMessagesFromThisAnthropicMessage.push(
+              // @ts-ignore
+              ...subsequentToolMessages
+            );
+
             if (trimmedUserText.length > 0) {
               openAiMessagesFromThisAnthropicMessage.push({
                 role: "user",
                 content: trimmedUserText,
               });
             }
-            // @ts-ignore
-            openAiMessagesFromThisAnthropicMessage.push(
-              // @ts-ignore
-              ...subsequentToolMessages
-            );
           } else {
             // Fallback for other roles (e.g. system, or custom roles if they were to appear here with array content)
             // This will combine all text parts into a single message for that role.
@@ -180,30 +181,9 @@ export const formatRequest = async (
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
     req.body = data;
-    console.log(JSON.stringify(data.messages, null, 2));
+    log("afterTransformRequest: ", req.body);
   } catch (error) {
-    console.error("Error in request processing:", error);
-    const errorCompletion: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk> =
-      {
-        async *[Symbol.asyncIterator]() {
-          yield {
-            id: `error_${Date.now()}`,
-            created: Math.floor(Date.now() / 1000),
-            model,
-            object: "chat.completion.chunk",
-            choices: [
-              {
-                index: 0,
-                delta: {
-                  content: `Error: ${(error as Error).message}`,
-                },
-                finish_reason: "stop",
-              },
-            ],
-          };
-        },
-      };
-    await streamOpenAIResponse(res, errorCompletion, model, req.body);
+    log("Error in TransformRequest:", error);
   }
   next();
 };

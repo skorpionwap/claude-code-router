@@ -8,6 +8,7 @@ import {
   HOME_DIR,
   PLUGINS_DIR,
 } from "../constants";
+import crypto from "node:crypto";
 
 export function getOpenAICommonOptions(): ClientOptions {
   const options: ClientOptions = {};
@@ -89,4 +90,8 @@ export const createClient = (options: ClientOptions) => {
     ...getOpenAICommonOptions(),
   });
   return client;
+};
+
+export const sha256 = (data: string | Buffer): string => {
+  return crypto.createHash("sha256").update(data).digest("hex");
 };

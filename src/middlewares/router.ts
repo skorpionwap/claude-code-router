@@ -41,9 +41,11 @@ const getUseModel = (req: Request, tokenCount: number) => {
       model,
     };
   }
+  const [defaultProvider, defaultModel] =
+    req.config.Router!.default?.split(",");
   return {
-    provider: "default",
-    model: req.config.OPENAI_MODEL,
+    provider: defaultProvider || "default",
+    model: defaultModel || req.config.OPENAI_MODEL,
   };
 };
 

@@ -3,7 +3,6 @@ import { writeFile } from "fs/promises";
 import { getOpenAICommonOptions, initConfig, initDir } from "./utils";
 import { createServer } from "./server";
 import { formatRequest } from "./middlewares/formatRequest";
-import { rewriteBody } from "./middlewares/rewriteBody";
 import { router } from "./middlewares/router";
 import OpenAI from "openai";
 import { streamOpenAIResponse } from "./utils/stream";
@@ -14,6 +13,11 @@ import {
 } from "./utils/processCheck";
 import { LRUCache } from "lru-cache";
 import { log } from "./utils/log";
+import {
+  loadPlugins,
+  PLUGINS,
+  usePluginMiddleware,
+} from "./middlewares/plugin";
 
 async function initializeClaudeConfig() {
   const homeDir = process.env.HOME;
@@ -44,6 +48,7 @@ interface ModelProvider {
   api_base_url: string;
   api_key: string;
   models: string[];
+  usePlugins?: string[];
 }
 
 async function run(options: RunOptions = {}) {
@@ -56,6 +61,7 @@ async function run(options: RunOptions = {}) {
   await initializeClaudeConfig();
   await initDir();
   const config = await initConfig();
+  await loadPlugins(config.usePlugins || []);
 
   const Providers = new Map<string, ModelProvider>();
   const providerCache = new LRUCache<string, OpenAI>({
@@ -63,7 +69,7 @@ async function run(options: RunOptions = {}) {
     ttl: 2 * 60 * 60 * 1000,
   });
 
-  function getProviderInstance(providerName: string): OpenAI {
+  async function getProviderInstance(providerName: string): Promise<OpenAI> {
     const provider: ModelProvider | undefined = Providers.get(providerName);
     if (provider === undefined) {
       throw new Error(`Provider ${providerName} not found`);
@@ -76,6 +82,10 @@ async function run(options: RunOptions = {}) {
         ...getOpenAICommonOptions(),
       });
       providerCache.set(provider.name, openai);
+    }
+    const plugins = provider.usePlugins || [];
+    if (plugins.length > 0) {
+      await loadPlugins(plugins.map((name) => `${providerName},${name}`));
     }
     return openai;
   }
@@ -130,7 +140,7 @@ async function run(options: RunOptions = {}) {
     req.config = config;
     next();
   });
-  server.useMiddleware(rewriteBody);
+  server.useMiddleware(usePluginMiddleware("beforeRouter"));
   if (
     config.Router?.background &&
     config.Router?.think &&
@@ -144,15 +154,22 @@ async function run(options: RunOptions = {}) {
       next();
     });
   }
+  server.useMiddleware(usePluginMiddleware("afterRouter"));
+  server.useMiddleware(usePluginMiddleware("beforeTransformRequest"));
   server.useMiddleware(formatRequest);
+  server.useMiddleware(usePluginMiddleware("afterTransformRequest"));
 
   server.app.post("/v1/messages", async (req, res) => {
     try {
-      const provider = getProviderInstance(req.provider || "default");
+      const provider = await getProviderInstance(req.provider || "default");
+      log("final request body:", req.body);
       const completion: any = await provider.chat.completions.create(req.body);
-      await streamOpenAIResponse(res, completion, req.body.model, req.body);
+      await streamOpenAIResponse(req, res, completion);
     } catch (e) {
       log("Error in OpenAI API call:", e);
+      res.status(500).json({
+        error: e.message,
+      });
     }
   });
   server.start();

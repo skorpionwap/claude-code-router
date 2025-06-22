@@ -11,6 +11,7 @@ if (!fs.existsSync(HOME_DIR)) {
 
 export function log(...args: any[]) {
   // Check if logging is enabled via environment variable
+  // console.log(...args); // Log to console for immediate feedback
   const isLogEnabled = process.env.LOG === "true";
 
   if (!isLogEnabled) {
