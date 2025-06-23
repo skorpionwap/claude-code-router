@@ -88,6 +88,8 @@ ccr code
 - [x] Github Actions
 - [ ] More robust plugin support
 - [ ] More detailed logs
+- [ ] Support image
+- [ ] Support web search
 
 ## Plugins
 You can modify or enhance Claude Code’s functionality by installing plugins. The mechanism works by using middleware to modify request parameters — this allows you to rewrite prompts or add/remove tools.
@@ -228,6 +230,7 @@ Thanks to the following sponsors:
 [@duanshuaimin](https://github.com/duanshuaimin)     
 [@vrgitadmin](https://github.com/vrgitadmin)     
 @*o   (可通过主页邮箱联系我修改github用户名)     
-@**聪 (可通过主页邮箱联系我修改github用户名)     
+[@ceilwoo](https://github.com/ceilwoo)      
 @*说  (可通过主页邮箱联系我修改github用户名)     
-@*更  (可通过主页邮箱联系我修改github用户名)     
+@*更  (可通过主页邮箱联系我修改github用户名)  
+@K*g  (可通过主页邮箱联系我修改github用户名)         
