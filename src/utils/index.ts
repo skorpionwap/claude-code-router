@@ -15,6 +15,8 @@ export function getOpenAICommonOptions(): ClientOptions {
     options.httpAgent = new HttpsProxyAgent(process.env.PROXY_URL);
   } else if (process.env.HTTPS_PROXY) {
     options.httpAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
+  } else if (process.env.https_proxy) {
+    options.httpAgent = new HttpsProxyAgent(process.env.https_proxy);
   }
   return options;
 }
