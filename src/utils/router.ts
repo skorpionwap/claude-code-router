@@ -1,57 +1,32 @@
 import { MessageCreateParamsBase } from "@anthropic-ai/sdk/resources/messages";
-import { Request, Response, NextFunction } from "express";
 import { get_encoding } from "tiktoken";
-import { log } from "../utils/log";
+import { log } from "./log";
 
 const enc = get_encoding("cl100k_base");
 
-const getUseModel = (req: Request, tokenCount: number) => {
-  const [provider, model] = req.body.model.split(",");
-  if (provider && model) {
-    return {
-      provider,
-      model,
-    };
+const getUseModel = (req: any, tokenCount: number, config: any) => {
+  if (req.body.model.includes(",")) {
+    return req.body.model;
   }
-
-  // if tokenCount is greater than 32K, use the long context model
-  if (tokenCount > 1000 * 32) {
+  // if tokenCount is greater than 60K, use the long context model
+  if (tokenCount > 1000 * 60) {
     log("Using long context model due to token count:", tokenCount);
-    const [provider, model] = req.config.Router!.longContext.split(",");
-    return {
-      provider,
-      model,
-    };
+    return config.Router!.longContext;
   }
   // If the model is claude-3-5-haiku, use the background model
   if (req.body.model?.startsWith("claude-3-5-haiku")) {
     log("Using background model for ", req.body.model);
-    const [provider, model] = req.config.Router!.background.split(",");
-    return {
-      provider,
-      model,
-    };
+    return config.Router!.background;
   }
   // if exits thinking, use the think model
   if (req.body.thinking) {
     log("Using think model for ", req.body.thinking);
-    const [provider, model] = req.config.Router!.think.split(",");
-    return {
-      provider,
-      model,
-    };
+    return config.Router!.think;
   }
-  return {
-    provider: "default",
-    model: req.config.OPENAI_MODEL,
-  };
+  return config.Router!.default;
 };
 
-export const router = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const router = async (req: any, res: any, config: any) => {
   const { messages, system = [], tools }: MessageCreateParamsBase = req.body;
   try {
     let tokenCount = 0;
@@ -102,14 +77,11 @@ export const router = async (
         }
       });
     }
-    const { provider, model } = getUseModel(req, tokenCount);
-    req.provider = provider;
+    const model = getUseModel(req, tokenCount, config);
     req.body.model = model;
-  } catch (error) {
+  } catch (error: any) {
     log("Error in router middleware:", error.message);
-    req.provider = "default";
-    req.body.model = req.config.OPENAI_MODEL;
-  } finally {
-    next();
+    req.body.model = config.Router!.default;
   }
+  return;
 };

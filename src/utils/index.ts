@@ -1,5 +1,3 @@
-import { HttpsProxyAgent } from "https-proxy-agent";
-import OpenAI, { ClientOptions } from "openai";
 import fs from "node:fs/promises";
 import readline from "node:readline";
 import {
@@ -8,16 +6,6 @@ import {
   HOME_DIR,
   PLUGINS_DIR,
 } from "../constants";
-
-export function getOpenAICommonOptions(): ClientOptions {
-  const options: ClientOptions = {};
-  if (process.env.PROXY_URL) {
-    options.httpAgent = new HttpsProxyAgent(process.env.PROXY_URL);
-  } else if (process.env.HTTPS_PROXY) {
-    options.httpAgent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
-  }
-  return options;
-}
 
 const ensureDir = async (dir_path: string) => {
   try {
@@ -63,9 +51,17 @@ export const readConfigFile = async () => {
     const baseUrl = await question("Enter OPENAI_BASE_URL: ");
     const model = await question("Enter OPENAI_MODEL: ");
     const config = Object.assign({}, DEFAULT_CONFIG, {
-      OPENAI_API_KEY: apiKey,
-      OPENAI_BASE_URL: baseUrl,
-      OPENAI_MODEL: model,
+      Providers: [
+        {
+          name: "openai",
+          api_base_url: baseUrl,
+          api_key: apiKey,
+          models: [model],
+        },
+      ],
+      Router: {
+        default: `openai,${model}`,
+      },
     });
     await writeConfigFile(config);
     return config;
@@ -81,12 +77,4 @@ export const initConfig = async () => {
   const config = await readConfigFile();
   Object.assign(process.env, config);
   return config;
-};
-
-export const createClient = (options: ClientOptions) => {
-  const client = new OpenAI({
-    ...options,
-    ...getOpenAICommonOptions(),
-  });
-  return client;
 };

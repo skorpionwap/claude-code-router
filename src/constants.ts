@@ -13,7 +13,7 @@ export const REFERENCE_COUNT_FILE = '/tmp/claude-code-reference-count.txt';
 
 
 export const DEFAULT_CONFIG = {
-  log: false,
+  LOG: false,
   OPENAI_API_KEY: "",
   OPENAI_BASE_URL: "",
   OPENAI_MODEL: "",

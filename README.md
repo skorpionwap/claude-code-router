@@ -29,13 +29,11 @@ ccr code
 
 ```json
 {
-  "OPENAI_API_KEY": "sk-xxx",
-  "OPENAI_BASE_URL": "https://api.deepseek.com",
-  "OPENAI_MODEL": "deepseek-chat",
   "Providers": [
     {
       "name": "openrouter",
-      "api_base_url": "https://openrouter.ai/api/v1",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
       "api_key": "sk-xxx",
       "models": [
         "google/gemini-2.5-pro-preview",
@@ -46,18 +44,48 @@ ccr code
     },
     {
       "name": "deepseek",
-      "api_base_url": "https://api.deepseek.com",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "https://api.deepseek.com/chat/completions",
       "api_key": "sk-xxx",
-      "models": ["deepseek-reasoner"]
+      "models": ["deepseek-chat", "deepseek-reasoner"],
+      "transformer": {
+        "use": ["deepseek"],
+        "deepseek-chat": {
+          // Enhance tool usage for the deepseek-chat model using the ToolUse transformer.
+          "use": ["tooluse"]
+        }
+      }
     },
     {
       "name": "ollama",
-      "api_base_url": "http://localhost:11434/v1",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "http://localhost:11434/v1/chat/completions",
       "api_key": "ollama",
       "models": ["qwen2.5-coder:latest"]
+    },
+    {
+      "name": "gemini",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "https://generativelanguage.googleapis.com/v1beta/models/",
+      "api_key": "sk-xxx",
+      "models": ["gemini-2.5-flash", "gemini-2.5-pro"],
+      "transformer": {
+        "use": ["gemini"]
+      }
+    },
+    {
+      "name": "volcengine",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "api_key": "sk-xxx",
+      "models": ["deepseek-v3-250324", "deepseek-r1-250528"],
+      "transformer": {
+        "use": ["deepseek"]
+      }
     }
   ],
   "Router": {
+    "default": "deepseek,deepseek-chat", // IMPORTANT OPENAI_MODEL has been deprecated
     "background": "ollama,qwen2.5-coder:latest",
     "think": "deepseek,deepseek-reasoner",
     "longContext": "openrouter,google/gemini-2.5-pro-preview"
@@ -86,40 +114,12 @@ ccr code
 
 - [x] Support change models
 - [x] Github Actions
-- [ ] More robust plugin support
 - [ ] More detailed logs
 
-## Plugins
-You can modify or enhance Claude Code’s functionality by installing plugins. The mechanism works by using middleware to modify request parameters — this allows you to rewrite prompts or add/remove tools.
-
-To use a plugin, place it in the ~/.claude-code-router/plugins/ directory and specify the plugin name in config.js using the `usePlugins` option.like this
-```json
-// ~/.claud-code-router/config.json
-{
-  ...,
-  "usePlugins": ["notebook-tools-filter", "toolcall-improvement"]
-}
-```
-
-Currently, the following plugins are available:
-
-
-- **notebook-tools-filter**    
-This plugin filters out tool calls related to Jupyter notebooks (.ipynb files). You can use it if your work does not involve Jupyter.
-
-
-- **toolcall-improvement**    
-If your LLM doesn’t handle tool usage well (for example, always returning code as plain text instead of modifying files — such as with deepseek-v3), you can use this plugin.    
-This plugin simply adds the following system prompt. If you have a better prompt, you can modify it.
-```markdown
-## **Important Instruction:**  
-You must use tools as frequently and accurately as possible to help the user solve their problem.  
-Prioritize tool usage whenever it can enhance accuracy, efficiency, or the quality of the response.
-```
-
-
 ## Github Actions
+
 You just need to install `Claude Code Actions` in your repository according to the [official documentation](https://docs.anthropic.com/en/docs/claude-code/github-actions). For `ANTHROPIC_API_KEY`, you can use any string. Then, modify your `.github/workflows/claude.yaml` file to include claude-code-router, like this:
+
 ```yaml
 name: Claude Code
 
@@ -151,7 +151,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      
+
       - name: Prepare Environment
         run: |
           curl -fsSL https://bun.sh/install | bash
@@ -165,7 +165,7 @@ jobs:
           }
           EOF
         shell: bash
-        
+
       - name: Start Claude Code Router
         run: |
           nohup ~/.bun/bin/bunx @musistudio/claude-code-router@1.0.8 start &
@@ -179,6 +179,7 @@ jobs:
         with:
           anthropic_api_key: "test"
 ```
+
 You can modify the contents of `$HOME/.claude-code-router/config.json` as needed.
 GitHub Actions support allows you to trigger Claude Code at specific times, which opens up some interesting possibilities.
 
@@ -189,7 +190,6 @@ For example, between 00:30 and 08:30 Beijing Time, using the official DeepSeek A
 - The `deepseek-r1` model is just 25% of the normal time.
 
 So maybe in the future, I’ll describe detailed tasks for Claude Code ahead of time and let it run during these discounted hours to reduce costs?
-
 
 ## Some tips:
 
@@ -205,11 +205,12 @@ Some interesting points: Based on my testing, including a lot of context informa
 
 ## Some articles:
 
-1. [Project Motivation and Principles](blog/en/project-motivation-and-how-it-works.md) ([中文版看这里](blog/zh/项目初衷及原理.md))
+1. [Project Motivation and Principles](blog/en/project-motivation-and-how-it-works.md) ([项目初衷及原理](blog/zh/项目初衷及原理.md))
+2. [Maybe We Can Do More with the Router](blog/en/maybe-we-can-do-more-with-the-route.md) ([或许我们能在 Router 中做更多事情](blog/zh/或许我们能在Router中做更多事情.md))
 
 ## Buy me a coffee
 
-If you find this project helpful, you can choose to sponsor the author with a cup of coffee. Please provide your GitHub information so I can add you to the sponsor list below.  
+If you find this project helpful, you can choose to sponsor the author with a cup of coffee. Please provide your GitHub information so I can add you to the sponsor list below.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F31GN2GM)
 
@@ -224,10 +225,16 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 
 Thanks to the following sponsors:
 
-@Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)    
-[@duanshuaimin](https://github.com/duanshuaimin)     
-[@vrgitadmin](https://github.com/vrgitadmin)     
-@*o   (可通过主页邮箱联系我修改github用户名)     
-@**聪 (可通过主页邮箱联系我修改github用户名)     
-@*说  (可通过主页邮箱联系我修改github用户名)     
-@*更  (可通过主页邮箱联系我修改github用户名)     
+@Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)  
+[@duanshuaimin](https://github.com/duanshuaimin)  
+[@vrgitadmin](https://github.com/vrgitadmin)  
+@\*o (可通过主页邮箱联系我修改 github 用户名)  
+@\*\*聪 (可通过主页邮箱联系我修改 github 用户名)  
+@\*说 (可通过主页邮箱联系我修改 github 用户名)  
+@\*更 (可通过主页邮箱联系我修改 github 用户名)  
+@\*更 (可通过主页邮箱联系我修改 github 用户名)  
+@K\*g (可通过主页邮箱联系我修改 github 用户名)  
+@R\*R (可通过主页邮箱联系我修改 github 用户名)  
+@[@bobleer](https://github.com/bobleer) (可通过主页邮箱联系我修改 github 用户名)  
+@\*苗 (可通过主页邮箱联系我修改 github 用户名)  
+@\*划 (可通过主页邮箱联系我修改 github 用户名)
