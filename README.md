@@ -115,6 +115,8 @@ ccr code
 - [x] Support change models
 - [x] Github Actions
 - [ ] More detailed logs
+- [ ] Support image
+- [ ] Support web search
 
 ## Github Actions
 
@@ -229,7 +231,7 @@ Thanks to the following sponsors:
 [@duanshuaimin](https://github.com/duanshuaimin)  
 [@vrgitadmin](https://github.com/vrgitadmin)  
 @\*o (可通过主页邮箱联系我修改 github 用户名)  
-@\*\*聪 (可通过主页邮箱联系我修改 github 用户名)  
+[@ceilwoo](https://github.com/ceilwoo)      
 @\*说 (可通过主页邮箱联系我修改 github 用户名)  
 @\*更 (可通过主页邮箱联系我修改 github 用户名)  
 @\*更 (可通过主页邮箱联系我修改 github 用户名)  
