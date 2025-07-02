@@ -225,7 +225,7 @@ If you find this project helpful, you can choose to sponsor the author with a cu
 
 ## Sponsors
 
-Thanks to the following sponsors:
+Thanks to the following sponsors for supporting the continued development of this project:
 
 @Simon Leischnig (If you see this, feel free to contact me and I can update it with your GitHub information)  
 [@duanshuaimin](https://github.com/duanshuaimin)  
@@ -233,7 +233,6 @@ Thanks to the following sponsors:
 @\*o (可通过主页邮箱联系我修改 github 用户名)  
 [@ceilwoo](https://github.com/ceilwoo)      
 @\*说 (可通过主页邮箱联系我修改 github 用户名)  
-@\*更 (可通过主页邮箱联系我修改 github 用户名)  
 @\*更 (可通过主页邮箱联系我修改 github 用户名)  
 @K\*g (可通过主页邮箱联系我修改 github 用户名)  
 @R\*R (可通过主页邮箱联系我修改 github 用户名)  
