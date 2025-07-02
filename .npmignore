@@ -9,3 +9,6 @@ screenshoots
 .env
 .blog
 docs
+.log
+blog
+config.json
