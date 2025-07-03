@@ -10,6 +10,7 @@ import {
   isServiceRunning,
   savePid,
 } from "./utils/processCheck";
+import { CONFIG_FILE } from "./constants";
 
 async function initializeClaudeConfig() {
   const homeDir = process.env.HOME;
@@ -69,10 +70,17 @@ async function run(options: RunOptions = {}) {
     ? parseInt(process.env.SERVICE_PORT)
     : port;
   const server = createServer({
-    ...config,
-    providers: config.Providers || config.providers,
-    PORT: servicePort,
-    LOG_FILE: join(homedir(), ".claude-code-router", "claude-code-router.log"),
+    jsonPath: CONFIG_FILE,
+    initialConfig: {
+      // ...config,
+      providers: config.Providers || config.providers,
+      PORT: servicePort,
+      LOG_FILE: join(
+        homedir(),
+        ".claude-code-router",
+        "claude-code-router.log"
+      ),
+    },
   });
   server.addHook("preHandler", async (req, reply) =>
     router(req, reply, config)
