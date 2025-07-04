@@ -40,7 +40,10 @@ ccr code
         "anthropic/claude-sonnet-4",
         "anthropic/claude-3.5-sonnet",
         "anthropic/claude-3.7-sonnet:thinking"
-      ]
+      ],
+      "transformer": {
+        "use": ["openrouter"]
+      }
     },
     {
       "name": "deepseek",
