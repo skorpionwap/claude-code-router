@@ -242,5 +242,6 @@ Thanks to the following sponsors for supporting the continued development of thi
 [@bobleer](https://github.com/bobleer)     
 @\*苗 (可通过主页邮箱联系我修改 github 用户名)  
 @\*划 (可通过主页邮箱联系我修改 github 用户名)     
-[@Clarence-pan](https://github.com/Clarence-pan)
-[@carter003](https://github.com/carter003)
+[@Clarence-pan](https://github.com/Clarence-pan)     
+[@carter003](https://github.com/carter003)      
+@S\*r (可通过主页邮箱联系我修改 github 用户名) 
