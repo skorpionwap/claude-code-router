@@ -13,8 +13,8 @@ import {
 import { CONFIG_FILE } from "./constants";
 
 async function initializeClaudeConfig() {
-  const homeDir = process.env.HOME;
-  const configPath = `${homeDir}/.claude.json`;
+  const homeDir = homedir();
+  const configPath = join(homeDir, ".claude.json");
   if (!existsSync(configPath)) {
     const userID = Array.from(
       { length: 64 },
