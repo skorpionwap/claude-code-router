@@ -6,7 +6,7 @@
     "ccr": "./dist/cli.js"
   },
   "scripts": {
-    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js && cp node_modules/tiktoken/tiktoken_bg.wasm dist/tiktoken_bg.wasm"
+    "build": "esbuild src/cli.ts --bundle --platform=node --outfile=dist/cli.js && shx cp node_modules/tiktoken/tiktoken_bg.wasm dist/tiktoken_bg.wasm"
   },
   "keywords": [
     "claude",
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.1",
+    "shx": "^0.4.0",
     "typescript": "^5.8.2"
   },
   "publishConfig": {

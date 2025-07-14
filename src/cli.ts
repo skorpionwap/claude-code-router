@@ -7,6 +7,7 @@ import { version } from "../package.json";
 import { spawn } from "child_process";
 import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
 import { existsSync, readFileSync } from "fs";
+import {join} from "path";
 
 const command = process.argv[2];
 
@@ -78,7 +79,8 @@ async function main() {
     case "code":
       if (!isServiceRunning()) {
         console.log("Service not running, starting service...");
-        const startProcess = spawn("ccr", ["start"], {
+        const cliPath = join(__dirname, "cli.js");
+        const startProcess = spawn("node", [cliPath, "start"], {
           detached: true,
           stdio: "ignore",
         });
