@@ -85,6 +85,23 @@ ccr code
       "transformer": {
         "use": ["deepseek"]
       }
+    },
+    {
+      "name": "siliconflow",
+      // IMPORTANT: api_base_url must be a complete (full) URL.
+      "api_base_url": "https://api.siliconflow.cn/v1/chat/completions",
+      "api_key": "sk-xxx",
+      "models": ["moonshotai/Kimi-K2-Instruct"],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 16384,// for siliconflow max_tokens
+            }
+          ]
+        ]
+      }
     }
   ],
   "Router": {
