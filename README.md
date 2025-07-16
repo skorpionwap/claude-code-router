@@ -97,7 +97,7 @@ ccr code
           [
             "maxtoken",
             {
-              "max_tokens": 16384,// for siliconflow max_tokens
+              "max_tokens": 16384 // for siliconflow max_tokens
             }
           ]
         ]
