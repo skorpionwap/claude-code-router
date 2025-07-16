@@ -343,3 +343,4 @@ Thanks to the following sponsors for supporting the continued development of thi
 @\*苗 (可通过主页邮箱联系我修改 github 用户名)    
 [@PromptExpert](https://github.com/PromptExpert)        
 @\*应 (可通过主页邮箱联系我修改 github 用户名)    
+[@yusnake](https://github.com/yusnake)    
