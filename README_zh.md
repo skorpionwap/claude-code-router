@@ -2,7 +2,7 @@
 
 > 一款强大的工具，可将 Claude Code 请求路由到不同的模型，并自定义任何请求。
 
-![](screenshoots/claude-code.png)
+![](blog/images/claude-code.png)
 
 ## ✨ 功能
 
@@ -306,3 +306,7 @@ jobs:
 - @董*
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
+
+
+## 交流群
+<img src="/blog/images/wechat_group.jpg" width="200" alt="wechat_group" />

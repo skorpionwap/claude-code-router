@@ -4,7 +4,7 @@
 
 > A powerful tool to route Claude Code requests to different models and customize any request.
 
-![](screenshoots/claude-code.png)
+![](blog/images/claude-code.png)
 
 ## ✨ Features
 
