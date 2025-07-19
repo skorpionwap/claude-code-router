@@ -308,5 +308,8 @@ A huge thank you to all our sponsors for their generous support!
 - [@yusnake](https://github.com/yusnake)
 - @*飞
 - @董*
+- @*琢
+- @*成
+- @**磊
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
