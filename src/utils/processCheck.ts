@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { PID_FILE, REFERENCE_COUNT_FILE } from '../constants';
+import { readConfigFile } from '.';
 
 export function incrementReferenceCount() {
     let count = 0;
@@ -70,15 +71,16 @@ export function getServicePid(): number | null {
     }
 }
 
-export function getServiceInfo() {
+export async function getServiceInfo() {
     const pid = getServicePid();
     const running = isServiceRunning();
+    const config = await readConfigFile();
     
     return {
         running,
         pid,
-        port: 3456,
-        endpoint: 'http://127.0.0.1:3456',
+        port: config.PORT,
+        endpoint: `http://127.0.0.1:${config.PORT}`,
         pidFile: PID_FILE,
         referenceCount: getReferenceCount()
     };

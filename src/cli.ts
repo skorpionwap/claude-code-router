@@ -74,7 +74,7 @@ async function main() {
       }
       break;
     case "status":
-      showStatus();
+      await showStatus();
       break;
     case "code":
       if (!isServiceRunning()) {

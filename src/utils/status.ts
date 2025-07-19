@@ -1,7 +1,7 @@
 import { getServiceInfo } from './processCheck';
 
-export function showStatus() {
-    const info = getServiceInfo();
+export async function showStatus() {
+    const info = await getServiceInfo();
     
     console.log('\n📊 Claude Code Router Status');
     console.log('═'.repeat(40));
