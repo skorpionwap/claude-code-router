@@ -9,13 +9,8 @@ importers:
   .:
     dependencies:
       '@musistudio/llms':
-<<<<<<< HEAD
         specifier: ^1.0.9
         version: 1.0.9(ws@8.18.3)(zod@3.25.67)
-=======
-        specifier: ^1.0.8
-        version: 1.0.8(ws@8.18.3)(zod@3.25.67)
->>>>>>> 2fc79dcf377ade7c4fc8883c94a6779fce830a5a
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
