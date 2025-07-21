@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@musistudio/llms':
-        specifier: ^1.0.10
-        version: 1.0.10(ws@8.18.3)(zod@3.25.67)
+        specifier: ^1.0.11
+        version: 1.0.11(ws@8.18.3)(zod@3.25.67)
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -21,6 +21,9 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
     devDependencies:
+      '@types/node':
+        specifier: ^24.0.15
+        version: 24.0.15
       esbuild:
         specifier: ^0.25.1
         version: 0.25.5
@@ -220,8 +223,8 @@ packages:
       '@modelcontextprotocol/sdk':
         optional: true
 
-  '@musistudio/llms@1.0.10':
-    resolution: {integrity: sha512-s3FUykkR/IykIHb5a/5GXfwB3MSf3DjGbJlmK9injoKhSVhA9SgbP8nG2cj3AlC1Ve5bFyLS5OR4R7wxWB4oqQ==}
+  '@musistudio/llms@1.0.11':
+    resolution: {integrity: sha512-qydLNzZDeURK8fsYJFspM04x/4mlqmKAN2Ie7MLvWuYjYT+fOtDm5BaEzQKhNLOqA5pcB2bCU0L0VFRnoeOpBg==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -234,6 +237,9 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@types/node@24.0.15':
+    resolution: {integrity: sha512-oaeTSbCef7U/z7rDeJA138xpG3NuKc64/rZ2qmUFkFJmnMsAPaluIifqyWd8hSSMxyP9oie3dLAqYPblag9KgA==}
 
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
@@ -651,6 +657,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@7.8.0:
+    resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
+
   undici@7.11.0:
     resolution: {integrity: sha512-heTSIac3iLhsmZhUCjyS3JQEkZELateufzZuBaVM5RHXdSBMb1LPMQf5x+FH7qjsZYDP0ttAc3nnVpUB+wYbOg==}
     engines: {node: '>=20.18.1'}
@@ -815,7 +824,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@musistudio/llms@1.0.10(ws@8.18.3)(zod@3.25.67)':
+  '@musistudio/llms@1.0.11(ws@8.18.3)(zod@3.25.67)':
     dependencies:
       '@anthropic-ai/sdk': 0.54.0
       '@fastify/cors': 11.0.1
@@ -845,6 +854,10 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
+
+  '@types/node@24.0.15':
+    dependencies:
+      undici-types: 7.8.0
 
   abstract-logging@2.0.1: {}
 
@@ -1277,6 +1290,8 @@ snapshots:
   tr46@0.0.3: {}
 
   typescript@5.8.3: {}
+
+  undici-types@7.8.0: {}
 
   undici@7.11.0: {}
 
