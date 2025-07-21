@@ -56,9 +56,12 @@ npm install -g @musistudio/claude-code-router
       "models": [
         "google/gemini-2.5-pro-preview",
         "anthropic/claude-sonnet-4",
-        "anthropic/claude-3.5-sonnet"
+        "anthropic/claude-3.5-sonnet",
+        "anthropic/claude-3.7-sonnet:thinking"
       ],
-      "transformer": { "use": ["openrouter"] }
+      "transformer": {
+        "use": ["openrouter"]
+      }
     },
     {
       "name": "deepseek",
@@ -67,7 +70,9 @@ npm install -g @musistudio/claude-code-router
       "models": ["deepseek-chat", "deepseek-reasoner"],
       "transformer": {
         "use": ["deepseek"],
-        "deepseek-chat": { "use": ["tooluse"] }
+        "deepseek-chat": {
+          "use": ["tooluse"]
+        }
       }
     },
     {
@@ -75,6 +80,24 @@ npm install -g @musistudio/claude-code-router
       "api_base_url": "http://localhost:11434/v1/chat/completions",
       "api_key": "ollama",
       "models": ["qwen2.5-coder:latest"]
+    },
+    {
+      "name": "gemini",
+      "api_base_url": "https://generativelanguage.googleapis.com/v1beta/models/",
+      "api_key": "sk-xxx",
+      "models": ["gemini-2.5-flash", "gemini-2.5-pro"],
+      "transformer": {
+        "use": ["gemini"]
+      }
+    },
+    {
+      "name": "volcengine",
+      "api_base_url": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "api_key": "sk-xxx",
+      "models": ["deepseek-v3-250324", "deepseek-r1-250528"],
+      "transformer": {
+        "use": ["deepseek"]
+      }
     }
   ],
   "Router": {
