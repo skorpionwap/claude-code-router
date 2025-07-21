@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@musistudio/llms':
-        specifier: ^1.0.9
-        version: 1.0.9(ws@8.18.3)(zod@3.25.67)
+        specifier: ^1.0.10
+        version: 1.0.10(ws@8.18.3)(zod@3.25.67)
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -220,13 +220,8 @@ packages:
       '@modelcontextprotocol/sdk':
         optional: true
 
-<<<<<<< HEAD
-  '@musistudio/llms@1.0.9':
-    resolution: {integrity: sha512-Z4H2yMcp3riDMQKAHTxqknanXgVSah/5HwDT5YtmsXaoznQpdzXLHlF4LBMMKNF6amq0R+MPfaPsjK8Lyddmxg==}
-=======
-  '@musistudio/llms@1.0.8':
-    resolution: {integrity: sha512-C2GFoiw/DEo2faAQerRVOyWEupTJpoV+3z3rE9XEN31ySOcsaVPnKyWPmKKg9EDMBw70gQg5FZFg3jZxSCnWlA==}
->>>>>>> 2fc79dcf377ade7c4fc8883c94a6779fce830a5a
+  '@musistudio/llms@1.0.10':
+    resolution: {integrity: sha512-s3FUykkR/IykIHb5a/5GXfwB3MSf3DjGbJlmK9injoKhSVhA9SgbP8nG2cj3AlC1Ve5bFyLS5OR4R7wxWB4oqQ==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -820,11 +815,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-<<<<<<< HEAD
-  '@musistudio/llms@1.0.9(ws@8.18.3)(zod@3.25.67)':
-=======
-  '@musistudio/llms@1.0.8(ws@8.18.3)(zod@3.25.67)':
->>>>>>> 2fc79dcf377ade7c4fc8883c94a6779fce830a5a
+  '@musistudio/llms@1.0.10(ws@8.18.3)(zod@3.25.67)':
     dependencies:
       '@anthropic-ai/sdk': 0.54.0
       '@fastify/cors': 11.0.1

@@ -14,7 +14,10 @@ const getUseModel = (req: any, tokenCount: number, config: any) => {
     return config.Router.longContext;
   }
   // If the model is claude-3-5-haiku, use the background model
-  if (req.body.model?.startsWith("claude-3-5-haiku") && config.Router.background) {
+  if (
+    req.body.model?.startsWith("claude-3-5-haiku") &&
+    config.Router.background
+  ) {
     log("Using background model for ", req.body.model);
     return config.Router.background;
   }
@@ -22,6 +25,9 @@ const getUseModel = (req: any, tokenCount: number, config: any) => {
   if (req.body.thinking && config.Router.think) {
     log("Using think model for ", req.body.thinking);
     return config.Router.think;
+  }
+  if (Array.isArray(req.body.tools) && req.body.tools.some(tool => tool.type?.startsWith('web_search')) && config.Router.webSearch) {
+    return config.Router.webSearch;
   }
   return config.Router!.default;
 };
