@@ -6,7 +6,7 @@ import { cleanupPidFile, isServiceRunning } from "./utils/processCheck";
 import { version } from "../package.json";
 import { spawn } from "child_process";
 import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
-import { existsSync, readFileSync } from "fs";
+import fs, { existsSync, readFileSync } from "fs";
 import {join} from "path";
 
 const command = process.argv[2];
@@ -15,10 +15,11 @@ const HELP_TEXT = `
 Usage: ccr [command]
 
 Commands:
-  start         Start service 
-  stop          Stop service
-  status        Show service status
-  code          Execute code command
+  start         Start server 
+  stop          Stop server
+  restart       Restart server
+  status        Show server status
+  code          Execute claude command
   -v, version   Show version information
   -h, help      Show help information
 
@@ -58,7 +59,7 @@ async function main() {
         cleanupPidFile();
         if (existsSync(REFERENCE_COUNT_FILE)) {
           try {
-            require("fs").unlinkSync(REFERENCE_COUNT_FILE);
+            fs.unlinkSync(REFERENCE_COUNT_FILE);
           } catch (e) {
             // Ignore cleanup errors
           }
