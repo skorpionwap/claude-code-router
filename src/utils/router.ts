@@ -64,7 +64,7 @@ const calculateTokenCount = (
   return tokenCount;
 };
 
-const getUseModel = (req: any, tokenCount: number, config: any) => {
+const getUseModel = async (req: any, tokenCount: number, config: any) => {
   if (req.body.model.includes(",")) {
     return req.body.model;
   }
@@ -115,7 +115,7 @@ export const router = async (req: any, _res: any, config: any) => {
       }
     }
     if (!model) {
-      model = getUseModel(req, tokenCount, config);
+      model = await getUseModel(req, tokenCount, config);
     }
     req.body.model = model;
   } catch (error: any) {
