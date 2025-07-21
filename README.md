@@ -226,6 +226,45 @@ You can also switch models dynamically in Claude Code with the `/model` command:
 `/model provider_name,model_name`
 Example: `/model openrouter,anthropic/claude-3.5-sonnet`
 
+#### Custom Router
+
+For more advanced routing logic, you can specify a custom router script via the `CUSTOM_ROUTER_PATH` in your `config.json`. This allows you to implement complex routing rules beyond the default scenarios.
+
+In your `config.json`:
+
+```json
+{
+  "CUSTOM_ROUTER_PATH": "$HOME/.claude-code-router/custom-router.js"
+}
+```
+
+The custom router file must be a JavaScript module that exports an `async` function. This function receives the request object and the config object as arguments and should return the provider and model name as a string (e.g., `"provider_name,model_name"`), or `null` to fall back to the default router.
+
+Here is an example of a `custom-router.js` based on `custom-router.example.js`:
+
+```javascript
+// $HOME/.claude-code-router/custom-router.js
+
+/**
+ * A custom router function to determine which model to use based on the request.
+ *
+ * @param {object} req - The request object from Claude Code, containing the request body.
+ * @param {object} config - The application's config object.
+ * @returns {Promise<string|null>} - A promise that resolves to the "provider,model_name" string, or null to use the default router.
+ */
+module.exports = async function router(req, config) {
+  const userMessage = req.body.messages.find(m => m.role === 'user')?.content;
+
+  if (userMessage && userMessage.includes('explain this code')) {
+    // Use a powerful model for code explanation
+    return 'openrouter,anthropic/claude-3.5-sonnet';
+  }
+
+  // Fallback to the default router configuration
+  return null;
+};
+```
+
 
 ## 🤖 GitHub Actions
 

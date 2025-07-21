@@ -222,6 +222,45 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 `/model provider_name,model_name`
 示例: `/model openrouter,anthropic/claude-3.5-sonnet`
 
+#### 自定义路由器
+
+对于更高级的路由逻辑，您可以在 `config.json` 中通过 `CUSTOM_ROUTER_PATH` 字段指定一个自定义路由器脚本。这允许您实现超出默认场景的复杂路由规则。
+
+在您的 `config.json` 中配置:
+
+```json
+{
+  "CUSTOM_ROUTER_PATH": "$HOME/.claude-code-router/custom-router.js"
+}
+```
+
+自定义路由器文件必须是一个导出 `async` 函数的 JavaScript 模块。该函数接收请求对象和配置对象作为参数，并应返回提供商和模型名称的字符串（例如 `"provider_name,model_name"`），如果返回 `null` 则回退到默认路由。
+
+这是一个基于 `custom-router.example.js` 的 `custom-router.js` 示例：
+
+```javascript
+// $HOME/.claude-code-router/custom-router.js
+
+/**
+ * 一个自定义路由函数，用于根据请求确定使用哪个模型。
+ *
+ * @param {object} req - 来自 Claude Code 的请求对象，包含请求体。
+ * @param {object} config - 应用程序的配置对象。
+ * @returns {Promise<string|null>} - 一个解析为 "provider,model_name" 字符串的 Promise，如果返回 null，则使用默认路由。
+ */
+module.exports = async function router(req, config) {
+  const userMessage = req.body.messages.find(m => m.role === 'user')?.content;
+
+  if (userMessage && userMessage.includes('解释这段代码')) {
+    // 为代码解释任务使用更强大的模型
+    return 'openrouter,anthropic/claude-3.5-sonnet';
+  }
+
+  // 回退到默认的路由配置
+  return null;
+};
+```
+
 
 ## 🤖 GitHub Actions
 
