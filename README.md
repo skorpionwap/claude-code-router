@@ -101,6 +101,38 @@ Here is a comprehensive example:
       "transformer": {
         "use": ["deepseek"]
       }
+    },
+    {
+      "name": "modelscope",
+      "api_base_url": "https://api-inference.modelscope.cn/v1/chat/completions",
+      "api_key": "",
+      "models": ["Qwen/Qwen3-Coder-480B-A35B-Instruct"],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 8192
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dashscope",
+      "api_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "api_key": "",
+      "models": ["qwen3-coder-plus"],
+      "transformer": {
+        "use": [
+          [
+            "maxtoken",
+            {
+              "max_tokens": 8192
+            }
+          ]
+        ]
+      }
     }
   ],
   "Router": {
@@ -380,5 +412,6 @@ A huge thank you to all our sponsors for their generous support!
 - @*琢
 - @*成
 - @Z*o
+- @*琨
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
