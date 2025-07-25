@@ -83,12 +83,24 @@ async function main() {
         const cliPath = join(__dirname, "cli.js");
         const startProcess = spawn("node", [cliPath, "start"], {
           detached: true,
-          stdio: "ignore",
+          stdio: ["ignore", "pipe", "pipe"],
+        });
+
+        let errorMessage = "";
+        startProcess.stderr?.on("data", (data) => {
+          errorMessage += data.toString();
         });
 
         startProcess.on("error", (error) => {
-          console.error("Failed to start service:", error);
+          console.error("Failed to start service:", error.message);
           process.exit(1);
+        });
+
+        startProcess.on("close", (code) => {
+          if (code !== 0 && errorMessage) {
+            console.error("Failed to start service:", errorMessage.trim());
+            process.exit(1);
+          }
         });
 
         startProcess.unref();
