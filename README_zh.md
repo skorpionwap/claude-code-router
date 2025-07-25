@@ -109,9 +109,10 @@ npm install -g @musistudio/claude-code-router
           [
             "maxtoken",
             {
-              "max_tokens": 8192
+              "max_tokens": 65536
             }
-          ]
+          ],
+          "enhancetool"
         ]
       }
     },
@@ -125,9 +126,10 @@ npm install -g @musistudio/claude-code-router
           [
             "maxtoken",
             {
-              "max_tokens": 8192
+              "max_tokens": 65536
             }
-          ]
+          ],
+          "enhancetool"
         ]
       }
     }
