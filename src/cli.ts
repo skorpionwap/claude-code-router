@@ -109,6 +109,41 @@ async function main() {
     case "version":
       console.log(`claude-code-router version: ${version}`);
       break;
+    case "restart":
+      // Stop the service if it's running
+      try {
+        const pid = parseInt(readFileSync(PID_FILE, "utf-8"));
+        process.kill(pid);
+        cleanupPidFile();
+        if (existsSync(REFERENCE_COUNT_FILE)) {
+          try {
+            fs.unlinkSync(REFERENCE_COUNT_FILE);
+          } catch (e) {
+            // Ignore cleanup errors
+          }
+        }
+        console.log("claude code router service has been stopped.");
+      } catch (e) {
+        console.log("Service was not running or failed to stop.");
+        cleanupPidFile();
+      }
+
+      // Start the service again in the background
+      console.log("Starting claude code router service...");
+      const cliPath = join(__dirname, "cli.js");
+      const startProcess = spawn("node", [cliPath, "start"], {
+        detached: true,
+        stdio: "ignore",
+      });
+
+      startProcess.on("error", (error) => {
+        console.error("Failed to start service:", error);
+        process.exit(1);
+      });
+
+      startProcess.unref();
+      console.log("✅ Service started successfully in the background.");
+      break;
     case "-h":
     case "help":
       console.log(HELP_TEXT);

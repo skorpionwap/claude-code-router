@@ -154,6 +154,11 @@ Start Claude Code using the router:
 ccr code
 ```
 
+> **Note**: After modifying the configuration file, you need to restart the service for the changes to take effect:
+> ```shell
+> ccr restart
+> ```
+
 #### Providers
 
 The `Providers` array is where you define the different model providers you want to use. Each provider object requires:
@@ -413,5 +418,8 @@ A huge thank you to all our sponsors for their generous support!
 - @*成
 - @Z*o
 - @*琨
+- [@congzhangzh](https://github.com/congzhangzh)
+- @*_
+
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)

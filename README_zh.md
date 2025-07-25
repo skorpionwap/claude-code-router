@@ -151,6 +151,11 @@ npm install -g @musistudio/claude-code-router
 ccr code
 ```
 
+> **注意**: 修改配置文件后，需要重启服务使配置生效：
+> ```shell
+> ccr restart
+> ```
+
 #### Providers
 
 `Providers` 数组是您定义要使用的不同模型提供商的地方。每个提供商对象都需要：
@@ -408,6 +413,8 @@ jobs:
 - @*琢
 - @*成
 - @Z*o
+- [@congzhangzh](https://github.com/congzhangzh)
+- @*_
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 
