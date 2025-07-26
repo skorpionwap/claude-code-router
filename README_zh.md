@@ -139,6 +139,7 @@ npm install -g @musistudio/claude-code-router
     "background": "ollama,qwen2.5-coder:latest",
     "think": "deepseek,deepseek-reasoner",
     "longContext": "openrouter,google/gemini-2.5-pro-preview",
+    "longContextThreshold": 60000,
     "webSearch": "gemini,gemini-2.5-flash"
   }
 }
@@ -255,6 +256,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 -   `background`: 用于后台任务的模型。这可以是一个较小的本地模型以节省成本。
 -   `think`: 用于推理密集型任务（如计划模式）的模型。
 -   `longContext`: 用于处理长上下文（例如，> 60K 令牌）的模型。
+-   `longContextThreshold` (可选): 触发长上下文模型的令牌数阈值。如果未指定，默认为 60000。
 -   `webSearch`: 用于处理网络搜索任务，需要模型本身支持。如果使用`openrouter`需要在模型后面加上`:online`后缀。
 
 您还可以使用 `/model` 命令在 Claude Code 中动态切换模型：
