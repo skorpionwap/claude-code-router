@@ -68,9 +68,10 @@ const getUseModel = async (req: any, tokenCount: number, config: any) => {
   if (req.body.model.includes(",")) {
     return req.body.model;
   }
-  // if tokenCount is greater than 60K, use the long context model
-  if (tokenCount > 1000 * 60 && config.Router.longContext) {
-    log("Using long context model due to token count:", tokenCount);
+  // if tokenCount is greater than the configured threshold, use the long context model
+  const longContextThreshold = config.Router.longContextThreshold || 60000;
+  if (tokenCount > longContextThreshold && config.Router.longContext) {
+    log("Using long context model due to token count:", tokenCount, "threshold:", longContextThreshold);
     return config.Router.longContext;
   }
   // If the model is claude-3-5-haiku, use the background model

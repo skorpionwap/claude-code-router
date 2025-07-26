@@ -143,6 +143,7 @@ Here is a comprehensive example:
     "background": "ollama,qwen2.5-coder:latest",
     "think": "deepseek,deepseek-reasoner",
     "longContext": "openrouter,google/gemini-2.5-pro-preview",
+    "longContextThreshold": 60000,
     "webSearch": "gemini,gemini-2.5-flash"
   }
 }
@@ -260,6 +261,7 @@ The `Router` object defines which model to use for different scenarios:
 - `background`: A model for background tasks. This can be a smaller, local model to save costs.
 - `think`: A model for reasoning-heavy tasks, like Plan Mode.
 - `longContext`: A model for handling long contexts (e.g., > 60K tokens).
+- `longContextThreshold` (optional): The token count threshold for triggering the long context model. Defaults to 60000 if not specified.
 - `webSearch`: Used for handling web search tasks and this requires the model itself to support the feature. If you're using openrouter, you need to add the `:online` suffix after the model name.
 
 You can also switch models dynamically in Claude Code with the `/model` command:
