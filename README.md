@@ -107,7 +107,7 @@ Here is a comprehensive example:
       "name": "modelscope",
       "api_base_url": "https://api-inference.modelscope.cn/v1/chat/completions",
       "api_key": "",
-      "models": ["Qwen/Qwen3-Coder-480B-A35B-Instruct"],
+      "models": ["Qwen/Qwen3-Coder-480B-A35B-Instruct", "Qwen/Qwen3-235B-A22B-Thinking-2507"],
       "transformer": {
         "use": [
           [
@@ -117,7 +117,10 @@ Here is a comprehensive example:
             }
           ],
           "enhancetool"
-        ]
+        ],
+        "Qwen/Qwen3-235B-A22B-Thinking-2507": {
+          "use": ["reasoning"]
+        }
       }
     },
     {
