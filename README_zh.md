@@ -40,6 +40,7 @@ npm install -g @musistudio/claude-code-router
 - **`HOST`** (可选): 您可以设置服务的主机地址。如果未设置 `APIKEY`，出于安全考虑，主机地址将强制设置为 `127.0.0.1`，以防止未经授权的访问。例如：`"HOST": "0.0.0.0"`。
 - **`Providers`**: 用于配置不同的模型提供商。
 - **`Router`**: 用于设置路由规则。`default` 指定默认模型，如果未配置其他路由，则该模型将用于所有请求。
+- **`API_TIMEOUT_MS`**: API 请求超时时间，单位为毫秒。
 
 这是一个综合示例：
 
@@ -48,6 +49,7 @@ npm install -g @musistudio/claude-code-router
   "APIKEY": "your-secret-key",
   "PROXY_URL": "http://127.0.0.1:7890",
   "LOG": true,
+  "API_TIMEOUT_MS": 600000,
   "Providers": [
     {
       "name": "openrouter",

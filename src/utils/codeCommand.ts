@@ -13,7 +13,7 @@ export async function executeCodeCommand(args: string[] = []) {
     ...process.env,
     ANTHROPIC_AUTH_TOKEN: "test",
     ANTHROPIC_BASE_URL: `http://127.0.0.1:${config.PORT || 3456}`,
-    API_TIMEOUT_MS: "600000",
+    API_TIMEOUT_MS: String(config.API_TIMEOUT_MS ?? 600000), // Default to 10 minutes if not set
   };
 
   if (config?.APIKEY) {

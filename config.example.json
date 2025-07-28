@@ -113,5 +113,6 @@
     "webSearch": "gemini,gemini-2.5-flash"
   },
   "APIKEY": "your-secret-key",
-  "HOST": "0.0.0.0"
+  "HOST": "0.0.0.0",
+  "API_TIMEOUT_MS": 600000
 }
