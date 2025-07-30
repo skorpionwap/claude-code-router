@@ -245,6 +245,11 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 -   `maxtoken`: 设置特定的 `max_tokens` 值。
 -   `tooluse`: 优化某些模型的工具使用(通过`tool_choice`参数)。
 -   `gemini-cli` (实验性): 通过 Gemini CLI [gemini-cli.js](https://gist.github.com/musistudio/1c13a65f35916a7ab690649d3df8d1cd) 对 Gemini 的非官方支持。
+-   `reasoning`: 用于处理 `reasoning_content` 字段。
+-   `sampling`: 用于处理采样信息字段，如 `temperature`、`top_p`、`top_k` 和 `repetition_penalty`。
+-   `enhancetool`: 对 LLM 返回的工具调用参数增加一层容错处理（这会导致不再流式返回工具调用信息）。
+-   `cleancache`: 清除请求中的 `cache_control` 字段。
+-   `vertex-gemini`: 处理使用 vertex 鉴权的 gemini api。
 
 **自定义 Transformer:**
 
@@ -435,6 +440,9 @@ jobs:
 - [@congzhangzh](https://github.com/congzhangzh)
 - @*_
 - @Z\*m
+- @*鑫
+- @c\*y
+- @\*昕
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 

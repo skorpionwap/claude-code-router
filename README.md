@@ -250,6 +250,11 @@ Transformers allow you to modify the request and response payloads to ensure com
 - `maxtoken`: Sets a specific `max_tokens` value.
 - `tooluse`: Optimizes tool usage for certain models via `tool_choice`.
 - `gemini-cli` (experimental): Unofficial support for Gemini via Gemini CLI [gemini-cli.js](https://gist.github.com/musistudio/1c13a65f35916a7ab690649d3df8d1cd).
+- `reasoning`: Used to process the `reasoning_content` field.
+- `sampling`: Used to process sampling information fields such as `temperature`, `top_p`, `top_k`, and `repetition_penalty`.
+- `enhancetool`: Adds a layer of error tolerance to the tool call parameters returned by the LLM (this will cause the tool call information to no longer be streamed).
+- `cleancache`: Clears the `cache_control` field from requests.
+- `vertex-gemini`: Handles the Gemini API using Vertex authentication.
 
 **Custom Transformers:**
 
@@ -440,5 +445,9 @@ A huge thank you to all our sponsors for their generous support!
 - [@congzhangzh](https://github.com/congzhangzh)
 - @\*\_
 - @Z\*m
+- @*鑫
+- @c\*y
+- @\*昕
+
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
