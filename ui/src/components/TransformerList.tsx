@@ -49,14 +49,32 @@ export function TransformerList({ transformers, onEdit, onRemove }: TransformerL
         // Handle case where transformer.options might be null or undefined
         const options = transformer.options || {};
         
-        // Handle case where options.project might be null or undefined
-        const project = options.project || "No Project";
+        // Render parameters as tags in a single line
+        const renderParameters = () => {
+          if (!options || Object.keys(options).length === 0) {
+            return <p className="text-sm text-gray-500">No parameters configured</p>;
+          }
+          
+          return (
+            <div className="flex flex-wrap gap-2 max-h-8 overflow-hidden">
+              {Object.entries(options).map(([key, value]) => (
+                <span 
+                  key={key} 
+                  className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs font-medium text-gray-700 border"
+                >
+                  <span className="text-gray-600">{key}:</span>
+                  <span className="ml-1 text-gray-800">{String(value)}</span>
+                </span>
+              ))}
+            </div>
+          );
+        };
 
         return (
           <div key={index} className="flex items-start justify-between rounded-md border bg-white p-4 transition-all hover:shadow-md animate-slide-in hover:scale-[1.01]">
             <div className="flex-1 space-y-1.5">
               <p className="text-md font-semibold text-gray-800">{transformerPath}</p>
-              <p className="text-sm text-gray-500">{project}</p>
+              {renderParameters()}
             </div>
             <div className="ml-4 flex flex-shrink-0 items-center gap-2">
               <Button variant="ghost" size="icon" onClick={() => onEdit(index)} className="transition-all-ease hover:scale-110">

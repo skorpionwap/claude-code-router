@@ -83,6 +83,7 @@
     "background": "Background",
     "think": "Think",
     "longContext": "Long Context",
+    "longContextThreshold": "Context Threshold",
     "webSearch": "Web Search",
     "selectModel": "Select a model...",
     "searchModel": "Search model...",

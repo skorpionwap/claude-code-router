@@ -24,7 +24,7 @@ export function Login() {
         try {
           await api.getConfig();
           navigate('/dashboard');
-        } catch (err) {
+        } catch {
           // If verification fails, remove the API key
           localStorage.removeItem('apiKey');
         } finally {
@@ -69,7 +69,7 @@ export function Login() {
       // Navigate to dashboard
       // The ConfigProvider will handle fetching the config
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       // Clear the API key on failure
       api.setApiKey('');
       setError(t('login.invalidApiKey'));

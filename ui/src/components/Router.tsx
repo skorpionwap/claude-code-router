@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useConfig } from "./ConfigProvider";
 import { Combobox } from "./ui/combobox";
 
@@ -28,10 +29,11 @@ export function Router() {
     background: "",
     think: "",
     longContext: "",
+    longContextThreshold: 60000,
     webSearch: ""
   };
 
-  const handleRouterChange = (field: string, value: string) => {
+  const handleRouterChange = (field: string, value: string | number) => {
     // Handle case where config.Router might be null or undefined
     const currentRouter = config.Router || {};
     const newRouter = { ...currentRouter, [field]: value };
@@ -97,15 +99,28 @@ export function Router() {
           />
         </div>
         <div className="space-y-2">
-          <Label>{t("router.longContext")}</Label>
-          <Combobox
-            options={modelOptions}
-            value={routerConfig.longContext || ""}
-            onChange={(value) => handleRouterChange("longContext", value)}
-            placeholder={t("router.selectModel")}
-            searchPlaceholder={t("router.searchModel")}
-            emptyPlaceholder={t("router.noModelFound")}
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label>{t("router.longContext")}</Label>
+              <Combobox
+                options={modelOptions}
+                value={routerConfig.longContext || ""}
+                onChange={(value) => handleRouterChange("longContext", value)}
+                placeholder={t("router.selectModel")}
+                searchPlaceholder={t("router.searchModel")}
+                emptyPlaceholder={t("router.noModelFound")}
+              />
+            </div>
+            <div className="w-48">
+              <Label>{t("router.longContextThreshold")}</Label>
+              <Input
+                type="number"
+                value={routerConfig.longContextThreshold || 60000}
+                onChange={(e) => handleRouterChange("longContextThreshold", parseInt(e.target.value) || 60000)}
+                placeholder="60000"
+              />
+            </div>
+          </div>
         </div>
         <div className="space-y-2">
           <Label>{t("router.webSearch")}</Label>

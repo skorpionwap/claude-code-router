@@ -203,11 +203,11 @@ export function Providers() {
           transformerArray.push(paramsObj);
         }
         
-        newProviders[providerIndex].transformer!.use[transformerIndex] = transformerArray as any;
+        newProviders[providerIndex].transformer!.use[transformerIndex] = transformerArray as string | (string | Record<string, unknown> | { max_tokens: number })[];
       } else {
         // Convert to array format with parameters
         const paramsObj = { [paramName]: paramValue };
-        newProviders[providerIndex].transformer!.use[transformerIndex] = [targetTransformer as string, paramsObj] as any;
+        newProviders[providerIndex].transformer!.use[transformerIndex] = [targetTransformer as string, paramsObj];
       }
     }
     
@@ -277,11 +277,11 @@ export function Providers() {
           transformerArray.push(paramsObj);
         }
         
-        newProviders[providerIndex].transformer![model].use[transformerIndex] = transformerArray as any;
+        newProviders[providerIndex].transformer![model].use[transformerIndex] = transformerArray as string | (string | Record<string, unknown> | { max_tokens: number })[];
       } else {
         // Convert to array format with parameters
         const paramsObj = { [paramName]: paramValue };
-        newProviders[providerIndex].transformer![model].use[transformerIndex] = [targetTransformer as string, paramsObj] as any;
+        newProviders[providerIndex].transformer![model].use[transformerIndex] = [targetTransformer as string, paramsObj];
       }
     }
     
@@ -409,7 +409,7 @@ export function Providers() {
                           ref={comboInputRef}
                           options={(editingProvider.models || []).map(model => ({ label: model, value: model }))}
                           value=""
-                          onChange={(_) => {
+                          onChange={() => {
                             // 只更新输入值，不添加模型
                           }}
                           onEnter={(value) => {
@@ -436,7 +436,7 @@ export function Providers() {
                       onClick={() => {
                         if (hasFetchedModels[editingProviderIndex] && comboInputRef.current) {
                           // 使用ComboInput的逻辑
-                          const comboInput = comboInputRef.current as any;
+                          const comboInput = comboInputRef.current as unknown as { getCurrentValue(): string; clearInput(): void };
                           const currentValue = comboInput.getCurrentValue();
                           if (currentValue && currentValue.trim() && editingProviderIndex !== null) {
                             handleAddModel(editingProviderIndex, currentValue.trim());
@@ -506,7 +506,7 @@ export function Providers() {
                 {editingProvider.transformer?.use && editingProvider.transformer.use.length > 0 && (
                   <div className="space-y-2 mt-2">
                     <div className="text-sm font-medium text-gray-700">{t("providers.selected_transformers")}</div>
-                    {editingProvider.transformer.use.map((transformer: any, transformerIndex: number) => (
+                    {editingProvider.transformer.use.map((transformer: string | (string | Record<string, unknown> | { max_tokens: number })[], transformerIndex: number) => (
                       <div key={transformerIndex} className="border rounded-md p-3">
                         <div className="flex gap-2 items-center mb-2">
                           <div className="flex-1 bg-gray-50 rounded p-2 text-sm">
@@ -660,7 +660,7 @@ export function Providers() {
                         {editingProvider.transformer?.[model]?.use && editingProvider.transformer[model].use.length > 0 && (
                           <div className="space-y-2 mt-2">
                             <div className="text-sm font-medium text-gray-700">{t("providers.selected_transformers")}</div>
-                            {editingProvider.transformer[model].use.map((transformer: any, transformerIndex: number) => (
+                            {editingProvider.transformer[model].use.map((transformer: string | (string | Record<string, unknown> | { max_tokens: number })[], transformerIndex: number) => (
                               <div key={transformerIndex} className="border rounded-md p-3">
                                 <div className="flex gap-2 items-center mb-2">
                                   <div className="flex-1 bg-gray-50 rounded p-2 text-sm">

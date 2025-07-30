@@ -32,6 +32,7 @@ export interface RouterConfig {
   background: string;
   think: string;
   longContext: string;
+  longContextThreshold: number;
   webSearch: string;
 }
 
@@ -123,12 +124,14 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
             background: typeof data.Router.background === 'string' ? data.Router.background : '',
             think: typeof data.Router.think === 'string' ? data.Router.think : '',
             longContext: typeof data.Router.longContext === 'string' ? data.Router.longContext : '',
+            longContextThreshold: typeof data.Router.longContextThreshold === 'number' ? data.Router.longContextThreshold : 60000,
             webSearch: typeof data.Router.webSearch === 'string' ? data.Router.webSearch : ''
           } : {
             default: '',
             background: '',
             think: '',
             longContext: '',
+            longContextThreshold: 60000,
             webSearch: ''
           }
         };
@@ -153,6 +156,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
               background: '',
               think: '',
               longContext: '',
+              longContextThreshold: 60000,
               webSearch: ''
             }
           });
