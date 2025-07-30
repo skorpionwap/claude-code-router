@@ -5,7 +5,7 @@ class ApiClient {
   private baseUrl: string;
   private apiKey: string;
 
-  constructor(baseUrl: string = 'http://127.0.0.1:3456/api', apiKey: string = '') {
+  constructor(baseUrl: string = '/api', apiKey: string = '') {
     this.baseUrl = baseUrl;
     // Load API key from localStorage if available
     this.apiKey = apiKey || localStorage.getItem('apiKey') || '';
