@@ -87,5 +87,13 @@
     "selectModel": "选择一个模型...",
     "searchModel": "搜索模型...",
     "noModelFound": "未找到模型."
+  },
+  "json_editor": {
+    "title": "JSON 编辑器",
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "save_failed": "配置保存失败",
+    "save_and_restart": "保存并重启"
   }
 }

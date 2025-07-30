@@ -87,5 +87,13 @@
     "selectModel": "Select a model...",
     "searchModel": "Search model...",
     "noModelFound": "No model found."
+  },
+  "json_editor": {
+    "title": "JSON Editor",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "save_failed": "Failed to save config",
+    "save_and_restart": "Save & Restart"
   }
 }

@@ -5,10 +5,11 @@ import { SettingsDialog } from "@/components/SettingsDialog";
 import { Transformers } from "@/components/Transformers";
 import { Providers } from "@/components/Providers";
 import { Router } from "@/components/Router";
+import { JsonEditor } from "@/components/JsonEditor";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
 import { api } from "@/lib/api";
-import { Settings, Languages, Save, RefreshCw } from "lucide-react";
+import { Settings, Languages, Save, RefreshCw, FileJson } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -22,6 +23,7 @@ function App() {
   const navigate = useNavigate();
   const { config, error } = useConfig();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
 
@@ -164,6 +166,9 @@ function App() {
           <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="transition-all-ease hover:scale-110">
             <Settings className="h-5 w-5" />
           </Button>
+          <Button variant="ghost" size="icon" onClick={() => setIsJsonEditorOpen(true)} className="transition-all-ease hover:scale-110">
+            <FileJson className="h-5 w-5" />
+          </Button>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="transition-all-ease hover:scale-110">
@@ -213,6 +218,11 @@ function App() {
         </div>
       </main>
       <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <JsonEditor 
+        open={isJsonEditorOpen} 
+        onOpenChange={setIsJsonEditorOpen} 
+        showToast={(message, type) => setToast({ message, type })} 
+      />
       {toast && (
         <Toast 
           message={toast.message} 
