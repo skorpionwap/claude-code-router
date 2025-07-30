@@ -1,6 +1,47 @@
 import Server from "@musistudio/llms";
+import { readConfigFile, writeConfigFile } from "./utils";
+import { CONFIG_FILE } from "./constants";
+import { join } from "path";
+import { readFileSync } from "fs";
+import fastifyStatic from "@fastify/static";
 
 export const createServer = (config: any): Server => {
   const server = new Server(config);
+
+  // Add endpoint to read config.json
+  server.app.get("/api/config", async () => {
+    return await readConfigFile();
+  });
+
+  // Add endpoint to save config.json
+  server.app.post("/api/config", async (req) => {
+    const newConfig = req.body;
+    await writeConfigFile(newConfig);
+    return { success: true, message: "Config saved successfully" };
+  });
+
+  // Add endpoint to restart the service
+  server.app.post("/api/restart", async (_, reply) => {
+    reply.send({ success: true, message: "Service restart initiated" });
+
+    // Restart the service after a short delay to allow response to be sent
+    setTimeout(() => {
+      const { spawn } = require('child_process');
+      spawn('ccr', ['restart'], { detached: true, stdio: 'ignore' });
+    }, 1000);
+  });
+
+  // Register static file serving with caching
+  server.app.register(fastifyStatic, {
+    root: join(__dirname, "..", "dist"),
+    prefix: "/ui/",
+    maxAge: "1h"
+  });
+
+  // Redirect /ui to /ui/ for proper static file serving
+  server.app.get("/ui", async (_, reply) => {
+    return reply.redirect("/ui/");
+  });
+
   return server;
 };

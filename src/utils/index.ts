@@ -87,8 +87,7 @@ export const readConfigFile = async () => {
 
 export const writeConfigFile = async (config: any) => {
   await ensureDir(HOME_DIR);
-  // Add a comment to indicate JSON5 support
-  const configWithComment = `// This config file supports JSON5 format (comments, trailing commas, etc.)\n${JSON5.stringify(config, null, 2)}`;
+  const configWithComment = `${JSON.stringify(config, null, 2)}`;
   await fs.writeFile(CONFIG_FILE, configWithComment);
 };
 

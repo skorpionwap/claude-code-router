@@ -2,9 +2,9 @@
 import { run } from "./index";
 import { showStatus } from "./utils/status";
 import { executeCodeCommand } from "./utils/codeCommand";
-import { cleanupPidFile, isServiceRunning } from "./utils/processCheck";
+import { cleanupPidFile, isServiceRunning, getServiceInfo } from "./utils/processCheck";
 import { version } from "../package.json";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
 import { PID_FILE, REFERENCE_COUNT_FILE } from "./constants";
 import fs, { existsSync, readFileSync } from "fs";
 import {join} from "path";
@@ -20,12 +20,14 @@ Commands:
   restart       Restart server
   status        Show server status
   code          Execute claude command
+  ui            Open the web UI in browser
   -v, version   Show version information
   -h, help      Show help information
 
 Example:
   ccr start
   ccr code "Write a Hello World"
+  ccr ui
 `;
 
 async function waitForService(
@@ -116,6 +118,61 @@ async function main() {
       } else {
         executeCodeCommand(process.argv.slice(3));
       }
+      break;
+    case "ui":
+      // Check if service is running
+      if (!isServiceRunning()) {
+        console.log("Service not running, starting service...");
+        const cliPath = join(__dirname, "cli.js");
+        const startProcess = spawn("node", [cliPath, "start"], {
+          detached: true,
+          stdio: "ignore",
+        });
+
+        startProcess.on("error", (error) => {
+          console.error("Failed to start service:", error.message);
+          process.exit(1);
+        });
+
+        startProcess.unref();
+
+        if (!(await waitForService())) {
+          console.error(
+            "Service startup timeout, please manually run `ccr start` to start the service"
+          );
+          process.exit(1);
+        }
+      }
+
+      // Get service info and open UI
+      const serviceInfo = await getServiceInfo();
+      const uiUrl = `${serviceInfo.endpoint}/ui/`;
+      console.log(`Opening UI at ${uiUrl}`);
+      
+      // Open URL in browser based on platform
+      const platform = process.platform;
+      let openCommand = "";
+      
+      if (platform === "win32") {
+        // Windows
+        openCommand = `start ${uiUrl}`;
+      } else if (platform === "darwin") {
+        // macOS
+        openCommand = `open ${uiUrl}`;
+      } else if (platform === "linux") {
+        // Linux
+        openCommand = `xdg-open ${uiUrl}`;
+      } else {
+        console.error("Unsupported platform for opening browser");
+        process.exit(1);
+      }
+      
+      exec(openCommand, (error) => {
+        if (error) {
+          console.error("Failed to open browser:", error.message);
+          process.exit(1);
+        }
+      });
       break;
     case "-v":
     case "version":
