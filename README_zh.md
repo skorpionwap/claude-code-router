@@ -164,7 +164,7 @@ ccr code
 > ccr restart
 > ```
 
-### 4. UI 模式
+### 4. UI 模式 (Beta)
 
 为了获得更直观的体验，您可以使用 UI 模式来管理您的配置：
 
@@ -173,6 +173,8 @@ ccr ui
 ```
 
 这将打开一个基于 Web 的界面，您可以在其中轻松查看和编辑您的 `config.json` 文件。
+
+> **注意**: UI 模式目前处于测试阶段。这是一个 100% vibe coding的项目，包括项目的初始化，我只是新建了一个文件夹和一个project.md文档。所有代码均由 ccr + qwen3-coder + gemini(webSearch) 实现。如有问题请提交 issue。
 
 #### Providers
 
