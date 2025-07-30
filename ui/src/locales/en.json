@@ -30,7 +30,8 @@
     "claude_path": "Claude Path",
     "host": "Host",
     "port": "Port",
-    "apikey": "API Key"
+    "apikey": "API Key",
+    "timeout": "API Timeout (ms)"
   },
   "transformers": {
     "title": "Custom Transformers",
