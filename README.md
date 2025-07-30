@@ -44,6 +44,7 @@ The `config.json` file has several key sections:
 
 - **`Providers`**: Used to configure different model providers.
 - **`Router`**: Used to set up routing rules. `default` specifies the default model, which will be used for all requests if no other route is configured.
+- **`API_TIMEOUT_MS`**: Specifies the timeout for API calls in milliseconds.
 
 Here is a comprehensive example:
 
@@ -52,6 +53,7 @@ Here is a comprehensive example:
   "APIKEY": "your-secret-key",
   "PROXY_URL": "http://127.0.0.1:7890",
   "LOG": true,
+  "API_TIMEOUT_MS": 600000,
   "Providers": [
     {
       "name": "openrouter",
