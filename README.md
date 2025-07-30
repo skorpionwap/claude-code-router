@@ -166,6 +166,16 @@ ccr code
 > ccr restart
 > ```
 
+### 4. UI Mode
+
+For a more intuitive experience, you can use the UI mode to manage your configuration:
+
+```shell
+ccr ui
+```
+
+This will open a web-based interface where you can easily view and edit your `config.json` file.
+
 #### Providers
 
 The `Providers` array is where you define the different model providers you want to use. Each provider object requires:

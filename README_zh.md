@@ -162,6 +162,16 @@ ccr code
 > ccr restart
 > ```
 
+### 4. UI 模式
+
+为了获得更直观的体验，您可以使用 UI 模式来管理您的配置：
+
+```shell
+ccr ui
+```
+
+这将打开一个基于 Web 的界面，您可以在其中轻松查看和编辑您的 `config.json` 文件。
+
 #### Providers
 
 `Providers` 数组是您定义要使用的不同模型提供商的地方。每个提供商对象都需要：
