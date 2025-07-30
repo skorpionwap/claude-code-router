@@ -85,6 +85,20 @@ export const readConfigFile = async () => {
   }
 };
 
+export const backupConfigFile = async () => {
+  try {
+    if (await fs.access(CONFIG_FILE).then(() => true).catch(() => false)) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const backupPath = `${CONFIG_FILE}.${timestamp}.bak`;
+      await fs.copyFile(CONFIG_FILE, backupPath);
+      return backupPath;
+    }
+  } catch (error) {
+    console.error("Failed to backup config file:", error);
+  }
+  return null;
+};
+
 export const writeConfigFile = async (config: any) => {
   await ensureDir(HOME_DIR);
   const configWithComment = `${JSON.stringify(config, null, 2)}`;

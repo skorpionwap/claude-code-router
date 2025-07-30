@@ -46,9 +46,22 @@ export function Providers() {
     fetchTransformers();
   }, []);
 
+  // Handle case where config is null or undefined
   if (!config) {
-    return null;
+    return (
+      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between border-b p-4">
+          <CardTitle className="text-lg">{t("providers.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-grow flex items-center justify-center p-4">
+          <div className="text-gray-500">Loading providers configuration...</div>
+        </CardContent>
+      </Card>
+    );
   }
+
+  // Validate config.Providers to ensure it's an array
+  const validProviders = Array.isArray(config.Providers) ? config.Providers : [];
 
 
   const handleAddProvider = () => {
@@ -307,8 +320,16 @@ export function Providers() {
   const handleAddModel = (index: number, model: string) => {
     if (!model.trim()) return;
     
+    // Handle case where config.Providers might be null or undefined
+    if (!config || !Array.isArray(config.Providers)) return;
+    
+    // Handle case where the provider at the given index might be null or undefined
+    if (!config.Providers[index]) return;
+    
     const newProviders = [...config.Providers];
-    const models = [...newProviders[index].models];
+    
+    // Handle case where provider.models might be null or undefined
+    const models = Array.isArray(newProviders[index].models) ? [...newProviders[index].models] : [];
     
     // Check if model already exists
     if (!models.includes(model.trim())) {
@@ -319,24 +340,36 @@ export function Providers() {
   };
 
   const handleRemoveModel = (providerIndex: number, modelIndex: number) => {
+    // Handle case where config.Providers might be null or undefined
+    if (!config || !Array.isArray(config.Providers)) return;
+    
+    // Handle case where the provider at the given index might be null or undefined
+    if (!config.Providers[providerIndex]) return;
+    
     const newProviders = [...config.Providers];
-    const models = [...newProviders[providerIndex].models];
-    models.splice(modelIndex, 1);
-    newProviders[providerIndex].models = models;
-    setConfig({ ...config, Providers: newProviders });
+    
+    // Handle case where provider.models might be null or undefined
+    const models = Array.isArray(newProviders[providerIndex].models) ? [...newProviders[providerIndex].models] : [];
+    
+    // Handle case where modelIndex might be out of bounds
+    if (modelIndex >= 0 && modelIndex < models.length) {
+      models.splice(modelIndex, 1);
+      newProviders[providerIndex].models = models;
+      setConfig({ ...config, Providers: newProviders });
+    }
   };
 
-  const editingProvider = editingProviderIndex !== null ? config.Providers[editingProviderIndex] : null;
+  const editingProvider = editingProviderIndex !== null ? validProviders[editingProviderIndex] : null;
 
   return (
     <Card className="flex h-full flex-col rounded-lg border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b p-4">
-        <CardTitle className="text-lg">{t("providers.title")} <span className="text-sm font-normal text-gray-500">({config.Providers.length})</span></CardTitle>
+        <CardTitle className="text-lg">{t("providers.title")} <span className="text-sm font-normal text-gray-500">({validProviders.length})</span></CardTitle>
         <Button onClick={handleAddProvider}>{t("providers.add")}</Button>
       </CardHeader>
       <CardContent className="flex-grow overflow-y-auto p-4">
         <ProviderList
-          providers={config.Providers}
+          providers={validProviders}
           onEdit={setEditingProviderIndex}
           onRemove={setDeletingProviderIndex}
         />
@@ -356,15 +389,15 @@ export function Providers() {
             <div className="space-y-4 p-4 overflow-y-auto flex-grow">
               <div className="space-y-2">
                 <Label htmlFor="name">{t("providers.name")}</Label>
-                <Input id="name" value={editingProvider.name} onChange={(e) => handleProviderChange(editingProviderIndex, 'name', e.target.value)} />
+                <Input id="name" value={editingProvider.name || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'name', e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="api_base_url">{t("providers.api_base_url")}</Label>
-                <Input id="api_base_url" value={editingProvider.api_base_url} onChange={(e) => handleProviderChange(editingProviderIndex, 'api_base_url', e.target.value)} />
+                <Input id="api_base_url" value={editingProvider.api_base_url || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'api_base_url', e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="api_key">{t("providers.api_key")}</Label>
-                <Input id="api_key" type="password" value={editingProvider.api_key} onChange={(e) => handleProviderChange(editingProviderIndex, 'api_key', e.target.value)} />
+                <Input id="api_key" type="password" value={editingProvider.api_key || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'api_key', e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="models">{t("providers.models")}</Label>
@@ -374,7 +407,7 @@ export function Providers() {
                       {hasFetchedModels[editingProviderIndex] ? (
                         <ComboInput
                           ref={comboInputRef}
-                          options={editingProvider.models.map(model => ({ label: model, value: model }))}
+                          options={(editingProvider.models || []).map(model => ({ label: model, value: model }))}
                           value=""
                           onChange={(_) => {
                             // 只更新输入值，不添加模型
@@ -431,7 +464,7 @@ export function Providers() {
                     </Button> */}
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {editingProvider.models.map((model, modelIndex) => (
+                    {(editingProvider.models || []).map((model, modelIndex) => (
                       <Badge key={modelIndex} variant="outline" className="font-normal flex items-center gap-1">
                         {model}
                         <button 
@@ -596,11 +629,11 @@ export function Providers() {
               </div>
               
               {/* Model-specific Transformers */}
-              {editingProvider.models.length > 0 && (
+              {editingProvider.models && editingProvider.models.length > 0 && (
                 <div className="space-y-2">
                   <Label>{t("providers.model_transformers")}</Label>
                   <div className="space-y-3">
-                    {editingProvider.models.map((model, modelIndex) => (
+                    {(editingProvider.models || []).map((model, modelIndex) => (
                       <div key={modelIndex} className="border rounded-md p-3">
                         <div className="font-medium text-sm mb-2">{model}</div>
                         {/* Add new transformer */}

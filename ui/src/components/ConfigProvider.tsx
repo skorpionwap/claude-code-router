@@ -108,7 +108,32 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
       try {
         // Try to fetch config regardless of API key presence
         const data = await api.getConfig();
-        setConfig(data);
+        
+        // Validate the received data to ensure it has the expected structure
+        const validConfig = {
+          LOG: typeof data.LOG === 'boolean' ? data.LOG : false,
+          CLAUDE_PATH: typeof data.CLAUDE_PATH === 'string' ? data.CLAUDE_PATH : '',
+          HOST: typeof data.HOST === 'string' ? data.HOST : '127.0.0.1',
+          PORT: typeof data.PORT === 'number' ? data.PORT : 3456,
+          APIKEY: typeof data.APIKEY === 'string' ? data.APIKEY : '',
+          transformers: Array.isArray(data.transformers) ? data.transformers : [],
+          Providers: Array.isArray(data.Providers) ? data.Providers : [],
+          Router: data.Router && typeof data.Router === 'object' ? {
+            default: typeof data.Router.default === 'string' ? data.Router.default : '',
+            background: typeof data.Router.background === 'string' ? data.Router.background : '',
+            think: typeof data.Router.think === 'string' ? data.Router.think : '',
+            longContext: typeof data.Router.longContext === 'string' ? data.Router.longContext : '',
+            webSearch: typeof data.Router.webSearch === 'string' ? data.Router.webSearch : ''
+          } : {
+            default: '',
+            background: '',
+            think: '',
+            longContext: '',
+            webSearch: ''
+          }
+        };
+        
+        setConfig(validConfig);
       } catch (err) {
         console.error('Failed to fetch config:', err);
         // If we get a 401, the API client will redirect to login

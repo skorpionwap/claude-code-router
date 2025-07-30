@@ -28,6 +28,14 @@ export const createServer = (config: any): Server => {
   // Add endpoint to save config.json
   server.app.post("/api/config", async (req) => {
     const newConfig = req.body;
+    
+    // Backup existing config file if it exists
+    const { backupConfigFile } = await import("./utils");
+    const backupPath = await backupConfigFile();
+    if (backupPath) {
+      console.log(`Backed up existing configuration file to ${backupPath}`);
+    }
+    
     await writeConfigFile(newConfig);
     return { success: true, message: "Config saved successfully" };
   });

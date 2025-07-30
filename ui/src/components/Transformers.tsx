@@ -23,27 +23,40 @@ export function Transformers() {
   const [deletingTransformerIndex, setDeletingTransformerIndex] = useState<number | null>(null);
   const [newTransformer, setNewTransformer] = useState<{ path: string; options: { [key: string]: string } } | null>(null);
 
+  // Handle case where config is null or undefined
   if (!config) {
-    return null;
+    return (
+      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between border-b p-4">
+          <CardTitle className="text-lg">{t("transformers.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-grow flex items-center justify-center p-4">
+          <div className="text-gray-500">Loading transformers configuration...</div>
+        </CardContent>
+      </Card>
+    );
   }
+
+  // Validate config.transformers to ensure it's an array
+  const validTransformers = Array.isArray(config.transformers) ? config.transformers : [];
 
   const handleAddTransformer = () => {
     const newTransformer = { path: "", options: {} };
     setNewTransformer(newTransformer);
-    setEditingTransformerIndex(config.transformers.length); // Use the length as index for the new item
+    setEditingTransformerIndex(validTransformers.length); // Use the length as index for the new item
   };
 
   const handleRemoveTransformer = (index: number) => {
-    const newTransformers = [...config.transformers];
+    const newTransformers = [...validTransformers];
     newTransformers.splice(index, 1);
     setConfig({ ...config, transformers: newTransformers });
     setDeletingTransformerIndex(null);
   };
 
   const handleTransformerChange = (index: number, field: string, value: string, optionKey?: string) => {
-    if (index < config.transformers.length) {
+    if (index < validTransformers.length) {
       // Editing an existing transformer
-      const newTransformers = [...config.transformers];
+      const newTransformers = [...validTransformers];
       if (optionKey !== undefined) {
         newTransformers[index].options[optionKey] = value;
       } else {
@@ -65,15 +78,15 @@ export function Transformers() {
   };
 
   const editingTransformer = editingTransformerIndex !== null ? 
-    (editingTransformerIndex < config.transformers.length ? 
-      config.transformers[editingTransformerIndex] : 
+    (editingTransformerIndex < validTransformers.length ? 
+      validTransformers[editingTransformerIndex] : 
       newTransformer) : 
     null;
 
   const handleSaveTransformer = () => {
-    if (newTransformer && editingTransformerIndex === config.transformers.length) {
+    if (newTransformer && editingTransformerIndex === validTransformers.length) {
       // Saving a new transformer
-      const newTransformers = [...config.transformers, newTransformer];
+      const newTransformers = [...validTransformers, newTransformer];
       setConfig({ ...config, transformers: newTransformers });
     }
     // Close the dialog
@@ -90,12 +103,12 @@ export function Transformers() {
   return (
     <Card className="flex h-full flex-col rounded-lg border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b p-4">
-        <CardTitle className="text-lg">{t("transformers.title")} <span className="text-sm font-normal text-gray-500">({config.transformers.length})</span></CardTitle>
+        <CardTitle className="text-lg">{t("transformers.title")} <span className="text-sm font-normal text-gray-500">({validTransformers.length})</span></CardTitle>
         <Button onClick={handleAddTransformer}>{t("transformers.add")}</Button>
       </CardHeader>
       <CardContent className="flex-grow overflow-y-auto p-4">
         <TransformerList
-          transformers={config.transformers}
+          transformers={validTransformers}
           onEdit={setEditingTransformerIndex}
           onRemove={setDeletingTransformerIndex}
         />
@@ -113,7 +126,7 @@ export function Transformers() {
                 <Label htmlFor="transformer-path">{t("transformers.path")}</Label>
                 <Input 
                   id="transformer-path" 
-                  value={editingTransformer.path} 
+                  value={editingTransformer.path || ''} 
                   onChange={(e) => handleTransformerChange(editingTransformerIndex, "path", e.target.value)} 
                 />
               </div>
@@ -124,11 +137,12 @@ export function Transformers() {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
-                      const newKey = `param${Object.keys(editingTransformer.options).length + 1}`;
+                      const options = editingTransformer.options || {};
+                      const newKey = `param${Object.keys(options).length + 1}`;
                       if (editingTransformerIndex !== null) {
-                        const newOptions = { ...editingTransformer.options, [newKey]: "" };
-                        if (editingTransformerIndex < config.transformers.length) {
-                          const newTransformers = [...config.transformers];
+                        const newOptions = { ...options, [newKey]: "" };
+                        if (editingTransformerIndex < validTransformers.length) {
+                          const newTransformers = [...validTransformers];
                           newTransformers[editingTransformerIndex].options = newOptions;
                           setConfig({ ...config, transformers: newTransformers });
                         } else if (newTransformer) {
@@ -140,17 +154,18 @@ export function Transformers() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                {Object.entries(editingTransformer.options).map(([key, value]) => (
+                {Object.entries(editingTransformer.options || {}).map(([key, value]) => (
                   <div key={key} className="flex items-center gap-2">
                     <Input 
                       value={key} 
                       onChange={(e) => {
-                        const newOptions = { ...editingTransformer.options };
+                        const options = editingTransformer.options || {};
+                        const newOptions = { ...options };
                         delete newOptions[key];
                         newOptions[e.target.value] = value;
                         if (editingTransformerIndex !== null) {
-                          if (editingTransformerIndex < config.transformers.length) {
-                            const newTransformers = [...config.transformers];
+                          if (editingTransformerIndex < validTransformers.length) {
+                            const newTransformers = [...validTransformers];
                             newTransformers[editingTransformerIndex].options = newOptions;
                             setConfig({ ...config, transformers: newTransformers });
                           } else if (newTransformer) {
@@ -174,10 +189,11 @@ export function Transformers() {
                       size="icon"
                       onClick={() => {
                         if (editingTransformerIndex !== null) {
-                          const newOptions = { ...editingTransformer.options };
+                          const options = editingTransformer.options || {};
+                          const newOptions = { ...options };
                           delete newOptions[key];
-                          if (editingTransformerIndex < config.transformers.length) {
-                            const newTransformers = [...config.transformers];
+                          if (editingTransformerIndex < validTransformers.length) {
+                            const newTransformers = [...validTransformers];
                             newTransformers[editingTransformerIndex].options = newOptions;
                             setConfig({ ...config, transformers: newTransformers });
                           } else if (newTransformer) {

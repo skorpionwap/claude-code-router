@@ -75,87 +75,108 @@ function App() {
   }, [config, navigate]);
 
   const saveConfig = async () => {
-    if (config) {
-      try {
-        // Save to API
-        const response = await api.updateConfig(config);
+    // Handle case where config might be null or undefined
+    if (!config) {
+      setToast({ message: t('app.config_missing'), type: 'error' });
+      return;
+    }
+    
+    try {
+      // Save to API
+      const response = await api.updateConfig(config);
+      // Show success message or handle as needed
+      console.log('Config saved successfully');
+      
+      // 根据响应信息进行提示
+      if (response && typeof response === 'object' && 'success' in response) {
+        const apiResponse = response as { success: boolean; message?: string };
+        if (apiResponse.success) {
+          setToast({ message: apiResponse.message || t('app.config_saved_success'), type: 'success' });
+        } else {
+          setToast({ message: apiResponse.message || t('app.config_saved_failed'), type: 'error' });
+        }
+      } else {
+        // 默认成功提示
+        setToast({ message: t('app.config_saved_success'), type: 'success' });
+      }
+    } catch (error) {
+      console.error('Failed to save config:', error);
+      // Handle error appropriately
+      setToast({ message: t('app.config_saved_failed') + ': ' + (error as Error).message, type: 'error' });
+    }
+  };
+
+  const saveConfigAndRestart = async () => {
+    // Handle case where config might be null or undefined
+    if (!config) {
+      setToast({ message: t('app.config_missing'), type: 'error' });
+      return;
+    }
+    
+    try {
+      // Save to API
+      const response = await api.updateConfig(config);
+      
+      // Check if save was successful before restarting
+      let saveSuccessful = true;
+      if (response && typeof response === 'object' && 'success' in response) {
+        const apiResponse = response as { success: boolean; message?: string };
+        if (!apiResponse.success) {
+          saveSuccessful = false;
+          setToast({ message: apiResponse.message || t('app.config_saved_failed'), type: 'error' });
+        }
+      }
+      
+      // Only restart if save was successful
+      if (saveSuccessful) {
+        // Restart service
+        const response = await api.restartService();
+        
         // Show success message or handle as needed
-        console.log('Config saved successfully');
+        console.log('Config saved and service restarted successfully');
         
         // 根据响应信息进行提示
         if (response && typeof response === 'object' && 'success' in response) {
           const apiResponse = response as { success: boolean; message?: string };
           if (apiResponse.success) {
-            setToast({ message: apiResponse.message || t('app.config_saved_success'), type: 'success' });
-          } else {
-            setToast({ message: apiResponse.message || t('app.config_saved_failed'), type: 'error' });
+            setToast({ message: apiResponse.message || t('app.config_saved_restart_success'), type: 'success' });
           }
         } else {
           // 默认成功提示
-          setToast({ message: t('app.config_saved_success'), type: 'success' });
+          setToast({ message: t('app.config_saved_restart_success'), type: 'success' });
         }
-      } catch (error) {
-        console.error('Failed to save config:', error);
-        // Handle error appropriately
-        setToast({ message: t('app.config_saved_failed') + ': ' + (error as Error).message, type: 'error' });
       }
-    }
-  };
-
-  const saveConfigAndRestart = async () => {
-    if (config) {
-      try {
-        // Save to API
-        const response = await api.updateConfig(config);
-        
-        // Check if save was successful before restarting
-        let saveSuccessful = true;
-        if (response && typeof response === 'object' && 'success' in response) {
-          const apiResponse = response as { success: boolean; message?: string };
-          if (!apiResponse.success) {
-            saveSuccessful = false;
-            setToast({ message: apiResponse.message || t('app.config_saved_failed'), type: 'error' });
-          }
-        }
-        
-        // Only restart if save was successful
-        if (saveSuccessful) {
-          // Restart service
-          const response = await api.restartService();
-          
-          // Show success message or handle as needed
-          console.log('Config saved and service restarted successfully');
-          
-          // 根据响应信息进行提示
-          if (response && typeof response === 'object' && 'success' in response) {
-            const apiResponse = response as { success: boolean; message?: string };
-            if (apiResponse.success) {
-              setToast({ message: apiResponse.message || t('app.config_saved_restart_success'), type: 'success' });
-            }
-          } else {
-            // 默认成功提示
-            setToast({ message: t('app.config_saved_restart_success'), type: 'success' });
-          }
-        }
-      } catch (error) {
-        console.error('Failed to save config and restart:', error);
-        // Handle error appropriately
-        setToast({ message: t('app.config_saved_restart_failed') + ': ' + (error as Error).message, type: 'error' });
-      }
+    } catch (error) {
+      console.error('Failed to save config and restart:', error);
+      // Handle error appropriately
+      setToast({ message: t('app.config_saved_restart_failed') + ': ' + (error as Error).message, type: 'error' });
     }
   };
 
   
   if (isCheckingAuth) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-gray-500">Loading application...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-red-500">Error: {error.message}</div>
+      </div>
+    );
   }
 
+  // Handle case where config is null or undefined
   if (!config) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-gray-500">Loading configuration...</div>
+      </div>
+    );
   }
 
   return (

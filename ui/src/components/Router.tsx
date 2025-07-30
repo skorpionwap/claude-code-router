@@ -8,21 +8,54 @@ export function Router() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
 
+  // Handle case where config is null or undefined
   if (!config) {
-    return null;
+    return (
+      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+        <CardHeader className="border-b p-4">
+          <CardTitle className="text-lg">{t("router.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-grow flex items-center justify-center p-4">
+          <div className="text-gray-500">Loading router configuration...</div>
+        </CardContent>
+      </Card>
+    );
   }
 
+  // Handle case where config.Router is null or undefined
+  const routerConfig = config.Router || {
+    default: "",
+    background: "",
+    think: "",
+    longContext: "",
+    webSearch: ""
+  };
+
   const handleRouterChange = (field: string, value: string) => {
-    const newRouter = { ...config.Router, [field]: value };
+    // Handle case where config.Router might be null or undefined
+    const currentRouter = config.Router || {};
+    const newRouter = { ...currentRouter, [field]: value };
     setConfig({ ...config, Router: newRouter });
   };
 
-  const modelOptions = config.Providers.flatMap((provider) =>
-    provider.models.map((model) => ({
-      value: `${provider.name},${model}`,
-      label: `${provider.name}, ${model}`,
-    }))
-  );
+  // Handle case where config.Providers might be null or undefined
+  const providers = Array.isArray(config.Providers) ? config.Providers : [];
+  
+  const modelOptions = providers.flatMap((provider) => {
+    // Handle case where individual provider might be null or undefined
+    if (!provider) return [];
+    
+    // Handle case where provider.models might be null or undefined
+    const models = Array.isArray(provider.models) ? provider.models : [];
+    
+    // Handle case where provider.name might be null or undefined
+    const providerName = provider.name || "Unknown Provider";
+    
+    return models.map((model) => ({
+      value: `${providerName},${model || "Unknown Model"}`,
+      label: `${providerName}, ${model || "Unknown Model"}`,
+    }));
+  });
 
   return (
     <Card className="flex h-full flex-col rounded-lg border shadow-sm">
@@ -34,7 +67,7 @@ export function Router() {
           <Label>{t("router.default")}</Label>
           <Combobox
             options={modelOptions}
-            value={config.Router.default}
+            value={routerConfig.default || ""}
             onChange={(value) => handleRouterChange("default", value)}
             placeholder={t("router.selectModel")}
             searchPlaceholder={t("router.searchModel")}
@@ -45,7 +78,7 @@ export function Router() {
           <Label>{t("router.background")}</Label>
           <Combobox
             options={modelOptions}
-            value={config.Router.background}
+            value={routerConfig.background || ""}
             onChange={(value) => handleRouterChange("background", value)}
             placeholder={t("router.selectModel")}
             searchPlaceholder={t("router.searchModel")}
@@ -56,7 +89,7 @@ export function Router() {
           <Label>{t("router.think")}</Label>
           <Combobox
             options={modelOptions}
-            value={config.Router.think}
+            value={routerConfig.think || ""}
             onChange={(value) => handleRouterChange("think", value)}
             placeholder={t("router.selectModel")}
             searchPlaceholder={t("router.searchModel")}
@@ -67,7 +100,7 @@ export function Router() {
           <Label>{t("router.longContext")}</Label>
           <Combobox
             options={modelOptions}
-            value={config.Router.longContext}
+            value={routerConfig.longContext || ""}
             onChange={(value) => handleRouterChange("longContext", value)}
             placeholder={t("router.selectModel")}
             searchPlaceholder={t("router.searchModel")}
@@ -78,7 +111,7 @@ export function Router() {
           <Label>{t("router.webSearch")}</Label>
           <Combobox
             options={modelOptions}
-            value={config.Router.webSearch}
+            value={routerConfig.webSearch || ""}
             onChange={(value) => handleRouterChange("webSearch", value)}
             placeholder={t("router.selectModel")}
             searchPlaceholder={t("router.searchModel")}

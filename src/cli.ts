@@ -137,10 +137,52 @@ async function main() {
         startProcess.unref();
 
         if (!(await waitForService())) {
-          console.error(
-            "Service startup timeout, please manually run `ccr start` to start the service"
-          );
-          process.exit(1);
+          // If service startup fails, try to start with default config
+          console.log("Service startup timeout, trying to start with default configuration...");
+          const { initDir, writeConfigFile, backupConfigFile } = require("./utils");
+          
+          try {
+            // Initialize directories
+            await initDir();
+            
+            // Backup existing config file if it exists
+            const backupPath = await backupConfigFile();
+            if (backupPath) {
+              console.log(`Backed up existing configuration file to ${backupPath}`);
+            }
+            
+            // Create a minimal default config file
+            await writeConfigFile({
+              "PORT": 3456,
+              "Providers": [],
+              "Router": {}
+            });
+            console.log("Created minimal default configuration file at ~/.claude-code-router/config.json");
+            console.log("Please edit this file with your actual configuration.");
+            
+            // Try starting the service again
+            const restartProcess = spawn("node", [cliPath, "start"], {
+              detached: true,
+              stdio: "ignore",
+            });
+            
+            restartProcess.on("error", (error) => {
+              console.error("Failed to start service with default config:", error.message);
+              process.exit(1);
+            });
+            
+            restartProcess.unref();
+            
+            if (!(await waitForService(15000))) { // Wait a bit longer for the first start
+              console.error(
+                "Service startup still failing. Please manually run `ccr start` to start the service and check the logs."
+              );
+              process.exit(1);
+            }
+          } catch (error: any) {
+            console.error("Failed to create default configuration:", error.message);
+            process.exit(1);
+          }
         }
       }
 
