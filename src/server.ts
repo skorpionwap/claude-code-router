@@ -13,6 +13,18 @@ export const createServer = (config: any): Server => {
     return await readConfigFile();
   });
 
+  server.app.get("/api/transformers", async () => {
+    const transformers =
+      server.app._server!.transformerService.getAllTransformers();
+    const transformerList = Array.from(transformers.entries()).map(
+      ([name, transformer]: any) => ({
+        name,
+        endpoint: transformer.endPoint || null,
+      })
+    );
+    return { transformers: transformerList };
+  });
+
   // Add endpoint to save config.json
   server.app.post("/api/config", async (req) => {
     const newConfig = req.body;
@@ -26,8 +38,8 @@ export const createServer = (config: any): Server => {
 
     // Restart the service after a short delay to allow response to be sent
     setTimeout(() => {
-      const { spawn } = require('child_process');
-      spawn('ccr', ['restart'], { detached: true, stdio: 'ignore' });
+      const { spawn } = require("child_process");
+      spawn("ccr", ["restart"], { detached: true, stdio: "ignore" });
     }, 1000);
   });
 
@@ -35,7 +47,7 @@ export const createServer = (config: any): Server => {
   server.app.register(fastifyStatic, {
     root: join(__dirname, "..", "dist"),
     prefix: "/ui/",
-    maxAge: "1h"
+    maxAge: "1h",
   });
 
   // Redirect /ui to /ui/ for proper static file serving

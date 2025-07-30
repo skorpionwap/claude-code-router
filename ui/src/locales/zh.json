@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "配置",
+    "title": "Claude Code Router",
     "save": "保存",
     "save_and_restart": "保存并重启",
     "cancel": "取消",

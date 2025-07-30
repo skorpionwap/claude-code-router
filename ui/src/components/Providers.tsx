@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { X, Trash2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
 import { ComboInput } from "@/components/ui/combo-input";
+import { api } from "@/lib/api";
 
 
 export function Providers() {
@@ -28,7 +29,22 @@ export function Providers() {
   const [hasFetchedModels, setHasFetchedModels] = useState<Record<number, boolean>>({});
   const [providerParamInputs, setProviderParamInputs] = useState<Record<string, {name: string, value: string}>>({});
   const [modelParamInputs, setModelParamInputs] = useState<Record<string, {name: string, value: string}>>({});
+  const [availableTransformers, setAvailableTransformers] = useState<{name: string; endpoint: string | null;}[]>([]);
   const comboInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch available transformers when component mounts
+  useEffect(() => {
+    const fetchTransformers = async () => {
+      try {
+        const response = await api.get<{transformers: {name: string; endpoint: string | null;}[]}>('/transformers');
+        setAvailableTransformers(response.transformers);
+      } catch (error) {
+        console.error('Failed to fetch transformers:', error);
+      }
+    };
+
+    fetchTransformers();
+  }, []);
 
   if (!config) {
     return null;
@@ -438,9 +454,9 @@ export function Providers() {
                 {/* Add new transformer */}
                 <div className="flex gap-2">
                   <Combobox
-                    options={config.transformers.map(t => ({
-                      label: t.path.split('/').pop() || t.path,
-                      value: t.path
+                    options={availableTransformers.map(t => ({
+                      label: t.name,
+                      value: t.name
                     }))}
                     value=""
                     onChange={(value) => {
@@ -591,9 +607,9 @@ export function Providers() {
                         <div className="flex gap-2">
                           <div className="flex-1 flex gap-2">
                             <Combobox
-                              options={config.transformers.map(t => ({
-                                label: t.path.split('/').pop() || t.path,
-                                value: t.path
+                              options={availableTransformers.map(t => ({
+                                label: t.name,
+                                value: t.name
                               }))}
                               value=""
                               onChange={(value) => {
