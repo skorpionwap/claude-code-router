@@ -4,6 +4,7 @@
   "HOST": "127.0.0.1",
   "PORT": 8080,
   "APIKEY": "1",
+  "API_TIMEOUT_MS": 600000,
   "transformers": [
     {
       "path": "/Users/abc/.claude-code-router/plugins/gemini-cli.js",

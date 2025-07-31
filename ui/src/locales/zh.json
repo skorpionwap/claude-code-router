@@ -30,7 +30,8 @@
     "claude_path": "Claude 路径",
     "host": "主机",
     "port": "端口",
-    "apikey": "API 密钥"
+    "apikey": "API 密钥",
+    "timeout": "API 超时时间 (毫秒)"
   },
   "transformers": {
     "title": "自定义转换器",

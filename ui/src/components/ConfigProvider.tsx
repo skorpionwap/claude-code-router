@@ -42,6 +42,7 @@ export interface Config {
   HOST: string;
   PORT: number;
   APIKEY: string;
+  API_TIMEOUT_MS: string;
   transformers: Transformer[];
   Providers: Provider[];
   Router: RouterConfig;
@@ -117,6 +118,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
           HOST: typeof data.HOST === 'string' ? data.HOST : '127.0.0.1',
           PORT: typeof data.PORT === 'number' ? data.PORT : 3456,
           APIKEY: typeof data.APIKEY === 'string' ? data.APIKEY : '',
+          API_TIMEOUT_MS: typeof data.API_TIMEOUT_MS === 'string' ? data.API_TIMEOUT_MS : '600000',
           transformers: Array.isArray(data.transformers) ? data.transformers : [],
           Providers: Array.isArray(data.Providers) ? data.Providers : [],
           Router: data.Router && typeof data.Router === 'object' ? {
@@ -149,6 +151,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
             HOST: '127.0.0.1',
             PORT: 3456,
             APIKEY: '',
+            API_TIMEOUT_MS: '600000',            
             transformers: [],
             Providers: [],
             Router: {
