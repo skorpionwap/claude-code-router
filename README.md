@@ -141,6 +141,16 @@ Here is a comprehensive example:
           "enhancetool"
         ]
       }
+    },
+    {
+      "name": "aihubmix",
+      "api_base_url": "https://aihubmix.com/v1/chat/completions",
+      "api_key": "sk-",
+      "models": [
+        "Z/glm-4.5",
+        "claude-opus-4-20250514",
+        "gemini-2.5-pro"
+      ]
     }
   ],
   "Router": {
@@ -412,6 +422,13 @@ If you find this project helpful, please consider sponsoring its development. Yo
 ### Our Sponsors
 
 A huge thank you to all our sponsors for their generous support!
+
+<table>
+  <tr>
+    <td><a href="https://aihubmix.com/" target="_blank"><img src="/blog/images/sponsors/aihubmix.png" width="100" alt="aihubmix" /></a></td>
+  </tr>
+</table>
+
 
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)

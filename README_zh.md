@@ -137,6 +137,16 @@ npm install -g @musistudio/claude-code-router
           "enhancetool"
         ]
       }
+    },
+    {
+      "name": "aihubmix",
+      "api_base_url": "https://aihubmix.com/v1/chat/completions",
+      "api_key": "sk-",
+      "models": [
+        "Z/glm-4.5",
+        "claude-opus-4-20250514",
+        "gemini-2.5-pro"
+      ]
     }
   ],
   "Router": {
@@ -407,6 +417,12 @@ jobs:
 ### 我们的赞助商
 
 非常感谢所有赞助商的慷慨支持！
+
+<table>
+  <tr>
+    <td><a href="https://aihubmix.com/" target="_blank"><img src="/blog/images/sponsors/aihubmix.png" width="100" alt="aihubmix" /></a></td>
+  </tr>
+</table>
 
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)
