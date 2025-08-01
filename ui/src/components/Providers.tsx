@@ -427,7 +427,7 @@ export function Providers() {
                       {hasFetchedModels[editingProviderIndex] ? (
                         <ComboInput
                           ref={comboInputRef}
-                          options={(editingProvider.models || []).map(model => ({ label: model, value: model }))}
+                          options={(editingProvider.models || []).map((model: string) => ({ label: model, value: model }))}
                           value=""
                           onChange={() => {
                             // 只更新输入值，不添加模型
@@ -484,7 +484,7 @@ export function Providers() {
                     </Button> */}
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {(editingProvider.models || []).map((model, modelIndex) => (
+                    {(editingProvider.models || []).map((model: string, modelIndex: number) => (
                       <Badge key={modelIndex} variant="outline" className="font-normal flex items-center gap-1">
                         {model}
                         <button 
@@ -653,7 +653,7 @@ export function Providers() {
                 <div className="space-y-2">
                   <Label>{t("providers.model_transformers")}</Label>
                   <div className="space-y-3">
-                    {(editingProvider.models || []).map((model, modelIndex) => (
+                    {(editingProvider.models || []).map((model: string, modelIndex: number) => (
                       <div key={modelIndex} className="border rounded-md p-3">
                         <div className="font-medium text-sm mb-2">{model}</div>
                         {/* Add new transformer */}

@@ -252,6 +252,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 
 **可用的内置 Transformer：**
 
+-   `Anthropic`: 如果你只使用这一个转换器，则会直接透传请求和响应(你可以用它来接入其他支持Anthropic端点的服务商)。
 -   `deepseek`: 适配 DeepSeek API 的请求/响应。
 -   `gemini`: 适配 Gemini API 的请求/响应。
 -   `openrouter`: 适配 OpenRouter API 的请求/响应。
@@ -418,12 +419,7 @@ jobs:
 
 非常感谢所有赞助商的慷慨支持！
 
-<table>
-  <tr>
-    <td><a href="https://aihubmix.com/" target="_blank"><img src="/blog/images/sponsors/aihubmix.png" width="100" alt="aihubmix" /></a></td>
-  </tr>
-</table>
-
+- [AIHubmix](https://aihubmix.com/)
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)
 - [@vrgitadmin](https://github.com/vrgitadmin)
@@ -463,6 +459,9 @@ jobs:
 - @*鑫
 - @c\*y
 - @\*昕
+- [@witsice](https://github.com/witsice)
+- @b\*g
+- @\*亿
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 

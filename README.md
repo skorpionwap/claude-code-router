@@ -258,6 +258,7 @@ Transformers allow you to modify the request and response payloads to ensure com
 
 **Available Built-in Transformers:**
 
+- `Anthropic`:If you use only the `Anthropic` transformer, it will preserve the original request and response parameters(you can use it to connect directly to an Anthropic endpoint).
 - `deepseek`: Adapts requests/responses for DeepSeek API.
 - `gemini`: Adapts requests/responses for Gemini API.
 - `openrouter`: Adapts requests/responses for OpenRouter API.
@@ -423,13 +424,8 @@ If you find this project helpful, please consider sponsoring its development. Yo
 
 A huge thank you to all our sponsors for their generous support!
 
-<table>
-  <tr>
-    <td><a href="https://aihubmix.com/" target="_blank"><img src="/blog/images/sponsors/aihubmix.png" width="100" alt="aihubmix" /></a></td>
-  </tr>
-</table>
 
-
+- [AIHubmix](https://aihubmix.com/)
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)
 - [@vrgitadmin](https://github.com/vrgitadmin)
@@ -470,6 +466,9 @@ A huge thank you to all our sponsors for their generous support!
 - @*鑫
 - @c\*y
 - @\*昕
+- [@witsice](https://github.com/witsice)
+- @b\*g
+- @\*亿
 
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
