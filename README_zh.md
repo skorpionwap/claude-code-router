@@ -255,7 +255,24 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 -   `Anthropic`: 如果你只使用这一个转换器，则会直接透传请求和响应(你可以用它来接入其他支持Anthropic端点的服务商)。
 -   `deepseek`: 适配 DeepSeek API 的请求/响应。
 -   `gemini`: 适配 Gemini API 的请求/响应。
--   `openrouter`: 适配 OpenRouter API 的请求/响应。
+-   `openrouter`: 适配 OpenRouter API 的请求/响应。它还可以接受一个 `provider` 路由参数，以指定 OpenRouter 应使用哪些底层提供商。有关更多详细信息，请参阅 [OpenRouter 文档](https://openrouter.ai/docs/features/provider-routing)。请参阅下面的示例：
+    ```json
+      "transformer": {
+        "use": ["openrouter"],
+        "moonshotai/kimi-k2": {
+          "use": [
+            [
+              "openrouter",
+              {
+                "provider": {
+                  "only": ["moonshotai/fp8"]
+                }
+              }
+            ]
+          ]
+        }
+      }
+    ```
 -   `groq`: 适配 groq API 的请求/响应
 -   `maxtoken`: 设置特定的 `max_tokens` 值。
 -   `tooluse`: 优化某些模型的工具使用(通过`tool_choice`参数)。

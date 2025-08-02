@@ -261,7 +261,24 @@ Transformers allow you to modify the request and response payloads to ensure com
 - `Anthropic`:If you use only the `Anthropic` transformer, it will preserve the original request and response parameters(you can use it to connect directly to an Anthropic endpoint).
 - `deepseek`: Adapts requests/responses for DeepSeek API.
 - `gemini`: Adapts requests/responses for Gemini API.
-- `openrouter`: Adapts requests/responses for OpenRouter API.
+- `openrouter`: Adapts requests/responses for OpenRouter API. It can also accept a `provider` routing parameter to specify which underlying providers OpenRouter should use. For more details, refer to the [OpenRouter documentation](https://openrouter.ai/docs/features/provider-routing). See an example below:
+  ```json
+    "transformer": {
+      "use": ["openrouter"],
+      "moonshotai/kimi-k2": {
+        "use": [
+          [
+            "openrouter",
+            {
+              "provider": {
+                "only": ["moonshotai/fp8"]
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ```
 - `groq`: Adapts requests/responses for groq API.
 - `maxtoken`: Sets a specific `max_tokens` value.
 - `tooluse`: Optimizes tool usage for certain models via `tool_choice`.
