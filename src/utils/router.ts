@@ -64,6 +64,16 @@ const calculateTokenCount = (
 
 const getUseModel = async (req: any, tokenCount: number, config: any) => {
   if (req.body.model.includes(",")) {
+    const [provider, model] = req.body.model.split(",");
+    const finalProvider = config.Providers.find(
+      (p: any) => p.name.toLowerCase() === provider
+    );
+    const finalModel = finalProvider?.models?.find(
+      (m: any) => m.name.toLowerCase() === model
+    );
+    if (finalProvider && finalModel) {
+      return `${finalProvider.name},${finalModel}`;
+    }
     return req.body.model;
   }
   // if tokenCount is greater than the configured threshold, use the long context model
