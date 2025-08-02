@@ -21,7 +21,7 @@ export function Transformers() {
   const { config, setConfig } = useConfig();
   const [editingTransformerIndex, setEditingTransformerIndex] = useState<number | null>(null);
   const [deletingTransformerIndex, setDeletingTransformerIndex] = useState<number | null>(null);
-  const [newTransformer, setNewTransformer] = useState<{ path: string; options: { [key: string]: string } } | null>(null);
+  const [newTransformer, setNewTransformer] = useState<{ name: string; path: string; project: string; parameters: { [key: string]: string } } | null>(null);
 
   // Handle case where config is null or undefined
   if (!config) {
@@ -37,11 +37,11 @@ export function Transformers() {
     );
   }
 
-  // Validate config.transformers to ensure it's an array
-  const validTransformers = Array.isArray(config.transformers) ? config.transformers : [];
+  // Validate config.Transformers to ensure it's an array
+  const validTransformers = Array.isArray(config.Transformers) ? config.Transformers : [];
 
   const handleAddTransformer = () => {
-    const newTransformer = { path: "", options: {} };
+    const newTransformer = { name: "", path: "", project: "", parameters: {} };
     setNewTransformer(newTransformer);
     setEditingTransformerIndex(validTransformers.length); // Use the length as index for the new item
   };
@@ -49,26 +49,26 @@ export function Transformers() {
   const handleRemoveTransformer = (index: number) => {
     const newTransformers = [...validTransformers];
     newTransformers.splice(index, 1);
-    setConfig({ ...config, transformers: newTransformers });
+    setConfig({ ...config, Transformers: newTransformers });
     setDeletingTransformerIndex(null);
   };
 
-  const handleTransformerChange = (index: number, field: string, value: string, optionKey?: string) => {
+  const handleTransformerChange = (index: number, field: string, value: string, parameterKey?: string) => {
     if (index < validTransformers.length) {
       // Editing an existing transformer
       const newTransformers = [...validTransformers];
-      if (optionKey !== undefined) {
-        newTransformers[index].options[optionKey] = value;
+      if (parameterKey !== undefined) {
+        newTransformers[index].parameters![parameterKey] = value;
       } else {
-        (newTransformers[index] as Record<string, unknown>)[field] = value;
+        (newTransformers[index] as unknown as Record<string, unknown>)[field] = value;
       }
-      setConfig({ ...config, transformers: newTransformers });
+      setConfig({ ...config, Transformers: newTransformers });
     } else {
       // Editing the new transformer
       if (newTransformer) {
         const updatedTransformer = { ...newTransformer };
-        if (optionKey !== undefined) {
-          updatedTransformer.options[optionKey] = value;
+        if (parameterKey !== undefined) {
+          updatedTransformer.parameters![parameterKey] = value;
         } else {
           (updatedTransformer as Record<string, unknown>)[field] = value;
         }
@@ -87,7 +87,7 @@ export function Transformers() {
     if (newTransformer && editingTransformerIndex === validTransformers.length) {
       // Saving a new transformer
       const newTransformers = [...validTransformers, newTransformer];
-      setConfig({ ...config, transformers: newTransformers });
+      setConfig({ ...config, Transformers: newTransformers });
     }
     // Close the dialog
     setEditingTransformerIndex(null);
@@ -137,16 +137,16 @@ export function Transformers() {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
-                      const options = editingTransformer.options || {};
-                      const newKey = `param${Object.keys(options).length + 1}`;
+                      const parameters = editingTransformer.parameters || {};
+                      const newKey = `param${Object.keys(parameters).length + 1}`;
                       if (editingTransformerIndex !== null) {
-                        const newOptions = { ...options, [newKey]: "" };
+                        const newParameters = { ...parameters, [newKey]: "" };
                         if (editingTransformerIndex < validTransformers.length) {
                           const newTransformers = [...validTransformers];
-                          newTransformers[editingTransformerIndex].options = newOptions;
-                          setConfig({ ...config, transformers: newTransformers });
+                          newTransformers[editingTransformerIndex].parameters = newParameters;
+                          setConfig({ ...config, Transformers: newTransformers });
                         } else if (newTransformer) {
-                          setNewTransformer({ ...newTransformer, options: newOptions });
+                          setNewTransformer({ ...newTransformer, parameters: newParameters });
                         }
                       }
                     }}
@@ -154,22 +154,22 @@ export function Transformers() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                {Object.entries(editingTransformer.options || {}).map(([key, value]) => (
+                {Object.entries(editingTransformer.parameters || {}).map(([key, value]) => (
                   <div key={key} className="flex items-center gap-2">
                     <Input 
                       value={key} 
                       onChange={(e) => {
-                        const options = editingTransformer.options || {};
-                        const newOptions = { ...options };
-                        delete newOptions[key];
-                        newOptions[e.target.value] = value;
+                        const parameters = editingTransformer.parameters || {};
+                        const newParameters = { ...parameters };
+                        delete newParameters[key];
+                        newParameters[e.target.value] = value;
                         if (editingTransformerIndex !== null) {
                           if (editingTransformerIndex < validTransformers.length) {
                             const newTransformers = [...validTransformers];
-                            newTransformers[editingTransformerIndex].options = newOptions;
-                            setConfig({ ...config, transformers: newTransformers });
+                            newTransformers[editingTransformerIndex].parameters = newParameters;
+                            setConfig({ ...config, Transformers: newTransformers });
                           } else if (newTransformer) {
-                            setNewTransformer({ ...newTransformer, options: newOptions });
+                            setNewTransformer({ ...newTransformer, parameters: newParameters });
                           }
                         }
                       }}
@@ -179,7 +179,7 @@ export function Transformers() {
                       value={value} 
                       onChange={(e) => {
                         if (editingTransformerIndex !== null) {
-                          handleTransformerChange(editingTransformerIndex, "options", e.target.value, key);
+                          handleTransformerChange(editingTransformerIndex, "parameters", e.target.value, key);
                         }
                       }}
                       className="flex-1"
@@ -189,15 +189,15 @@ export function Transformers() {
                       size="icon"
                       onClick={() => {
                         if (editingTransformerIndex !== null) {
-                          const options = editingTransformer.options || {};
-                          const newOptions = { ...options };
-                          delete newOptions[key];
+                          const parameters = editingTransformer.parameters || {};
+                          const newParameters = { ...parameters };
+                          delete newParameters[key];
                           if (editingTransformerIndex < validTransformers.length) {
                             const newTransformers = [...validTransformers];
-                            newTransformers[editingTransformerIndex].options = newOptions;
-                            setConfig({ ...config, transformers: newTransformers });
+                            newTransformers[editingTransformerIndex].parameters = newParameters;
+                            setConfig({ ...config, Transformers: newTransformers });
                           } else if (newTransformer) {
-                            setNewTransformer({ ...newTransformer, options: newOptions });
+                            setNewTransformer({ ...newTransformer, parameters: newParameters });
                           }
                         }
                       }}

@@ -1,4 +1,4 @@
-import type { Config, Provider, Transformer } from '@/components/ConfigProvider';
+import type { Config, Provider, Transformer } from '@/types';
 
 // API Client Class for handling requests with baseUrl and apikey authentication
 class ApiClient {

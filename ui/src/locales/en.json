@@ -77,7 +77,11 @@
     "add_parameter": "Add Parameter",
     "parameter_name": "Parameter Name",
     "parameter_value": "Parameter Value",
-    "selected_transformers": "Selected Transformers"
+    "selected_transformers": "Selected Transformers",
+    "import_from_template": "Import from template",
+    "no_templates_found": "No templates found",
+    "select_template": "Select a template..."
+
   },
   "router": {
     "title": "Router",

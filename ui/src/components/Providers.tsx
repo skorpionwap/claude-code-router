@@ -19,7 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
 import { ComboInput } from "@/components/ui/combo-input";
 import { api } from "@/lib/api";
+import type { Provider } from "@/types";
 
+interface ProviderType extends Provider {}
 
 export function Providers() {
   const { t } = useTranslation();
@@ -30,9 +32,28 @@ export function Providers() {
   const [providerParamInputs, setProviderParamInputs] = useState<Record<string, {name: string, value: string}>>({});
   const [modelParamInputs, setModelParamInputs] = useState<Record<string, {name: string, value: string}>>({});
   const [availableTransformers, setAvailableTransformers] = useState<{name: string; endpoint: string | null;}[]>([]);
-  const [editingProviderData, setEditingProviderData] = useState<any>(null);
+  const [editingProviderData, setEditingProviderData] = useState<ProviderType | null>(null);
   const [isNewProvider, setIsNewProvider] = useState<boolean>(false);
+  const [providerTemplates, setProviderTemplates] = useState<ProviderType[]>([]);
   const comboInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchProviderTemplates = async () => {
+      try {
+        const response = await fetch('https://pub-0dc3e1677e894f07bbea11b17a29e032.r2.dev/providers.json');
+        if (response.ok) {
+          const data = await response.json();
+          setProviderTemplates(data || []);
+        } else {
+          console.error('Failed to fetch provider templates');
+        }
+      } catch (error) {
+        console.error('Failed to fetch provider templates:', error);
+      }
+    };
+
+    fetchProviderTemplates();
+  }, []);
 
   // Fetch available transformers when component mounts
   useEffect(() => {
@@ -67,7 +88,7 @@ export function Providers() {
 
 
   const handleAddProvider = () => {
-    const newProvider = { name: "", api_base_url: "", api_key: "", models: [] };
+    const newProvider: ProviderType = { name: "", api_base_url: "", api_key: "", models: [] };
     setEditingProviderIndex(config.Providers.length);
     setEditingProviderData(newProvider);
     setIsNewProvider(true);
@@ -116,14 +137,14 @@ export function Providers() {
     setDeletingProviderIndex(null);
   };
 
-  const handleProviderChange = (index: number, field: string, value: string) => {
+  const handleProviderChange = (_index: number, field: string, value: string) => {
     if (editingProviderData) {
       const updatedProvider = { ...editingProviderData, [field]: value };
       setEditingProviderData(updatedProvider);
     }
   };
 
-  const handleProviderTransformerChange = (index: number, transformerPath: string) => {
+  const handleProviderTransformerChange = (_index: number, transformerPath: string) => {
     if (!transformerPath || !editingProviderData) return; // Don't add empty transformers
     
     const updatedProvider = { ...editingProviderData };
@@ -137,7 +158,7 @@ export function Providers() {
     setEditingProviderData(updatedProvider);
   };
 
-  const removeProviderTransformerAtIndex = (index: number, transformerIndex: number) => {
+  const removeProviderTransformerAtIndex = (_index: number, transformerIndex: number) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -156,7 +177,7 @@ export function Providers() {
     setEditingProviderData(updatedProvider);
   };
 
-  const handleModelTransformerChange = (providerIndex: number, model: string, transformerPath: string) => {
+  const handleModelTransformerChange = (_providerIndex: number, model: string, transformerPath: string) => {
     if (!transformerPath || !editingProviderData) return; // Don't add empty transformers
     
     const updatedProvider = { ...editingProviderData };
@@ -175,7 +196,7 @@ export function Providers() {
     setEditingProviderData(updatedProvider);
   };
 
-  const removeModelTransformerAtIndex = (providerIndex: number, model: string, transformerIndex: number) => {
+  const removeModelTransformerAtIndex = (_providerIndex: number, model: string, transformerIndex: number) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -195,7 +216,7 @@ export function Providers() {
   };
 
 
-  const addProviderTransformerParameter = (providerIndex: number, transformerIndex: number, paramName: string, paramValue: string) => {
+  const addProviderTransformerParameter = (_providerIndex: number, transformerIndex: number, paramName: string, paramValue: string) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -239,7 +260,7 @@ export function Providers() {
   };
 
 
-  const removeProviderTransformerParameterAtIndex = (providerIndex: number, transformerIndex: number, paramName: string) => {
+  const removeProviderTransformerParameterAtIndex = (_providerIndex: number, transformerIndex: number, paramName: string) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -269,7 +290,7 @@ export function Providers() {
     }
   };
 
-  const addModelTransformerParameter = (providerIndex: number, model: string, transformerIndex: number, paramName: string, paramValue: string) => {
+  const addModelTransformerParameter = (_providerIndex: number, model: string, transformerIndex: number, paramName: string, paramValue: string) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -317,7 +338,7 @@ export function Providers() {
   };
 
 
-  const removeModelTransformerParameterAtIndex = (providerIndex: number, model: string, transformerIndex: number, paramName: string) => {
+  const removeModelTransformerParameterAtIndex = (_providerIndex: number, model: string, transformerIndex: number, paramName: string) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -347,7 +368,7 @@ export function Providers() {
     }
   };
 
-  const handleAddModel = (index: number, model: string) => {
+  const handleAddModel = (_index: number, model: string) => {
     if (!model.trim() || !editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -363,7 +384,26 @@ export function Providers() {
     }
   };
 
-  const handleRemoveModel = (providerIndex: number, modelIndex: number) => {
+    const handleTemplateImport = (value: string) => {
+    if (!value) return;
+    try {
+      const selectedTemplate = JSON.parse(value);
+      if (selectedTemplate) {
+        const currentName = editingProviderData?.name;
+        const newProviderData = JSON.parse(JSON.stringify(selectedTemplate));
+
+        if (!isNewProvider && currentName) {
+          newProviderData.name = currentName;
+        }
+        
+        setEditingProviderData(newProviderData as ProviderType);
+      }
+    } catch (e) {
+      console.error("Failed to parse template", e);
+    }
+  };
+
+  const handleRemoveModel = (_providerIndex: number, modelIndex: number) => {
     if (!editingProviderData) return;
     
     const updatedProvider = { ...editingProviderData };
@@ -407,6 +447,18 @@ export function Providers() {
           </DialogHeader>
           {editingProvider && editingProviderIndex !== null && (
             <div className="space-y-4 p-4 overflow-y-auto flex-grow">
+              {providerTemplates.length > 0 && (
+                <div className="space-y-2">
+                  <Label>{t("providers.import_from_template")}</Label>
+                  <Combobox
+                    options={providerTemplates.map(p => ({ label: p.name, value: JSON.stringify(p) }))}
+                    value=""
+                    onChange={handleTemplateImport}
+                    placeholder={t("providers.select_template")}
+                    emptyPlaceholder={t("providers.no_templates_found")}
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="name">{t("providers.name")}</Label>
                 <Input id="name" value={editingProvider.name || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'name', e.target.value)} />

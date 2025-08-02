@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type Transformer } from "./ConfigProvider";
+import type { Transformer } from "@/types";
 
 interface TransformerListProps {
   transformers: Transformer[];
@@ -46,8 +46,8 @@ export function TransformerList({ transformers, onEdit, onRemove }: TransformerL
         // Handle case where transformer.path might be null or undefined
         const transformerPath = transformer.path || "Unnamed Transformer";
         
-        // Handle case where transformer.options might be null or undefined
-        const options = transformer.options || {};
+        // Handle case where transformer.parameters might be null or undefined
+        const options = transformer.parameters || {};
         
         // Render parameters as tags in a single line
         const renderParameters = () => {

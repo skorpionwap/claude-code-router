@@ -1,53 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 import { api } from '@/lib/api';
-
-export interface Transformer {
-  path: string;
-  options: {
-    [key: string]: string;
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
-
-export interface ProviderTransformer {
-  use: (string | (string | Record<string, unknown> | { max_tokens: number })[])[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any; // for model specific transformers
-}
-
-export interface Provider {
-  name: string;
-  api_base_url: string;
-  api_key: string;
-  models: string[];
-  transformer?: ProviderTransformer;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
-
-export interface RouterConfig {
-  default: string;
-  background: string;
-  think: string;
-  longContext: string;
-  longContextThreshold: number;
-  webSearch: string;
-}
-
-export interface Config {
-  LOG: boolean;
-  CLAUDE_PATH: string;
-  HOST: string;
-  PORT: number;
-  APIKEY: string;
-  API_TIMEOUT_MS: string;
-  PROXY_URL: string;
-  transformers: Transformer[];
-  Providers: Provider[];
-  Router: RouterConfig;
-}
+import type { Config } from '@/types';
 
 interface ConfigContextType {
   config: Config | null;
@@ -121,7 +75,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
           APIKEY: typeof data.APIKEY === 'string' ? data.APIKEY : '',
           API_TIMEOUT_MS: typeof data.API_TIMEOUT_MS === 'string' ? data.API_TIMEOUT_MS : '600000',
           PROXY_URL: typeof data.PROXY_URL === 'string' ? data.PROXY_URL : '',
-          transformers: Array.isArray(data.transformers) ? data.transformers : [],
+          Transformers: Array.isArray(data.Transformers) ? data.Transformers : [],
           Providers: Array.isArray(data.Providers) ? data.Providers : [],
           Router: data.Router && typeof data.Router === 'object' ? {
             default: typeof data.Router.default === 'string' ? data.Router.default : '',
@@ -155,7 +109,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
             APIKEY: '',
             API_TIMEOUT_MS: '600000',
             PROXY_URL: '',
-            transformers: [],
+            Transformers: [],
             Providers: [],
             Router: {
               default: '',
