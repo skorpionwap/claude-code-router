@@ -31,7 +31,8 @@
     "host": "Host",
     "port": "Port",
     "apikey": "API Key",
-    "timeout": "API Timeout (ms)"
+    "timeout": "API Timeout (ms)",
+    "proxy_url": "Proxy URL"
   },
   "transformers": {
     "title": "Custom Transformers",

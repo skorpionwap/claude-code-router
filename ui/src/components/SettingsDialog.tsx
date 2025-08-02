@@ -62,6 +62,10 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
             <Input id="timeout" value={config.API_TIMEOUT_MS} onChange={(e) => setConfig({ ...config, API_TIMEOUT_MS: e.target.value })} className="transition-all-ease focus:scale-[1.01]" />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="proxy-url" className="transition-all-ease hover:scale-[1.01] cursor-pointer">{t("toplevel.proxy_url")}</Label>
+            <Input id="proxy-url" value={config.PROXY_URL} onChange={(e) => setConfig({ ...config, PROXY_URL: e.target.value })} className="transition-all-ease focus:scale-[1.01]" />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="apikey" className="transition-all-ease hover:scale-[1.01] cursor-pointer">{t("toplevel.apikey")}</Label>
             <Input id="apikey" type="password" value={config.APIKEY} onChange={(e) => setConfig({ ...config, APIKEY: e.target.value })} className="transition-all-ease focus:scale-[1.01]" />
           </div>
