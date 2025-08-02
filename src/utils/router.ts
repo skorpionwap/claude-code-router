@@ -129,6 +129,7 @@ export const router = async (req: any, _res: any, config: any) => {
     if (config.CUSTOM_ROUTER_PATH) {
       try {
         const customRouter = require(config.CUSTOM_ROUTER_PATH);
+        req.tokenCount = tokenCount; // Pass token count to custom router
         model = await customRouter(req, config);
       } catch (e: any) {
         log("failed to load custom router", e.message);
