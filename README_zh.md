@@ -354,6 +354,17 @@ module.exports = async function router(req, config) {
 };
 ```
 
+##### 子代理路由
+
+对于子代理内的路由，您必须在子代理提示词的**开头**包含 `<CCR-SUBAGENT-MODEL>provider,model</CCR-SUBAGENT-MODEL>` 来指定特定的提供商和模型。这样可以将特定的子代理任务定向到指定的模型。
+
+**示例：**
+
+```
+<CCR-SUBAGENT-MODEL>openrouter,anthropic/claude-3.5-sonnet</CCR-SUBAGENT-MODEL>
+请帮我分析这段代码是否存在潜在的优化空间...
+```
+
 
 ## 🤖 GitHub Actions
 
