@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SettingsDialog } from "@/components/SettingsDialog";
@@ -9,23 +9,30 @@ import { JsonEditor } from "@/components/JsonEditor";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
 import { api } from "@/lib/api";
-import { Settings, Languages, Save, RefreshCw, FileJson } from "lucide-react";
+import { Settings, Languages, Save, RefreshCw, FileJson, Upload, Download } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Toast } from "@/components/ui/toast";
 import "@/styles/animations.css";
 
 function App() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { config, error } = useConfig();
+  const { config, setConfig, error } = useConfig();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -153,6 +160,43 @@ function App() {
     }
   };
 
+  const exportConfig = () => {
+    if (!config) return;
+    
+    const configString = JSON.stringify(config, null, 2);
+    const blob = new Blob([configString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "claude-code-router-config.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const importConfig = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const configString = event.target?.result as string;
+        const importedConfig = JSON.parse(configString);
+        setConfig(importedConfig);
+      } catch (error) {
+        console.error("Failed to parse config file:", error);
+        setToast({ message: t('settings.import_error'), type: 'error' });
+      }
+    };
+    reader.readAsText(file);
+  };
+
   
   if (isCheckingAuth) {
     return (
@@ -180,51 +224,93 @@ function App() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 font-sans">
-      <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-        <h1 className="text-xl font-semibold text-gray-800">{t('app.title')}</h1>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="transition-all-ease hover:scale-110">
-            <Settings className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setIsJsonEditorOpen(true)} className="transition-all-ease hover:scale-110">
-            <FileJson className="h-5 w-5" />
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="transition-all-ease hover:scale-110">
-                <Languages className="h-5 w-5" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-32 p-2">
-              <div className="space-y-1">
-                <Button
-                  variant={i18n.language.startsWith('en') ? 'default' : 'ghost'}
-                  className="w-full justify-start transition-all-ease hover:scale-[1.02]"
-                  onClick={() => i18n.changeLanguage('en')}
-                >
-                  English
+    <TooltipProvider>
+      <div className="h-screen bg-gray-50 font-sans">
+        <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+          <h1 className="text-xl font-semibold text-gray-800">{t('app.title')}</h1>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={importConfig} className="transition-all-ease hover:scale-110">
+                  <Download className="h-5 w-5" />
                 </Button>
-                <Button
-                  variant={i18n.language.startsWith('zh') ? 'default' : 'ghost'}
-                  className="w-full justify-start transition-all-ease hover:scale-[1.02]"
-                  onClick={() => i18n.changeLanguage('zh')}
-                >
-                  中文
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('app.import_config')}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={exportConfig} className="transition-all-ease hover:scale-110">
+                  <Upload className="h-5 w-5" />
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Button onClick={saveConfig} variant="outline" className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
-            <Save className="mr-2 h-4 w-4" />
-            {t('app.save')}
-          </Button>
-          <Button onClick={saveConfigAndRestart} className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            {t('app.save_and_restart')}
-          </Button>
-        </div>
-      </header>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('app.export_config')}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="transition-all-ease hover:scale-110">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('app.settings')}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={() => setIsJsonEditorOpen(true)} className="transition-all-ease hover:scale-110">
+                  <FileJson className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('json_editor.title')}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Popover>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="transition-all-ease hover:scale-110">
+                      <Languages className="h-5 w-5" />
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('app.change_language')}</p>
+                </TooltipContent>
+              </Tooltip>
+              <PopoverContent className="w-32 p-2">
+                <div className="space-y-1">
+                  <Button
+                    variant={i18n.language.startsWith('en') ? 'default' : 'ghost'}
+                    className="w-full justify-start transition-all-ease hover:scale-[1.02]"
+                    onClick={() => i18n.changeLanguage('en')}
+                  >
+                    English
+                  </Button>
+                  <Button
+                    variant={i18n.language.startsWith('zh') ? 'default' : 'ghost'}
+                    className="w-full justify-start transition-all-ease hover:scale-[1.02]"
+                    onClick={() => i18n.changeLanguage('zh')}
+                  >
+                    中文
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Button onClick={saveConfig} variant="outline" className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
+              <Save className="mr-2 h-4 w-4" />
+              {t('app.save')}
+            </Button>
+            <Button onClick={saveConfigAndRestart} className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              {t('app.save_and_restart')}
+            </Button>
+          </div>
+        </header>
       <main className="flex h-[calc(100vh-4rem)] gap-4 p-4">
         <div className="w-3/5">
           <Providers />
@@ -238,20 +324,28 @@ function App() {
           </div>
         </div>
       </main>
-      <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
-      <JsonEditor 
-        open={isJsonEditorOpen} 
-        onOpenChange={setIsJsonEditorOpen} 
-        showToast={(message, type) => setToast({ message, type })} 
-      />
-      {toast && (
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
+        <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+        <JsonEditor 
+          open={isJsonEditorOpen} 
+          onOpenChange={setIsJsonEditorOpen} 
+          showToast={(message, type) => setToast({ message, type })} 
         />
-      )}
-    </div>
+        {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast(null)} 
+          />
+        )}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".json"
+          className="hidden"
+        />
+      </div>
+    </TooltipProvider>
   );
 }
 

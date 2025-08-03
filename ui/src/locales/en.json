@@ -12,7 +12,10 @@
     "config_saved_success": "Config saved successfully",
     "config_saved_failed": "Failed to save config",
     "config_saved_restart_success": "Config saved and service restarted successfully",
-    "config_saved_restart_failed": "Failed to save config and restart service"
+    "config_saved_restart_failed": "Failed to save config and restart service",
+    "import_config": "Import Config",
+    "export_config": "Export Config",
+    "change_language": "Change Language"
   },
   "login": {
     "title": "Sign in to your account",
