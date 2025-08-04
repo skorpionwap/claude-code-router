@@ -16,6 +16,11 @@ export async function executeCodeCommand(args: string[] = []) {
     API_TIMEOUT_MS: String(config.API_TIMEOUT_MS ?? 600000), // Default to 10 minutes if not set
   };
 
+  // Set ANTHROPIC_SMALL_FAST_MODEL if it exists in config
+  if (config?.ANTHROPIC_SMALL_FAST_MODEL) {
+    env.ANTHROPIC_SMALL_FAST_MODEL = config.ANTHROPIC_SMALL_FAST_MODEL;
+  }
+
   if (config?.APIKEY) {
     env.ANTHROPIC_API_KEY = config.APIKEY;
     delete env.ANTHROPIC_AUTH_TOKEN;
