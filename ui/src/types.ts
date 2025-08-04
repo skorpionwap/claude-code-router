@@ -22,16 +22,15 @@ export interface RouterConfig {
 }
 
 export interface Transformer {
-    name: string;
+    name?: string;
     path: string;
-    project: string;
-    parameters?: Record<string, any>;
+    options?: Record<string, any>;
 }
 
 export interface Config {
   Providers: Provider[];
   Router: RouterConfig;
-  Transformers: Transformer[];
+  transformers: Transformer[];
   // Top-level settings
   LOG: boolean;
   CLAUDE_PATH: string;

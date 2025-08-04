@@ -47,7 +47,7 @@ export function TransformerList({ transformers, onEdit, onRemove }: TransformerL
         const transformerPath = transformer.path || "Unnamed Transformer";
         
         // Handle case where transformer.parameters might be null or undefined
-        const options = transformer.parameters || {};
+        const options = transformer.options || {};
         
         // Render parameters as tags in a single line
         const renderParameters = () => {
