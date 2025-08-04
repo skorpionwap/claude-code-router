@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { X, Trash2, Plus } from "lucide-react";
+import { X, Trash2, Plus, Eye, EyeOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
 import { ComboInput } from "@/components/ui/combo-input";
@@ -35,6 +35,7 @@ export function Providers() {
   const [editingProviderData, setEditingProviderData] = useState<ProviderType | null>(null);
   const [isNewProvider, setIsNewProvider] = useState<boolean>(false);
   const [providerTemplates, setProviderTemplates] = useState<ProviderType[]>([]);
+  const [showApiKey, setShowApiKey] = useState<Record<number, boolean>>({});
   const comboInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -92,6 +93,11 @@ export function Providers() {
     setEditingProviderIndex(config.Providers.length);
     setEditingProviderData(newProvider);
     setIsNewProvider(true);
+    // Reset API key visibility when adding new provider
+    setShowApiKey(prev => ({
+      ...prev,
+      [config.Providers.length]: false
+    }));
   };
 
   const handleEditProvider = (index: number) => {
@@ -99,6 +105,11 @@ export function Providers() {
     setEditingProviderIndex(index);
     setEditingProviderData(JSON.parse(JSON.stringify(provider))); // 深拷贝
     setIsNewProvider(false);
+    // Reset API key visibility when opening edit dialog
+    setShowApiKey(prev => ({
+      ...prev,
+      [index]: false
+    }));
   };
 
   const handleSaveProvider = () => {
@@ -111,6 +122,14 @@ export function Providers() {
       }
       setConfig({ ...config, Providers: newProviders });
     }
+    // Reset API key visibility for this provider
+    if (editingProviderIndex !== null) {
+      setShowApiKey(prev => {
+        const newState = { ...prev };
+        delete newState[editingProviderIndex];
+        return newState;
+      });
+    }
     setEditingProviderIndex(null);
     setEditingProviderData(null);
     setIsNewProvider(false);
@@ -120,6 +139,12 @@ export function Providers() {
     // Reset fetched models state for this provider
     if (editingProviderIndex !== null) {
       setHasFetchedModels(prev => {
+        const newState = { ...prev };
+        delete newState[editingProviderIndex];
+        return newState;
+      });
+      // Reset API key visibility for this provider
+      setShowApiKey(prev => {
         const newState = { ...prev };
         delete newState[editingProviderIndex];
         return newState;
@@ -469,7 +494,33 @@ export function Providers() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="api_key">{t("providers.api_key")}</Label>
-                <Input id="api_key" type="password" value={editingProvider.api_key || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'api_key', e.target.value)} />
+                <div className="relative">
+                  <Input 
+                    id="api_key" 
+                    type={showApiKey[editingProviderIndex || 0] ? "text" : "password"} 
+                    value={editingProvider.api_key || ''} 
+                    onChange={(e) => handleProviderChange(editingProviderIndex, 'api_key', e.target.value)} 
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
+                    onClick={() => {
+                      const index = editingProviderIndex || 0;
+                      setShowApiKey(prev => ({
+                        ...prev,
+                        [index]: !prev[index]
+                      }));
+                    }}
+                  >
+                    {showApiKey[editingProviderIndex || 0] ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="models">{t("providers.models")}</Label>
