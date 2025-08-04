@@ -441,6 +441,8 @@ If you find this project helpful, please consider sponsoring its development. Yo
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F31GN2GM)
 
+[Paypal](https://paypal.me/musistudio1999)
+
 <table>
   <tr>
     <td><img src="/blog/images/alipay.jpg" width="200" alt="Alipay" /></td>
