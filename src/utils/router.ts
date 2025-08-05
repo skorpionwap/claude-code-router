@@ -95,7 +95,6 @@ const getUseModel = async (req: any, tokenCount: number, config: any) => {
       /<CCR-SUBAGENT-MODEL>(.*?)<\/CCR-SUBAGENT-MODEL>/s
     );
     if (model) {
-      log("检测到CCR-SUBAGENT-MODEL:", model[1]);
       req.body.system[1].text = req.body.system[1].text.replace(
         `<CCR-SUBAGENT-MODEL>${model[1]}</CCR-SUBAGENT-MODEL>`,
         ""
