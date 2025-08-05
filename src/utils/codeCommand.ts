@@ -31,7 +31,12 @@ export async function executeCodeCommand(args: string[] = []) {
 
   // Execute claude command
   const claudePath = process.env.CLAUDE_PATH || "claude";
-  const claudeProcess = spawn(claudePath, args, {
+  
+  // Properly join arguments to preserve spaces in quotes
+  // Wrap each argument in double quotes to preserve single and double quotes inside arguments
+  const joinedArgs = args.length > 0 ? args.map(arg => `"${arg.replace(/\"/g, '\\"')}"`).join(" ") : "";
+  
+  const claudeProcess = spawn(claudePath + (joinedArgs ? ` ${joinedArgs}` : ""), [], {
     env,
     stdio: "inherit",
     shell: true,
