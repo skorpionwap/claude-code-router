@@ -47,7 +47,7 @@ export const createServer = (config: any): Server => {
     // Restart the service after a short delay to allow response to be sent
     setTimeout(() => {
       const { spawn } = require("child_process");
-      spawn("ccr", ["restart"], { detached: true, stdio: "ignore" });
+      spawn(process.execPath, [process.argv[1], "restart"], { detached: true, stdio: "ignore" });
     }, 1000);
   });
 

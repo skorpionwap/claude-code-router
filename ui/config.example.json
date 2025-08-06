@@ -174,5 +174,6 @@
     "think": "gemini-cli,gemini-2.5-pro",
     "longContext": "gemini-cli,gemini-2.5-pro",
     "webSearch": "gemini-cli,gemini-2.5-flash"
-  }
+  },
+  "NON_INTERACTIVE_MODE": false
 }
