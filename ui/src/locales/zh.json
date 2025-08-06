@@ -81,7 +81,9 @@
     "import_from_template": "从模板导入",
     "no_templates_found": "未找到模板",
     "select_template": "选择一个模板...",
-    "api_key_required": "API 密钥为必填项"
+    "api_key_required": "API 密钥为必填项",
+    "name_required": "名称为必填项",
+    "name_duplicate": "已存在同名供应商"
 
   },
   "router": {

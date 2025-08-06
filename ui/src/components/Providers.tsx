@@ -37,6 +37,7 @@ export function Providers() {
   const [providerTemplates, setProviderTemplates] = useState<ProviderType[]>([]);
   const [showApiKey, setShowApiKey] = useState<Record<number, boolean>>({});
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
   const comboInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -100,6 +101,7 @@ export function Providers() {
       [config.Providers.length]: false
     }));
     setApiKeyError(null);
+    setNameError(null);
   };
 
   const handleEditProvider = (index: number) => {
@@ -113,17 +115,42 @@ export function Providers() {
       [index]: false
     }));
     setApiKeyError(null);
+    setNameError(null);
   };
 
   const handleSaveProvider = () => {
+    if (!editingProviderData) return;
+    
+    // Validate name
+    if (!editingProviderData.name || editingProviderData.name.trim() === '') {
+      setNameError(t("providers.name_required"));
+      return;
+    }
+    
+    // Check for duplicate names (case-insensitive)
+    const trimmedName = editingProviderData.name.trim();
+    const isDuplicate = config.Providers.some((provider, index) => {
+      // For edit mode, skip checking the current provider being edited
+      if (!isNewProvider && index === editingProviderIndex) {
+        return false;
+      }
+      return provider.name.toLowerCase() === trimmedName.toLowerCase();
+    });
+    
+    if (isDuplicate) {
+      setNameError(t("providers.name_duplicate"));
+      return;
+    }
+    
     // Validate API key
-    if (!editingProviderData || !editingProviderData.api_key || editingProviderData.api_key.trim() === '') {
+    if (!editingProviderData.api_key || editingProviderData.api_key.trim() === '') {
       setApiKeyError(t("providers.api_key_required"));
       return;
     }
     
-    // Clear error if validation passes
+    // Clear errors if validation passes
     setApiKeyError(null);
+    setNameError(null);
     
     if (editingProviderIndex !== null && editingProviderData) {
       const newProviders = [...config.Providers];
@@ -166,6 +193,7 @@ export function Providers() {
     setEditingProviderData(null);
     setIsNewProvider(false);
     setApiKeyError(null);
+    setNameError(null);
   };
 
   const handleRemoveProvider = (index: number) => {
@@ -499,7 +527,21 @@ export function Providers() {
               )}
               <div className="space-y-2">
                 <Label htmlFor="name">{t("providers.name")}</Label>
-                <Input id="name" value={editingProvider.name || ''} onChange={(e) => handleProviderChange(editingProviderIndex, 'name', e.target.value)} />
+                <Input 
+                  id="name" 
+                  value={editingProvider.name || ''} 
+                  onChange={(e) => {
+                    handleProviderChange(editingProviderIndex, 'name', e.target.value);
+                    // Clear name error when user starts typing
+                    if (nameError) {
+                      setNameError(null);
+                    }
+                  }}
+                  className={nameError ? "border-red-500" : ""}
+                />
+                {nameError && (
+                  <p className="text-sm text-red-500">{nameError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="api_base_url">{t("providers.api_base_url")}</Label>
