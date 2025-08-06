@@ -36,6 +36,7 @@ export function Providers() {
   const [isNewProvider, setIsNewProvider] = useState<boolean>(false);
   const [providerTemplates, setProviderTemplates] = useState<ProviderType[]>([]);
   const [showApiKey, setShowApiKey] = useState<Record<number, boolean>>({});
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const comboInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -93,11 +94,12 @@ export function Providers() {
     setEditingProviderIndex(config.Providers.length);
     setEditingProviderData(newProvider);
     setIsNewProvider(true);
-    // Reset API key visibility when adding new provider
+    // Reset API key visibility and error when adding new provider
     setShowApiKey(prev => ({
       ...prev,
       [config.Providers.length]: false
     }));
+    setApiKeyError(null);
   };
 
   const handleEditProvider = (index: number) => {
@@ -105,14 +107,24 @@ export function Providers() {
     setEditingProviderIndex(index);
     setEditingProviderData(JSON.parse(JSON.stringify(provider))); // 深拷贝
     setIsNewProvider(false);
-    // Reset API key visibility when opening edit dialog
+    // Reset API key visibility and error when opening edit dialog
     setShowApiKey(prev => ({
       ...prev,
       [index]: false
     }));
+    setApiKeyError(null);
   };
 
   const handleSaveProvider = () => {
+    // Validate API key
+    if (!editingProviderData || !editingProviderData.api_key || editingProviderData.api_key.trim() === '') {
+      setApiKeyError(t("providers.api_key_required"));
+      return;
+    }
+    
+    // Clear error if validation passes
+    setApiKeyError(null);
+    
     if (editingProviderIndex !== null && editingProviderData) {
       const newProviders = [...config.Providers];
       if (isNewProvider) {
@@ -153,6 +165,7 @@ export function Providers() {
     setEditingProviderIndex(null);
     setEditingProviderData(null);
     setIsNewProvider(false);
+    setApiKeyError(null);
   };
 
   const handleRemoveProvider = (index: number) => {
@@ -500,6 +513,7 @@ export function Providers() {
                     type={showApiKey[editingProviderIndex || 0] ? "text" : "password"} 
                     value={editingProvider.api_key || ''} 
                     onChange={(e) => handleProviderChange(editingProviderIndex, 'api_key', e.target.value)} 
+                    className={apiKeyError ? "border-red-500" : ""}
                   />
                   <Button
                     type="button"
@@ -521,6 +535,9 @@ export function Providers() {
                     )}
                   </Button>
                 </div>
+                {apiKeyError && (
+                  <p className="text-sm text-red-500">{apiKeyError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="models">{t("providers.models")}</Label>

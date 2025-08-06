@@ -48,7 +48,7 @@
   "providers": {
     "title": "供应商",
     "name": "名称",
-    "api_base_url": "API 基础地址",
+    "api_base_url": "API 完整地址",
     "api_key": "API 密钥",
     "models": "模型",
     "models_placeholder": "输入模型名称并按回车键添加",
@@ -80,7 +80,8 @@
     "selected_transformers": "已选转换器",
     "import_from_template": "从模板导入",
     "no_templates_found": "未找到模板",
-    "select_template": "选择一个模板..."
+    "select_template": "选择一个模板...",
+    "api_key_required": "API 密钥为必填项"
 
   },
   "router": {

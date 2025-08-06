@@ -48,7 +48,7 @@
   "providers": {
     "title": "Providers",
     "name": "Name",
-    "api_base_url": "API Base URL",
+    "api_base_url": "API Full URL",
     "api_key": "API Key",
     "models": "Models",
     "models_placeholder": "Enter model name and press Enter to add",
@@ -80,7 +80,8 @@
     "selected_transformers": "Selected Transformers",
     "import_from_template": "Import from template",
     "no_templates_found": "No templates found",
-    "select_template": "Select a template..."
+    "select_template": "Select a template...",
+    "api_key_required": "API Key is required"
 
   },
   "router": {

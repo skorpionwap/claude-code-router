@@ -69,7 +69,7 @@ const getUseModel = async (req: any, tokenCount: number, config: any) => {
       (p: any) => p.name.toLowerCase() === provider
     );
     const finalModel = finalProvider?.models?.find(
-      (m: any) => m.name.toLowerCase() === model
+      (m: any) => m.toLowerCase() === model
     );
     if (finalProvider && finalModel) {
       return `${finalProvider.name},${finalModel}`;
