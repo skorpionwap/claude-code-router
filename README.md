@@ -504,6 +504,7 @@ A huge thank you to all our sponsors for their generous support!
 - [@witsice](https://github.com/witsice)
 - @b\*g
 - @\*亿
-
+- @\*辉
+- @JACK 
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
