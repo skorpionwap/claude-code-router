@@ -38,6 +38,7 @@ npm install -g @musistudio/claude-code-router
 - **`LOG`** (可选): 您可以通过将其设置为 `true` 来启用日志记录。日志文件将位于 `$HOME/.claude-code-router.log`。
 - **`APIKEY`** (可选): 您可以设置一个密钥来进行身份验证。设置后，客户端请求必须在 `Authorization` 请求头 (例如, `Bearer your-secret-key`) 或 `x-api-key` 请求头中提供此密钥。例如：`"APIKEY": "your-secret-key"`。
 - **`HOST`** (可选): 您可以设置服务的主机地址。如果未设置 `APIKEY`，出于安全考虑，主机地址将强制设置为 `127.0.0.1`，以防止未经授权的访问。例如：`"HOST": "0.0.0.0"`。
+- **`NON_INTERACTIVE_MODE`** (可选): 当设置为 `true` 时，启用与非交互式环境（如 GitHub Actions、Docker 容器或其他 CI/CD 系统）的兼容性。这会设置适当的环境变量（`CI=true`、`FORCE_COLOR=0` 等）并配置 stdin 处理，以防止进程在自动化环境中挂起。例如：`"NON_INTERACTIVE_MODE": true`。
 - **`Providers`**: 用于配置不同的模型提供商。
 - **`Router`**: 用于设置路由规则。`default` 指定默认模型，如果未配置其他路由，则该模型将用于所有请求。
 - **`API_TIMEOUT_MS`**: API 请求超时时间，单位为毫秒。
@@ -50,6 +51,7 @@ npm install -g @musistudio/claude-code-router
   "PROXY_URL": "http://127.0.0.1:7890",
   "LOG": true,
   "API_TIMEOUT_MS": 600000,
+  "NON_INTERACTIVE_MODE": false,
   "Providers": [
     {
       "name": "openrouter",
@@ -402,6 +404,7 @@ jobs:
           cat << 'EOF' > $HOME/.claude-code-router/config.json
           {
             "log": true,
+            "NON_INTERACTIVE_MODE": true,
             "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
             "OPENAI_BASE_URL": "https://api.deepseek.com",
             "OPENAI_MODEL": "deepseek-chat"

@@ -41,6 +41,7 @@ The `config.json` file has several key sections:
 - **`LOG`** (optional): You can enable logging by setting it to `true`. The log file will be located at `$HOME/.claude-code-router.log`.
 - **`APIKEY`** (optional): You can set a secret key to authenticate requests. When set, clients must provide this key in the `Authorization` header (e.g., `Bearer your-secret-key`) or the `x-api-key` header. Example: `"APIKEY": "your-secret-key"`.
 - **`HOST`** (optional): You can set the host address for the server. If `APIKEY` is not set, the host will be forced to `127.0.0.1` for security reasons to prevent unauthorized access. Example: `"HOST": "0.0.0.0"`.
+- **`NON_INTERACTIVE_MODE`** (optional): When set to `true`, enables compatibility with non-interactive environments like GitHub Actions, Docker containers, or other CI/CD systems. This sets appropriate environment variables (`CI=true`, `FORCE_COLOR=0`, etc.) and configures stdin handling to prevent the process from hanging in automated environments. Example: `"NON_INTERACTIVE_MODE": true`.
 
 - **`Providers`**: Used to configure different model providers.
 - **`Router`**: Used to set up routing rules. `default` specifies the default model, which will be used for all requests if no other route is configured.
@@ -54,6 +55,7 @@ Here is a comprehensive example:
   "PROXY_URL": "http://127.0.0.1:7890",
   "LOG": true,
   "API_TIMEOUT_MS": 600000,
+  "NON_INTERACTIVE_MODE": false,
   "Providers": [
     {
       "name": "openrouter",
@@ -407,6 +409,7 @@ jobs:
           cat << 'EOF' > $HOME/.claude-code-router/config.json
           {
             "log": true,
+            "NON_INTERACTIVE_MODE": true,
             "OPENAI_API_KEY": "${{ secrets.OPENAI_API_KEY }}",
             "OPENAI_BASE_URL": "https://api.deepseek.com",
             "OPENAI_MODEL": "deepseek-chat"
@@ -427,6 +430,8 @@ jobs:
         with:
           anthropic_api_key: "any-string-is-ok"
 ```
+
+> **Note**: When running in GitHub Actions or other automation environments, make sure to set `"NON_INTERACTIVE_MODE": true` in your configuration to prevent the process from hanging due to stdin handling issues.
 
 This setup allows for interesting automations, like running tasks during off-peak hours to reduce API costs.
 
