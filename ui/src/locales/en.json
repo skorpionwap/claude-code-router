@@ -81,7 +81,9 @@
     "import_from_template": "Import from template",
     "no_templates_found": "No templates found",
     "select_template": "Select a template...",
-    "api_key_required": "API Key is required"
+    "api_key_required": "API Key is required",
+    "name_required": "Name is required",
+    "name_duplicate": "A provider with this name already exists"
 
   },
   "router": {
