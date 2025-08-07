@@ -215,7 +215,22 @@ async function main() {
 
       // Get service info and open UI
       const serviceInfo = await getServiceInfo();
-      const uiUrl = `${serviceInfo.endpoint}/ui/`;
+      
+      // Generate temporary API key based on system UUID
+      let tempApiKey = "";
+      try {
+        const { getTempAPIKey } = require("./utils");
+        tempApiKey = await getTempAPIKey();
+      } catch (error: any) {
+        console.warn("Warning: Failed to generate temporary API key:", error.message);
+        console.warn("Continuing without temporary API key...");
+      }
+      
+      // Add temporary API key as URL parameter if successfully generated
+      const uiUrl = tempApiKey 
+        ? `${serviceInfo.endpoint}/ui/?tempApiKey=${tempApiKey}`
+        : `${serviceInfo.endpoint}/ui/`;
+      
       console.log(`Opening UI at ${uiUrl}`);
 
       // Open URL in browser based on platform

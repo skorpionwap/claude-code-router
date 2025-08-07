@@ -128,6 +128,20 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
     fetchConfig();
   }, [hasFetched, apiKey]);
 
+  // Check if user has full access
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (config) {
+        const hasFullAccess = await api.checkFullAccess();
+        // Store access level in a global state or context if needed
+        // For now, we'll just log it
+        console.log('User has full access:', hasFullAccess);
+      }
+    };
+    
+    checkAccess();
+  }, [config]);
+
   return (
     <ConfigContext.Provider value={{ config, setConfig, error }}>
       {children}

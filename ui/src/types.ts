@@ -40,3 +40,5 @@ export interface Config {
   API_TIMEOUT_MS: string;
   PROXY_URL: string;
 }
+
+export type AccessLevel = 'restricted' | 'full';
