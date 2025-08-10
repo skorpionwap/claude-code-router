@@ -12,8 +12,8 @@ importers:
         specifier: ^8.2.0
         version: 8.2.0
       '@musistudio/llms':
-        specifier: v1.0.19
-        version: 1.0.19(ws@8.18.3)(zod@3.25.67)
+        specifier: ^1.0.21
+        version: 1.0.21(ws@8.18.3)(zod@3.25.67)
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -23,6 +23,9 @@ importers:
       openurl:
         specifier: ^1.1.1
         version: 1.1.1
+      pino-rotating-file-stream:
+        specifier: ^0.0.2
+        version: 0.0.2
       tiktoken:
         specifier: ^1.0.21
         version: 1.0.21
@@ -257,8 +260,8 @@ packages:
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
 
-  '@musistudio/llms@1.0.19':
-    resolution: {integrity: sha512-+U29ZxqXUQJBur5kE9d3e0mC19H0uetwxYvMpWCF4lBtXb2syBPIop2KeolBP+5/vSUz8M45HFd8yKFfVDEO3A==}
+  '@musistudio/llms@1.0.21':
+    resolution: {integrity: sha512-oRSs9U0o13HCNaw+fesLnJv75t+AUSKn37LxJOlO1yNWYucjfB76vo3y3rK47wztxv2rmSumrlbu2FzjRG4YuQ==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -707,6 +710,9 @@ packages:
   pino-abstract-transport@2.0.0:
     resolution: {integrity: sha512-F63x5tizV6WCh4R6RHyi2Ml+M70DNRXt/+HANowMflpgGFMAym/VKm6G7ZOQRjqN7XbGxK1Lg9t6ZrtzOaivMw==}
 
+  pino-rotating-file-stream@0.0.2:
+    resolution: {integrity: sha512-knF+ReDBMQMB7gzBfuFpUmCrXpRen6YYh5Q9Ymmj//dDHeH4QEMwAV7VoGEEM+30s7VHqfbabazs9wxkMO2BIQ==}
+
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
@@ -756,6 +762,10 @@ packages:
 
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
+
+  rotating-file-stream@3.2.6:
+    resolution: {integrity: sha512-r8yShzMWUvWXkRzbOXDM1fEaMpc3qo2PzK7bBH/0p0Nl/uz8Mud/Y+0XTQxe3kbSnDF7qBH2tSe83WDKA7o3ww==}
+    engines: {node: '>=14.0'}
 
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -1102,7 +1112,7 @@ snapshots:
 
   '@lukeed/ms@2.0.2': {}
 
-  '@musistudio/llms@1.0.19(ws@8.18.3)(zod@3.25.67)':
+  '@musistudio/llms@1.0.21(ws@8.18.3)(zod@3.25.67)':
     dependencies:
       '@anthropic-ai/sdk': 0.54.0
       '@fastify/cors': 11.0.1
@@ -1604,6 +1614,10 @@ snapshots:
     dependencies:
       split2: 4.2.0
 
+  pino-rotating-file-stream@0.0.2:
+    dependencies:
+      rotating-file-stream: 3.2.6
+
   pino-std-serializers@7.0.0: {}
 
   pino@9.7.0:
@@ -1652,6 +1666,8 @@ snapshots:
   reusify@1.1.0: {}
 
   rfdc@1.4.1: {}
+
+  rotating-file-stream@3.2.6: {}
 
   run-parallel@1.2.0:
     dependencies:

@@ -290,6 +290,7 @@ Transformers allow you to modify the request and response payloads to ensure com
 - `enhancetool`: Adds a layer of error tolerance to the tool call parameters returned by the LLM (this will cause the tool call information to no longer be streamed).
 - `cleancache`: Clears the `cache_control` field from requests.
 - `vertex-gemini`: Handles the Gemini API using Vertex authentication.
+- `qwen-cli` (experimental): Unofficial support for qwen3-coder-plus model via Qwen CLI [qwen-cli.js](https://gist.github.com/musistudio/f5a67841ced39912fd99e42200d5ca8b).
 
 **Custom Transformers:**
 
@@ -506,5 +507,10 @@ A huge thank you to all our sponsors for their generous support!
 - @\*亿
 - @\*辉
 - @JACK 
+- @\*光
+- @W\*l
+- [@kesku](https://github.com/kesku)
+- @水\*丫
+- @二吉吉
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)

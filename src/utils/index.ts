@@ -9,6 +9,7 @@ import {
   PLUGINS_DIR,
 } from "../constants";
 import { getSystemUUID, generateTempAPIKey, getTempAPIKey } from "./systemUUID";
+import { cleanupLogFiles } from "./logCleanup";
 
 const ensureDir = async (dir_path: string) => {
   try {
@@ -139,3 +140,6 @@ export const initConfig = async () => {
 
 // 导出系统UUID相关函数
 export { getSystemUUID, generateTempAPIKey, getTempAPIKey };
+
+// 导出日志清理函数
+export { cleanupLogFiles };

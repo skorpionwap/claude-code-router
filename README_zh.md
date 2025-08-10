@@ -284,6 +284,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 -   `enhancetool`: 对 LLM 返回的工具调用参数增加一层容错处理（这会导致不再流式返回工具调用信息）。
 -   `cleancache`: 清除请求中的 `cache_control` 字段。
 -   `vertex-gemini`: 处理使用 vertex 鉴权的 gemini api。
+-   `qwen-cli` (实验性): 通过 Qwen CLI [qwen-cli.js](https://gist.github.com/musistudio/f5a67841ced39912fd99e42200d5ca8b) 对 qwen3-coder-plus 的非官方支持。
 
 **自定义 Transformer:**
 
@@ -497,6 +498,11 @@ jobs:
 - @\*亿
 - @\*辉
 - @JACK 
+- @\*光
+- @W\*l
+- [@kesku](https://github.com/kesku)
+- @水\*丫
+- @二吉吉
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 
