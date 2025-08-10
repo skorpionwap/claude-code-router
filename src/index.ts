@@ -82,8 +82,6 @@ async function run(options: RunOptions = {}) {
     ? parseInt(process.env.SERVICE_PORT)
     : port;
 
-  const startTime = new Date().toISOString();
-
   const server = createServer({
     jsonPath: CONFIG_FILE,
     initialConfig: {
@@ -101,7 +99,7 @@ async function run(options: RunOptions = {}) {
       level: "debug",
       stream: createWriteStream({
         path: HOME_DIR,
-        filename: `./logs/ccr-${startTime}.log`,
+        filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
         maxFiles: 3,
         interval: "1d",
       }),
