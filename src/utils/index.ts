@@ -22,6 +22,7 @@ const ensureDir = async (dir_path: string) => {
 export const initDir = async () => {
   await ensureDir(HOME_DIR);
   await ensureDir(PLUGINS_DIR);
+  await ensureDir(path.join(HOME_DIR, "logs"));
 };
 
 const createReadline = () => {
