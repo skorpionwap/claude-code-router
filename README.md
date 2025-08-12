@@ -47,6 +47,27 @@ The `config.json` file has several key sections:
 - **`Router`**: Used to set up routing rules. `default` specifies the default model, which will be used for all requests if no other route is configured.
 - **`API_TIMEOUT_MS`**: Specifies the timeout for API calls in milliseconds.
 
+#### Environment Variable Interpolation
+
+Claude Code Router supports environment variable interpolation for secure API key management. You can reference environment variables in your `config.json` using either `$VAR_NAME` or `${VAR_NAME}` syntax:
+
+```json
+{
+  "OPENAI_API_KEY": "$OPENAI_API_KEY",
+  "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+  "Providers": [
+    {
+      "name": "openai",
+      "api_base_url": "https://api.openai.com/v1/chat/completions",
+      "api_key": "$OPENAI_API_KEY",
+      "models": ["gpt-5", "gpt-5-mini"]
+    }
+  ]
+}
+```
+
+This allows you to keep sensitive API keys in environment variables instead of hardcoding them in configuration files. The interpolation works recursively through nested objects and arrays.
+
 Here is a comprehensive example:
 
 ```json
