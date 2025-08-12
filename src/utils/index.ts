@@ -11,6 +11,26 @@ import {
 import { getSystemUUID, generateTempAPIKey, getTempAPIKey } from "./systemUUID";
 import { cleanupLogFiles } from "./logCleanup";
 
+// Function to interpolate environment variables in config values
+const interpolateEnvVars = (obj: any): any => {
+  if (typeof obj === "string") {
+    // Replace $VAR_NAME or ${VAR_NAME} with environment variable values
+    return obj.replace(/\$\{([^}]+)\}|\$([A-Z_][A-Z0-9_]*)/g, (match, braced, unbraced) => {
+      const varName = braced || unbraced;
+      return process.env[varName] || match; // Keep original if env var doesn't exist
+    });
+  } else if (Array.isArray(obj)) {
+    return obj.map(interpolateEnvVars);
+  } else if (obj !== null && typeof obj === "object") {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = interpolateEnvVars(value);
+    }
+    return result;
+  }
+  return obj;
+};
+
 const ensureDir = async (dir_path: string) => {
   try {
     await fs.access(dir_path);
@@ -52,7 +72,9 @@ export const readConfigFile = async () => {
     const config = await fs.readFile(CONFIG_FILE, "utf-8");
     try {
       // Try to parse with JSON5 first (which also supports standard JSON)
-      return JSON5.parse(config);
+      const parsedConfig = JSON5.parse(config);
+      // Interpolate environment variables in the parsed config
+      return interpolateEnvVars(parsedConfig);
     } catch (parseError) {
       console.error(`Failed to parse config file at ${CONFIG_FILE}`);
       console.error("Error details:", (parseError as Error).message);
