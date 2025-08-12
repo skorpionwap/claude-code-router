@@ -140,22 +140,6 @@ class ApiClient {
     return this.post<Config>('/config', config);
   }
   
-  // Check if user has full access
-  async checkFullAccess(): Promise<boolean> {
-    try {
-      // Try to access test endpoint (won't actually modify anything)
-      // This will return 403 if user doesn't have full access
-      await this.post<Config>('/config/test', { test: true });
-      return true;
-    } catch (error: any) {
-      if (error.message && error.message.includes('403')) {
-        return false;
-      }
-      // For other errors, assume user has access (to avoid blocking legitimate users)
-      return true;
-    }
-  }
-  
   // Get providers
   async getProviders(): Promise<Provider[]> {
     return this.get<Provider[]>('/api/providers');
