@@ -14,6 +14,7 @@ import {
 import { CONFIG_FILE } from "./constants";
 import createWriteStream from "pino-rotating-file-stream";
 import { HOME_DIR } from "./constants";
+import { configureLogging } from "./utils/log";
 
 async function initializeClaudeConfig() {
   const homeDir = homedir();
@@ -51,6 +52,10 @@ async function run(options: RunOptions = {}) {
   // Clean up old log files, keeping only the 10 most recent ones
   await cleanupLogFiles();
   const config = await initConfig();
+  
+  // Configure logging based on config
+  configureLogging(config);
+  
   let HOST = config.HOST;
 
   if (config.HOST && !config.APIKEY) {
@@ -82,6 +87,17 @@ async function run(options: RunOptions = {}) {
     ? parseInt(process.env.SERVICE_PORT)
     : port;
 
+  // Configure logger based on config settings
+  const loggerConfig = config.LOG !== false ? {
+    level: config.LOG_LEVEL || "info",
+    stream: createWriteStream({
+      path: HOME_DIR,
+      filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
+      maxFiles: 3,
+      interval: "1d",
+    }),
+  } : false;
+
   const server = createServer({
     jsonPath: CONFIG_FILE,
     initialConfig: {
@@ -95,15 +111,7 @@ async function run(options: RunOptions = {}) {
         "claude-code-router.log"
       ),
     },
-    logger: {
-      level: "debug",
-      stream: createWriteStream({
-        path: HOME_DIR,
-        filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
-        maxFiles: 3,
-        interval: "1d",
-      }),
-    },
+    logger: loggerConfig,
   });
   // Add async preHandler hook for authentication
   server.addHook("preHandler", async (req, reply) => {

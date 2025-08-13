@@ -115,5 +115,7 @@
   "APIKEY": "your-secret-key",
   "HOST": "0.0.0.0",
   "API_TIMEOUT_MS": 600000,
-  "NON_INTERACTIVE_MODE": false
+  "NON_INTERACTIVE_MODE": false,
+  "LOG": true,
+  "LOG_LEVEL": "info"
 }

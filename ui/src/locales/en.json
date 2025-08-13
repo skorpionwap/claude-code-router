@@ -36,6 +36,7 @@
   "toplevel": {
     "title": "General Settings",
     "log": "Enable Logging",
+    "log_level": "Log Level",
     "claude_path": "Claude Path",
     "host": "Host",
     "port": "Port",
