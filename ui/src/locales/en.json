@@ -12,7 +12,16 @@
     "config_saved_success": "Config saved successfully",
     "config_saved_failed": "Failed to save config",
     "config_saved_restart_success": "Config saved and service restarted successfully",
-    "config_saved_restart_failed": "Failed to save config and restart service"
+    "config_saved_restart_failed": "Failed to save config and restart service",
+    "new_version_available": "New Version Available",
+    "update_description": "A new version is available. Please review the changelog and update to get the latest features and improvements.",
+    "no_changelog_available": "No changelog available",
+    "later": "Later",
+    "update_now": "Update Now",
+    "no_updates_available": "No updates available",
+    "update_check_failed": "Failed to check for updates",
+    "update_successful": "Update successful",
+    "update_failed": "Update failed"
   },
   "login": {
     "title": "Sign in to your account",

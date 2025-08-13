@@ -1,5 +1,8 @@
 # Claude Code Router
 
+I am seeking funding support for this project to better sustain its development. If you have any ideas, feel free to reach out to me: [m@musiiot.top](mailto:m@musiiot.top)
+
+
 [中文版](README_zh.md)
 
 > A powerful tool to route Claude Code requests to different models and customize any request.
