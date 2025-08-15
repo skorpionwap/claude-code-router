@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 import { api } from '@/lib/api';
-import type { Config } from '@/types';
+import type { Config, StatusLineConfig } from '@/types';
 
 interface ConfigContextType {
   config: Config | null;
@@ -78,6 +78,17 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
           PROXY_URL: typeof data.PROXY_URL === 'string' ? data.PROXY_URL : '',
           transformers: Array.isArray(data.transformers) ? data.transformers : [],
           Providers: Array.isArray(data.Providers) ? data.Providers : [],
+          StatusLine: data.StatusLine && typeof data.StatusLine === 'object' ? {
+            enabled: typeof data.StatusLine.enabled === 'boolean' ? data.StatusLine.enabled : false,
+            currentStyle: typeof data.StatusLine.currentStyle === 'string' ? data.StatusLine.currentStyle : 'default',
+            default: data.StatusLine.default && typeof data.StatusLine.default === 'object' && Array.isArray(data.StatusLine.default.modules) ? data.StatusLine.default : { modules: [] },
+            powerline: data.StatusLine.powerline && typeof data.StatusLine.powerline === 'object' && Array.isArray(data.StatusLine.powerline.modules) ? data.StatusLine.powerline : { modules: [] }
+          } : { 
+            enabled: false,
+            currentStyle: 'default',
+            default: { modules: [] },
+            powerline: { modules: [] }
+          },
           Router: data.Router && typeof data.Router === 'object' ? {
             default: typeof data.Router.default === 'string' ? data.Router.default : '',
             background: typeof data.Router.background === 'string' ? data.Router.background : '',
@@ -113,6 +124,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
             PROXY_URL: '',
             transformers: [],
             Providers: [],
+            StatusLine: undefined,
             Router: {
               default: '',
               background: '',

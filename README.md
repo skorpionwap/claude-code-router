@@ -329,7 +329,7 @@ You can also create your own transformers and load them via the `transformers` f
 {
   "transformers": [
     {
-      "path": "$HOME/.claude-code-router/plugins/gemini-cli.js",
+      "path": "/User/xxx/.claude-code-router/plugins/gemini-cli.js",
       "options": {
         "project": "xxx"
       }
@@ -361,7 +361,7 @@ In your `config.json`:
 
 ```json
 {
-  "CUSTOM_ROUTER_PATH": "$HOME/.claude-code-router/custom-router.js"
+  "CUSTOM_ROUTER_PATH": "/User/xxx/.claude-code-router/custom-router.js"
 }
 ```
 
@@ -370,7 +370,7 @@ The custom router file must be a JavaScript module that exports an `async` funct
 Here is an example of a `custom-router.js` based on `custom-router.example.js`:
 
 ```javascript
-// $HOME/.claude-code-router/custom-router.js
+// /User/xxx/.claude-code-router/custom-router.js
 
 /**
  * A custom router function to determine which model to use based on the request.

@@ -27,10 +27,30 @@ export interface Transformer {
     options?: Record<string, any>;
 }
 
+export interface StatusLineModuleConfig {
+  type: string;
+  icon?: string;
+  text: string;
+  color?: string;
+  background?: string;
+}
+
+export interface StatusLineThemeConfig {
+  modules: StatusLineModuleConfig[];
+}
+
+export interface StatusLineConfig {
+  enabled: boolean;
+  currentStyle: string;
+  default: StatusLineThemeConfig;
+  powerline: StatusLineThemeConfig;
+}
+
 export interface Config {
   Providers: Provider[];
   Router: RouterConfig;
   transformers: Transformer[];
+  StatusLine?: StatusLineConfig;
   // Top-level settings
   LOG: boolean;
   LOG_LEVEL: string;

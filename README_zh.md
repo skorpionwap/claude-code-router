@@ -301,7 +301,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 {
   "transformers": [
       {
-        "path": "$HOME/.claude-code-router/plugins/gemini-cli.js",
+        "path": "/User/xxx/.claude-code-router/plugins/gemini-cli.js",
         "options": {
           "project": "xxx"
         }
@@ -333,7 +333,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 
 ```json
 {
-  "CUSTOM_ROUTER_PATH": "$HOME/.claude-code-router/custom-router.js"
+  "CUSTOM_ROUTER_PATH": "/User/xxx/.claude-code-router/custom-router.js"
 }
 ```
 
@@ -342,7 +342,7 @@ Transformers 允许您修改请求和响应负载，以确保与不同提供商 
 这是一个基于 `custom-router.example.js` 的 `custom-router.js` 示例：
 
 ```javascript
-// $HOME/.claude-code-router/custom-router.js
+// /User/xxx/.claude-code-router/custom-router.js
 
 /**
  * 一个自定义路由函数，用于根据请求确定使用哪个模型。
