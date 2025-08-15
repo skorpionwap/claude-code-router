@@ -24,7 +24,7 @@ Commands:
   stop          Stop server
   restart       Restart server
   status        Show server status
-  statusline    Show status line information
+  statusline    Integrated statusline
   code          Execute claude command
   ui            Open the web UI in browser
   -v, version   Show version information
