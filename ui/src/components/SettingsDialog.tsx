@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Combobox } from "@/components/ui/combobox";
 import { useConfig } from "./ConfigProvider";
 
 interface SettingsDialogProps {
@@ -44,6 +45,21 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
           <div className="flex items-center space-x-2">
             <Switch id="log" checked={config.LOG} onCheckedChange={handleLogChange} />
             <Label htmlFor="log" className="transition-all-ease hover:scale-[1.02] cursor-pointer">{t("toplevel.log")}</Label>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="log-level" className="transition-all-ease hover:scale-[1.01] cursor-pointer">{t("toplevel.log_level")}</Label>
+            <Combobox
+              options={[
+                { label: "fatal", value: "fatal" },
+                { label: "error", value: "error" },
+                { label: "warn", value: "warn" },
+                { label: "info", value: "info" },
+                { label: "debug", value: "debug" },
+                { label: "trace", value: "trace" },
+              ]}
+              value={config.LOG_LEVEL}
+              onChange={(value) => setConfig({ ...config, LOG_LEVEL: value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="claude-path" className="transition-all-ease hover:scale-[1.01] cursor-pointer">{t("toplevel.claude_path")}</Label>
