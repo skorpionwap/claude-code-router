@@ -135,6 +135,7 @@
     "gitBranch": "Git Branch",
     "model": "Model",
     "usage": "Usage",
+    "script": "Script",
     "background_none": "None",
     "color_black": "Black",
     "color_red": "Red",

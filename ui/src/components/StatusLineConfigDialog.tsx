@@ -50,6 +50,7 @@ const MODULE_TYPES = [
   { label: "gitBranch", value: "gitBranch" },
   { label: "model", value: "model" },
   { label: "usage", value: "usage" },
+  { label: "script", value: "script" },
 ];
 
 // ANSI颜色代码映射
@@ -675,6 +676,15 @@ export function StatusLineConfigDialog({
                           color: "bright_magenta",
                         };
                         break;
+                      case "script":
+                        newModule = {
+                          type: "script",
+                          icon: "📜",
+                          text: "Script Module",
+                          color: "bright_cyan",
+                          scriptPath: "",
+                        };
+                        break;
                       default:
                         newModule = { ...DEFAULT_MODULE, type: moduleType };
                     }
@@ -920,6 +930,31 @@ export function StatusLineConfigDialog({
                       </p>
                     </div>
 
+                    {/* Script Path 输入框 - 仅在type为script时显示 */}
+                    {selectedModule.type === "script" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="module-script-path">
+                          脚本路径
+                        </Label>
+                        <Input
+                          id="module-script-path"
+                          value={selectedModule.scriptPath || ""}
+                          onChange={(e) =>
+                            handleModuleChange(
+                              selectedModuleIndex,
+                              "scriptPath",
+                              e.target.value
+                            )
+                          }
+                          placeholder="例如: /path/to/your/script.js"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          输入Node.js脚本文件的绝对路径
+                        </p>
+                      </div>
+                    )}
+
+                    
                     <Button
                       variant="destructive"
                       size="sm"

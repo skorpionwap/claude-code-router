@@ -10,6 +10,7 @@ export interface StatusLineModuleConfig {
   text: string;
   color?: string;
   background?: string;
+  scriptPath?: string; // 用于script类型的模块，指定要执行的Node.js脚本文件路径
 }
 
 export interface StatusLineThemeConfig {
@@ -132,9 +133,56 @@ function getColorCode(colorName: string): string {
 
 // 变量替换函数，支持{{var}}格式的变量替换
 function replaceVariables(text: string, variables: Record<string, string>): string {
-  return text.replace(/\{\{(\w+)\}\}/g, (match, varName) => {
-    return variables[varName] || match;
+  return text.replace(/\{\{(\w+)\}\}/g, (_match, varName) => {
+    return variables[varName] || "";
   });
+}
+
+// 执行脚本并获取输出
+async function executeScript(scriptPath: string, variables: Record<string, string>): Promise<string> {
+  try {
+    // 检查文件是否存在
+    await fs.access(scriptPath);
+    
+    // 使用require动态加载脚本模块
+    const scriptModule = require(scriptPath);
+    
+    // 如果导出的是函数，则调用它并传入变量
+    if (typeof scriptModule === 'function') {
+      const result = scriptModule(variables);
+      // 如果返回的是Promise，则等待它完成
+      if (result instanceof Promise) {
+        return await result;
+      }
+      return result;
+    }
+    
+    // 如果导出的是default函数，则调用它
+    if (scriptModule.default && typeof scriptModule.default === 'function') {
+      const result = scriptModule.default(variables);
+      // 如果返回的是Promise，则等待它完成
+      if (result instanceof Promise) {
+        return await result;
+      }
+      return result;
+    }
+    
+    // 如果导出的是字符串，则直接返回
+    if (typeof scriptModule === 'string') {
+      return scriptModule;
+    }
+    
+    // 如果导出的是default字符串，则返回它
+    if (scriptModule.default && typeof scriptModule.default === 'string') {
+      return scriptModule.default;
+    }
+    
+    // 默认情况下返回空字符串
+    return "";
+  } catch (error) {
+    console.error(`执行脚本 ${scriptPath} 时出错:`, error);
+    return "";
+  }
 }
 
 // 默认主题配置 - 使用Nerd Fonts图标和美观配色
@@ -490,9 +538,9 @@ export async function parseStatusLineData(input: StatusLineInput): Promise<strin
     
     // 根据风格渲染状态行
     if (isPowerline) {
-      return renderPowerlineStyle(theme, variables);
+      return await renderPowerlineStyle(theme, variables);
     } else {
-      return renderDefaultStyle(theme, variables);
+      return await renderDefaultStyle(theme, variables);
     }
   } catch (error) {
     // 发生错误时返回空字符串
@@ -529,10 +577,10 @@ async function getProjectThemeConfigForStyle(style: string): Promise<StatusLineT
 }
 
 // 渲染默认风格的状态行
-function renderDefaultStyle(
+async function renderDefaultStyle(
   theme: StatusLineThemeConfig,
   variables: Record<string, string>
-): string {
+): Promise<string> {
   const modules = theme.modules || DEFAULT_THEME.modules;
   const parts: string[] = [];
   
@@ -542,19 +590,30 @@ function renderDefaultStyle(
     const color = module.color ? getColorCode(module.color) : "";
     const background = module.background ? getColorCode(module.background) : "";
     const icon = module.icon || "";
-    const text = replaceVariables(module.text, variables);
     
-    // 如果text为空且不是usage类型，则跳过该模块
-    if (!text && module.type !== "usage") {
+    // 如果是script类型，执行脚本获取文本
+    let text = "";
+    if (module.type === "script" && module.scriptPath) {
+      text = await executeScript(module.scriptPath, variables);
+    } else {
+      text = replaceVariables(module.text, variables);
+    }
+    
+    // 构建显示文本
+    let displayText = "";
+    if (icon) {
+      displayText += `${icon} `;
+    }
+    displayText += text;
+    
+    // 如果displayText为空，或者只有图标没有实际文本，则跳过该模块
+    if (!displayText || !text) {
       continue;
     }
     
     // 构建模块字符串
     let part = `${background}${color}`;
-    if (icon) {
-      part += `${icon} `;
-    }
-    part += `${text}${COLORS.reset}`;
+    part += `${displayText}${COLORS.reset}`;
     
     parts.push(part);
   }
@@ -701,10 +760,10 @@ function segment(text: string, textFg: string, bgColor: string, nextBgColor: str
 }
 
 // 渲染Powerline风格的状态行
-function renderPowerlineStyle(
+async function renderPowerlineStyle(
   theme: StatusLineThemeConfig,
   variables: Record<string, string>
-): string {
+): Promise<string> {
   const modules = theme.modules || POWERLINE_THEME.modules;
   const segments: string[] = [];
   
@@ -714,11 +773,13 @@ function renderPowerlineStyle(
     const color = module.color || "white";
     const backgroundName = module.background || "";
     const icon = module.icon || "";
-    const text = replaceVariables(module.text, variables);
     
-    // 如果text为空且不是usage类型，则跳过该模块
-    if (!text && module.type !== "usage") {
-      continue;
+    // 如果是script类型，执行脚本获取文本
+    let text = "";
+    if (module.type === "script" && module.scriptPath) {
+      text = await executeScript(module.scriptPath, variables);
+    } else {
+      text = replaceVariables(module.text, variables);
     }
     
     // 构建显示文本
@@ -727,6 +788,11 @@ function renderPowerlineStyle(
       displayText += `${icon} `;
     }
     displayText += text;
+    
+    // 如果displayText为空，或者只有图标没有实际文本，则跳过该模块
+    if (!displayText || !text) {
+      continue;
+    }
     
     // 获取下一个模块的背景色（用于分隔符）
     let nextBackground: string | null = null;
