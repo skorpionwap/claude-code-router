@@ -89,7 +89,7 @@ async function run(options: RunOptions = {}) {
 
   // Configure logger based on config settings
   const loggerConfig = config.LOG !== false ? {
-    level: config.LOG_LEVEL || "info",
+    level: config.LOG_LEVEL || "debug",
     stream: createWriteStream({
       path: HOME_DIR,
       filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,

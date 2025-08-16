@@ -16,6 +16,18 @@ export async function executeCodeCommand(args: string[] = []) {
     API_TIMEOUT_MS: String(config.API_TIMEOUT_MS ?? 600000), // Default to 10 minutes if not set
   };
 
+  const settingsFlag: Record<string, any> = {};
+  if (config?.StatusLine?.enabled) {
+    settingsFlag.statusLine = {
+      type: "command",
+      command: "ccr statusline",
+      padding: 0,
+    };
+  }
+  if (Object.keys(settingsFlag).length > 0) {
+    args.push(`--settings=${JSON.stringify(settingsFlag)}`);
+  }
+
   // Non-interactive mode for automation environments
   if (config.NON_INTERACTIVE_MODE) {
     env.CI = "true";
@@ -39,21 +51,28 @@ export async function executeCodeCommand(args: string[] = []) {
 
   // Execute claude command
   const claudePath = process.env.CLAUDE_PATH || "claude";
-  
+
   // Properly join arguments to preserve spaces in quotes
   // Wrap each argument in double quotes to preserve single and double quotes inside arguments
-  const joinedArgs = args.length > 0 ? args.map(arg => `"${arg.replace(/\"/g, '\\"')}"`).join(" ") : "";
+  const joinedArgs =
+    args.length > 0
+      ? args.map((arg) => `"${arg.replace(/\"/g, '\\"')}"`).join(" ")
+      : "";
 
   // 🔥 CONFIG-DRIVEN: stdio configuration based on environment
   const stdioConfig: StdioOptions = config.NON_INTERACTIVE_MODE
     ? ["pipe", "inherit", "inherit"] // Pipe stdin for non-interactive
     : "inherit"; // Default inherited behavior
 
-  const claudeProcess = spawn(claudePath + (joinedArgs ? ` ${joinedArgs}` : ""), [], {
-    env,
-    stdio: stdioConfig,
-    shell: true,
-  });
+  const claudeProcess = spawn(
+    claudePath + (joinedArgs ? ` ${joinedArgs}` : ""),
+    [],
+    {
+      env,
+      stdio: stdioConfig,
+      shell: true,
+    }
+  );
 
   // Close stdin for non-interactive mode
   if (config.NON_INTERACTIVE_MODE) {
