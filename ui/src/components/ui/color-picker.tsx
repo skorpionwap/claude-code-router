@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
 
 interface ColorPickerProps {
   value?: string;
@@ -15,42 +14,8 @@ interface ColorPickerProps {
   showPreview?: boolean;
 }
 
-// 预定义的ANSI颜色映射
-const ANSI_COLOR_MAP: Record<string, string> = {
-  "black": "#000000",
-  "red": "#ff0000",
-  "green": "#00ff00",
-  "yellow": "#ffff00",
-  "blue": "#0000ff",
-  "magenta": "#ff00ff",
-  "cyan": "#00ffff",
-  "white": "#ffffff",
-  "bright_black": "#808080",
-  "bright_red": "#ff8080",
-  "bright_green": "#80ff80",
-  "bright_yellow": "#ffff80",
-  "bright_blue": "#8080ff",
-  "bright_magenta": "#ff80ff",
-  "bright_cyan": "#80ffff",
-  "bright_white": "#ffffff"
-}
-
-// 背景颜色映射（添加bg_前缀）
-const ANSI_BG_COLOR_MAP: Record<string, string> = Object.keys(ANSI_COLOR_MAP).reduce((acc, key) => {
-  acc[`bg_${key}`] = ANSI_COLOR_MAP[key]
-  return acc
-}, {} as Record<string, string>)
-
-// 合并所有颜色映射
-const ALL_COLOR_MAP = { ...ANSI_COLOR_MAP, ...ANSI_BG_COLOR_MAP }
-
 // 获取颜色值的函数
 const getColorValue = (color: string): string => {
-  // 如果是预定义的ANSI颜色
-  if (ALL_COLOR_MAP[color]) {
-    return ALL_COLOR_MAP[color]
-  }
-  
   // 如果是十六进制颜色
   if (color.startsWith("#")) {
     return color
@@ -91,15 +56,8 @@ export function ColorPicker({
     }
   }
 
-  const handlePresetColorClick = (colorName: string) => {
-    handleColorChange(colorName)
-    setOpen(false)
-  }
-
-  const selectedColorValue = getColorValue(value)
   
-  // 获取ANSI颜色名称（如果适用）
-  const ansiColorName = Object.keys(ALL_COLOR_MAP).find(key => ALL_COLOR_MAP[key] === selectedColorValue) || value
+  const selectedColorValue = getColorValue(value)
 
   return (
     <div className="space-y-2">
@@ -120,7 +78,7 @@ export function ColorPicker({
                 />
               )}
               <span className="truncate flex-1">
-                {value ? ansiColorName : placeholder}
+                {value || placeholder}
               </span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m7 15 5 5 5-5"/>
@@ -152,7 +110,7 @@ export function ColorPicker({
               />
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">
-                  {value ? ansiColorName : "未选择颜色"}
+                  {value || "未选择颜色"}
                 </div>
                 {value && value.startsWith("#") && (
                   <div className="text-xs text-muted-foreground font-mono">
@@ -184,7 +142,12 @@ export function ColorPicker({
                 />
                 <Button 
                   size="sm" 
-                  onClick={() => customColor && handleColorChange(customColor)}
+                  onClick={() => {
+                    if (customColor && /^#[0-9A-F]{6}$/i.test(customColor)) {
+                      handleColorChange(customColor)
+                      setOpen(false)
+                    }
+                  }}
                   disabled={!customColor || !/^#[0-9A-F]{6}$/i.test(customColor)}
                 >
                   应用
@@ -193,66 +156,6 @@ export function ColorPicker({
               <p className="text-xs text-muted-foreground">
                 输入十六进制颜色值 (例如: #FF0000)
               </p>
-            </div>
-            
-            {/* 预定义颜色选项 */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">ANSI 颜色</label>
-                <span className="text-xs text-muted-foreground">文字颜色</span>
-              </div>
-              <div className="grid grid-cols-8 gap-1">
-                {Object.entries(ANSI_COLOR_MAP).map(([name, color]) => (
-                  <Button
-                    key={name}
-                    variant={value === name ? "default" : "outline"}
-                    size="sm"
-                    className={cn(
-                      "h-8 w-8 p-0 rounded-full transition-all hover:scale-110",
-                      value === name && "ring-2 ring-offset-2 ring-ring ring-offset-background"
-                    )}
-                    style={{ backgroundColor: value === name ? color : undefined }}
-                    onClick={() => handlePresetColorClick(name)}
-                    title={name}
-                  >
-                    {value === name && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    )}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            
-            {/* 背景颜色选项 */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">背景颜色</label>
-                <span className="text-xs text-muted-foreground">背景色</span>
-              </div>
-              <div className="grid grid-cols-8 gap-1">
-                {Object.entries(ANSI_BG_COLOR_MAP).map(([name, color]) => (
-                  <Button
-                    key={name}
-                    variant={value === name ? "default" : "outline"}
-                    size="sm"
-                    className={cn(
-                      "h-8 w-8 p-0 rounded-full transition-all hover:scale-110",
-                      value === name && "ring-2 ring-offset-2 ring-ring ring-offset-background"
-                    )}
-                    style={{ backgroundColor: value === name ? color : undefined }}
-                    onClick={() => handlePresetColorClick(name)}
-                    title={name}
-                  >
-                    {value === name && (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    )}
-                  </Button>
-                ))}
-              </div>
             </div>
           </div>
         </PopoverContent>

@@ -44,6 +44,7 @@ export interface StatusLineConfig {
   currentStyle: string;
   default: StatusLineThemeConfig;
   powerline: StatusLineThemeConfig;
+  fontFamily?: string;
 }
 
 export interface Config {
