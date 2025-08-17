@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Dialog,
   DialogContent,
@@ -95,6 +96,207 @@ const ANSI_COLORS: Record<string, string> = {
   bg_bright_orange: "bg-orange-400",
   bg_bright_purple: "bg-purple-400",
 };
+
+
+// 图标搜索输入组件
+interface IconData {
+  className: string;
+  unicode: string;
+  char: string;
+}
+
+interface IconSearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  fontFamily: string;
+  t: (key: string) => string;
+}
+
+const IconSearchInput = React.memo(({ value, onChange, fontFamily, t }: IconSearchInputProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(value);
+  const [icons, setIcons] = useState<IconData[]>([]);
+  const [filteredIcons, setFilteredIcons] = useState<IconData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // 加载Nerdfonts图标数据
+  const loadIcons = useCallback(async () => {
+    if (icons.length > 0) return; // 已经加载过了
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('https://www.nerdfonts.com/assets/css/combo.css');
+      const cssText = await response.text();
+      
+      // 解析CSS中的图标类名和Unicode
+      const iconRegex = /\.nf-([a-zA-Z0-9_-]+):before\s*\{\s*content:\s*"\\([0-9a-fA-F]+)";?\s*\}/g;
+      const iconData: IconData[] = [];
+      let match;
+      
+      while ((match = iconRegex.exec(cssText)) !== null) {
+        const className = `nf-${match[1]}`;
+        const unicode = match[2];
+        const char = String.fromCharCode(parseInt(unicode, 16));
+        iconData.push({ className, unicode, char });
+      }
+      
+      setIcons(iconData);
+      setFilteredIcons(iconData.slice(0, 200));
+    } catch (error) {
+      console.error('Failed to load icons:', error);
+      setIcons([]);
+      setFilteredIcons([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [icons.length]);
+
+  // 模糊搜索图标
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredIcons(icons.slice(0, 100)); // 显示前100个图标
+      return;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    let filtered = icons;
+    
+    // 如果输入的是特殊字符（可能是粘贴的图标），则搜索对应图标
+    if (term.length === 1 || /[\u{2000}-\u{2FFFF}]/u.test(searchTerm)) {
+      const pastedIcon = icons.find(icon => icon.char === searchTerm);
+      if (pastedIcon) {
+        filtered = [pastedIcon];
+      } else {
+        // 搜索包含该字符的图标
+        filtered = icons.filter(icon => icon.char === searchTerm);
+      }
+    } else {
+      // 模糊搜索：类名、简化后的名称匹配
+      filtered = icons.filter(icon => {
+        const className = icon.className.toLowerCase();
+        const simpleClassName = className.replace(/[_-]/g, '');
+        const simpleTerm = term.replace(/[_-]/g, '');
+        
+        return (
+          className.includes(term) ||
+          simpleClassName.includes(simpleTerm) ||
+          // 关键词匹配
+          term.split(' ').every(keyword => 
+            className.includes(keyword) || simpleClassName.includes(keyword)
+          )
+        );
+      });
+    }
+    
+    setFilteredIcons(filtered.slice(0, 120)); // 显示更多结果
+  }, [searchTerm, icons]);
+
+  // 处理输入变化
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSearchTerm(newValue);
+    onChange(newValue);
+    
+    // 始终打开下拉框，让用户搜索或确认粘贴的内容
+    setIsOpen(true);
+    if (icons.length === 0) {
+      loadIcons();
+    }
+  };
+
+  // 处理粘贴事件
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData('text');
+    
+    // 如果是单个字符（可能是图标），直接接受并打开下拉框显示相应图标
+    if (pastedText && pastedText.length === 1) {
+      setTimeout(() => {
+        setIsOpen(true);
+      }, 10);
+    }
+  };
+
+  // 选择图标
+  const handleIconSelect = (iconChar: string) => {
+    setSearchTerm(iconChar);
+    onChange(iconChar);
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
+
+  // 处理焦点事件
+  const handleFocus = () => {
+    setIsOpen(true);
+    if (icons.length === 0) {
+      loadIcons();
+    }
+  };
+
+
+  // 处理失去焦点（延迟关闭以便点击图标）
+  const handleBlur = () => {
+    setTimeout(() => setIsOpen(false), 200);
+  };
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Input
+          ref={inputRef}
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onPaste={handlePaste}
+          placeholder={t("statusline.icon_placeholder")}
+          style={{ fontFamily: fontFamily + ', monospace' }}
+          className="text-lg pr-2"
+        />
+      </div>
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full max-h-72 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg">
+            {isLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.1"/>
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-5 gap-2 p-2 max-h-72 overflow-y-auto">
+                  {filteredIcons.map((icon) => (
+                    <div
+                      key={icon.className}
+                      className="flex items-center justify-center p-3 text-2xl cursor-pointer hover:bg-secondary rounded transition-colors"
+                      onClick={() => handleIconSelect(icon.char)}
+                      onMouseDown={(e) => e.preventDefault()} // 防止失去焦点
+                      title={`${icon.char} - ${icon.className}`}
+                      style={{ fontFamily: fontFamily + ', monospace' }}
+                    >
+                      {icon.char}
+                    </div>
+                  ))}
+                  {filteredIcons.length === 0 && (
+                    <div className="col-span-5 flex flex-col items-center justify-center p-8 text-muted-foreground">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mb-2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                      </svg>
+                      <div className="text-sm">
+                        {searchTerm ? `${t("statusline.no_icons_found")} "${searchTerm}"` : t("statusline.no_icons_available")}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+      )}
+    </div>
+  );
+});
 
 // 变量替换函数
 function replaceVariables(
@@ -500,8 +702,56 @@ export function StatusLineConfigDialog({
       ? currentModules[selectedModuleIndex]
       : null;
 
+  // 删除选中模块的函数
+  const deleteSelectedModule = useCallback(() => {
+    if (selectedModuleIndex === null) return;
+    
+    const currentTheme =
+      statusLineConfig.currentStyle as keyof StatusLineConfig;
+    const themeConfig = statusLineConfig[currentTheme];
+    const modules =
+      themeConfig &&
+      typeof themeConfig === "object" &&
+      "modules" in themeConfig
+        ? [...((themeConfig as StatusLineThemeConfig).modules || [])]
+        : [];
+        
+    if (selectedModuleIndex >= 0 && selectedModuleIndex < modules.length) {
+      modules.splice(selectedModuleIndex, 1);
+      
+      setStatusLineConfig((prev) => ({
+        ...prev,
+        [currentTheme]: { modules },
+      }));
+      
+      setSelectedModuleIndex(null);
+    }
+  }, [selectedModuleIndex, statusLineConfig]);
+
   // 字体样式
   const fontStyle = fontFamily ? { fontFamily } : {};
+
+  // 键盘事件监听器，支持删除选中的模块
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 检查是否选中了模块
+      if (selectedModuleIndex === null) return;
+      
+      // 检查是否按下了删除键 (Delete 或 Backspace)
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        deleteSelectedModule();
+      }
+    };
+
+    // 添加事件监听器
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // 清理函数
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedModuleIndex, deleteSelectedModule]);
 
   // 当字体或主题变化时强制重新渲染
   const fontKey = `${fontFamily}-${statusLineConfig.currentStyle}`;
@@ -558,30 +808,30 @@ export function StatusLineConfigDialog({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="theme-style" className="text-sm font-medium">
-                  主题样式
+                  {t("statusline.theme")}
                 </Label>
                 <Combobox
                   options={[
-                    { label: "默认", value: "default" },
-                    { label: "Powerline", value: "powerline" },
+                    { label: t("statusline.theme_default"), value: "default" },
+                    { label: t("statusline.theme_powerline"), value: "powerline" },
                   ]}
                   value={statusLineConfig.currentStyle}
                   onChange={handleThemeChange}
                   data-testid="theme-selector"
-                  placeholder="选择主题样式"
+                  placeholder={t("statusline.theme_placeholder")}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="font-family" className="text-sm font-medium">
-                  字体
+                  {t("statusline.module_icon")}
                 </Label>
                 <Combobox
                   options={NERD_FONTS}
                   value={fontFamily}
                   onChange={(value) => setFontFamily(value)}
                   data-testid="font-family-selector"
-                  placeholder="选择字体"
+                  placeholder={t("statusline.font_placeholder")}
                 />
               </div>
             </div>
@@ -590,9 +840,9 @@ export function StatusLineConfigDialog({
           {/* 三栏布局：组件列表 | 预览区域 | 属性配置 */}
           <div className="grid grid-cols-5 gap-6 overflow-hidden flex-1">
             {/* 左侧：支持的组件 */}
-            <div className="border rounded-lg p-4 flex flex-col overflow-hidden col-span-1">
-              <h3 className="text-sm font-medium mb-3">组件</h3>
-              <div className="space-y-2 overflow-y-auto flex-1">
+            <div className="border rounded-lg flex flex-col overflow-hidden col-span-1">
+              <h3 className="text-sm font-medium p-4 pb-0 mb-3">{t("statusline.components")}</h3>
+              <div className="space-y-2 overflow-y-auto px-4 pb-4 flex-1">
                 {MODULE_TYPES_OPTIONS.map((moduleType) => (
                   <div
                     key={moduleType.value}
@@ -610,7 +860,7 @@ export function StatusLineConfigDialog({
 
             {/* 中间：预览区域 */}
             <div className="border rounded-lg p-4 flex flex-col col-span-3">
-              <h3 className="text-sm font-medium mb-3">预览</h3>
+              <h3 className="text-sm font-medium mb-3">{t("statusline.preview")}</h3>
               <div
                 key={fontKey}
                 className={`rounded bg-black/90 text-white font-mono text-sm overflow-x-auto flex items-center border border-border p-3 py-5 shadow-inner overflow-hidden ${
@@ -793,7 +1043,7 @@ export function StatusLineConfigDialog({
                       <path d="M8 12h8" />
                     </svg>
                     <span className="text-gray-500 text-sm">
-                      拖拽组件到此处进行配置
+                      {t("statusline.drag_hint")}
                     </span>
                   </div>
                 )}
@@ -801,45 +1051,31 @@ export function StatusLineConfigDialog({
             </div>
 
             {/* 右侧：属性配置 */}
-            <div className="border rounded-lg p-4 flex flex-col overflow-hidden col-span-1">
-              <h3 className="text-sm font-medium mb-3">属性</h3>
-              <div className="overflow-y-auto flex-1">
+            <div className="border rounded-lg flex flex-col overflow-hidden col-span-1">
+              <h3 className="text-sm font-medium p-4 pb-0 mb-3">{t("statusline.properties")}</h3>
+              <div className="overflow-y-auto px-4 pb-4 flex-1">
                 {selectedModule && selectedModuleIndex !== null ? (
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>{t("statusline.module_type")}</Label>
-                      <Combobox
-                        options={MODULE_TYPES_OPTIONS}
-                        value={selectedModule.type}
-                        onChange={(value) =>
-                          handleModuleChange(selectedModuleIndex, "type", value)
-                        }
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        选择模块类型以确定显示的信息
-                      </p>
-                    </div>
-
+                    
                     <div className="space-y-2">
                       <Label htmlFor="module-icon">
                         {t("statusline.module_icon")}
                       </Label>
-                      <Input
+                      <IconSearchInput
                         key={fontKey}
-                        id="module-icon"
                         value={selectedModule.icon || ""}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           handleModuleChange(
                             selectedModuleIndex,
                             "icon",
-                            e.target.value
+                            value
                           )
                         }
-                        placeholder="例如: 󰉋"
-                        style={fontStyle}
+                        fontFamily={fontFamily}
+                        t={t}
                       />
                       <p className="text-xs text-muted-foreground">
-                        输入图标字符或表情符号（可选）
+                        {t("statusline.icon_description")}
                       </p>
                     </div>
 
@@ -857,10 +1093,10 @@ export function StatusLineConfigDialog({
                             e.target.value
                           )
                         }
-                        placeholder="例如: {{workDirName}}"
+                        placeholder={t("statusline.text_placeholder")}
                       />
                       <div className="text-xs text-muted-foreground">
-                        <p>输入显示文本，可使用变量:</p>
+                        <p>{t("statusline.module_text_description")}</p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           <Badge
                             variant="secondary"
@@ -909,7 +1145,7 @@ export function StatusLineConfigDialog({
                         }
                       />
                       <p className="text-xs text-muted-foreground">
-                        选择文字颜色
+                        {t("statusline.module_color_description")}
                       </p>
                     </div>
 
@@ -926,7 +1162,7 @@ export function StatusLineConfigDialog({
                         }
                       />
                       <p className="text-xs text-muted-foreground">
-                        选择背景颜色（可选）
+                        {t("statusline.module_background_description")}
                       </p>
                     </div>
 
@@ -934,7 +1170,7 @@ export function StatusLineConfigDialog({
                     {selectedModule.type === "script" && (
                       <div className="space-y-2">
                         <Label htmlFor="module-script-path">
-                          脚本路径
+                          {t("statusline.module_script_path")}
                         </Label>
                         <Input
                           id="module-script-path"
@@ -946,10 +1182,10 @@ export function StatusLineConfigDialog({
                               e.target.value
                             )
                           }
-                          placeholder="例如: /path/to/your/script.js"
+                          placeholder={t("statusline.script_placeholder")}
                         />
                         <p className="text-xs text-muted-foreground">
-                          输入Node.js脚本文件的绝对路径
+                          {t("statusline.module_script_path_description")}
                         </p>
                       </div>
                     )}
@@ -958,36 +1194,15 @@ export function StatusLineConfigDialog({
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => {
-                        const currentTheme =
-                          statusLineConfig.currentStyle as keyof StatusLineConfig;
-                        const themeConfig = statusLineConfig[currentTheme];
-                        const modules =
-                          themeConfig &&
-                          typeof themeConfig === "object" &&
-                          "modules" in themeConfig
-                            ? [
-                                ...((themeConfig as StatusLineThemeConfig)
-                                  .modules || []),
-                              ]
-                            : [];
-                        modules.splice(selectedModuleIndex, 1);
-
-                        setStatusLineConfig((prev) => ({
-                          ...prev,
-                          [currentTheme]: { modules },
-                        }));
-
-                        setSelectedModuleIndex(null);
-                      }}
+                      onClick={deleteSelectedModule}
                     >
-                      删除组件
+                      {t("statusline.delete_module")}
                     </Button>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full min-h-[200px]">
                     <p className="text-muted-foreground text-sm">
-                      选择一个组件进行配置
+                      {t("statusline.select_hint")}
                     </p>
                   </div>
                 )}

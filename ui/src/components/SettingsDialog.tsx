@@ -58,12 +58,12 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent data-testid="settings-dialog">
-        <DialogHeader>
+    <Dialog open={isOpen} onOpenChange={onOpenChange} >
+      <DialogContent data-testid="settings-dialog" className="max-h-[80vh] flex flex-col p-0">
+        <DialogHeader className="p-4 pb-0">
           <DialogTitle>{t("toplevel.title")}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 p-4 px-8 overflow-y-auto flex-1">
           <div className="flex items-center space-x-2">
             <Switch
               id="log"
@@ -213,7 +213,7 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="p-4 pt-0">
           <Button
             onClick={() => onOpenChange(false)}
             className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]"

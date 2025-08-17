@@ -331,7 +331,7 @@ function App() {
           </Button>
         </div>
       </header>
-      <main className="flex h-[calc(100vh-4rem)] gap-4 p-4">
+      <main className="flex h-[calc(100vh-4rem)] gap-4 p-4 overflow-hidden">
         <div className="w-3/5">
           <Providers />
         </div>
@@ -339,7 +339,7 @@ function App() {
           <div className="h-3/5">
             <Router />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-hidden">
             <Transformers />
           </div>
         </div>

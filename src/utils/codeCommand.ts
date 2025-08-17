@@ -11,12 +11,14 @@ export async function executeCodeCommand(args: string[] = []) {
   const config = await readConfigFile();
   const env: Record<string, string> = {
     ...process.env,
-    ANTHROPIC_AUTH_TOKEN: "test",
+    ANTHROPIC_AUTH_TOKEN: config?.APIKEY || "test",
     ANTHROPIC_BASE_URL: `http://127.0.0.1:${config.PORT || 3456}`,
     API_TIMEOUT_MS: String(config.API_TIMEOUT_MS ?? 600000), // Default to 10 minutes if not set
   };
 
-  const settingsFlag: Record<string, any> = {};
+  const settingsFlag: Record<string, any> = {
+    env,
+  };
   if (config?.StatusLine?.enabled) {
     settingsFlag.statusLine = {
       type: "command",
@@ -41,10 +43,10 @@ export async function executeCodeCommand(args: string[] = []) {
     env.ANTHROPIC_SMALL_FAST_MODEL = config.ANTHROPIC_SMALL_FAST_MODEL;
   }
 
-  if (config?.APIKEY) {
-    env.ANTHROPIC_API_KEY = config.APIKEY;
-    delete env.ANTHROPIC_AUTH_TOKEN;
-  }
+  // if (config?.APIKEY) {
+  //   env.ANTHROPIC_API_KEY = config.APIKEY;
+  //   delete env.ANTHROPIC_AUTH_TOKEN;
+  // }
 
   // Increment reference count when command starts
   incrementReferenceCount();

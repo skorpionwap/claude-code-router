@@ -16,7 +16,7 @@ let logLevel: string = "info";
 // Function to configure logging
 export function configureLogging(config: { LOG?: boolean; LOG_LEVEL?: string }) {
   isLogEnabled = config.LOG !== false; // Default to true if not explicitly set to false
-  logLevel = config.LOG_LEVEL || "info";
+  logLevel = config.LOG_LEVEL || "debug";
 }
 
 export function log(...args: any[]) {

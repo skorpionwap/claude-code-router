@@ -15,6 +15,7 @@ import { CONFIG_FILE } from "./constants";
 import createWriteStream from "pino-rotating-file-stream";
 import { HOME_DIR } from "./constants";
 import { configureLogging } from "./utils/log";
+import { sessionUsageCache } from "./utils/cache";
 
 async function initializeClaudeConfig() {
   const homeDir = homedir();
@@ -52,10 +53,10 @@ async function run(options: RunOptions = {}) {
   // Clean up old log files, keeping only the 10 most recent ones
   await cleanupLogFiles();
   const config = await initConfig();
-  
+
   // Configure logging based on config
   configureLogging(config);
-  
+
   let HOST = config.HOST;
 
   if (config.HOST && !config.APIKEY) {
@@ -88,15 +89,18 @@ async function run(options: RunOptions = {}) {
     : port;
 
   // Configure logger based on config settings
-  const loggerConfig = config.LOG !== false ? {
-    level: config.LOG_LEVEL || "debug",
-    stream: createWriteStream({
-      path: HOME_DIR,
-      filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
-      maxFiles: 3,
-      interval: "1d",
-    }),
-  } : false;
+  const loggerConfig =
+    config.LOG !== false
+      ? {
+          level: config.LOG_LEVEL || "debug",
+          stream: createWriteStream({
+            path: HOME_DIR,
+            filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
+            maxFiles: 3,
+            interval: "1d",
+          }),
+        }
+      : false;
 
   const server = createServer({
     jsonPath: CONFIG_FILE,
@@ -128,6 +132,33 @@ async function run(options: RunOptions = {}) {
     if (req.url.startsWith("/v1/messages")) {
       router(req, reply, config);
     }
+  });
+  server.addHook("onSend", async (req, reply, payload) => {
+    if (req.sessionId && req.url.startsWith("/v1/messages")) {
+      if (payload instanceof ReadableStream) {
+        const [originalStream, clonedStream] = payload.tee();
+        const reader1 = clonedStream.getReader();
+        while (true) {
+          const { done, value } = await reader1.read();
+          if (done) break;
+          // Process the value if needed
+          const dataStr = new TextDecoder().decode(value);
+          if (!dataStr.startsWith("event: message_delta")) {
+            continue;
+          }
+          const str = dataStr.slice(27);
+          try {
+            const message = JSON.parse(str);
+            sessionUsageCache.put(req.sessionId, message.usage);
+          } catch {}
+        }
+
+        return originalStream;
+      } else {
+        sessionUsageCache.put(req.sessionId, payload.usage);
+      }
+    }
+    return payload;
   });
   server.start();
 }
