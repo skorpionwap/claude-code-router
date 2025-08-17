@@ -52,7 +52,7 @@ export async function executeCodeCommand(args: string[] = []) {
   incrementReferenceCount();
 
   // Execute claude command
-  const claudePath = process.env.CLAUDE_PATH || "claude";
+  const claudePath = config?.CLAUDE_PATH || process.env.CLAUDE_PATH || "claude";
 
   // Properly join arguments to preserve spaces in quotes
   // Wrap each argument in double quotes to preserve single and double quotes inside arguments
