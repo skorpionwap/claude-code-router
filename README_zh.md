@@ -182,7 +182,7 @@ ccr code
 > ccr restart
 > ```
 
-### 4. UI 模式 (Beta)
+### 4. UI 模式
 
 为了获得更直观的体验，您可以使用 UI 模式来管理您的配置：
 
@@ -193,8 +193,6 @@ ccr ui
 这将打开一个基于 Web 的界面，您可以在其中轻松查看和编辑您的 `config.json` 文件。
 
 ![UI](/blog/images/ui.png)
-
-> **注意**: UI 模式目前处于测试阶段。这是一个 100% vibe coding的项目，包括项目的初始化，我只是新建了一个文件夹和一个project.md文档。所有代码均由 ccr + qwen3-coder + gemini(webSearch) 实现。如有问题请提交 issue。
 
 #### Providers
 
@@ -375,6 +373,12 @@ module.exports = async function router(req, config) {
 请帮我分析这段代码是否存在潜在的优化空间...
 ```
 
+## Status Line (Beta)
+为了在运行时更好的查看claude-code-router的状态，claude-code-router在v1.0.40内置了一个statusline工具，你可以在UI中启用它，
+![statusline-config.png](/blog/images/statusline-config.png)
+
+效果如下：
+![statusline](/blog/images/statusline.png)
 
 ## 🤖 GitHub Actions
 
