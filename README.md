@@ -542,6 +542,7 @@ A huge thank you to all our sponsors for their generous support!
 - @水\*丫
 - @二吉吉
 - @a\*g
-- @*林
+- @\*林
+- @\*咸
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
