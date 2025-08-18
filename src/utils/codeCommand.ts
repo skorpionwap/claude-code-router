@@ -27,7 +27,7 @@ export async function executeCodeCommand(args: string[] = []) {
       padding: 0,
     };
   }
-  if (Object.keys(settingsFlag).length > 0) {
+  if (Object.keys(settingsFlag).length > 0 && process.platform !== 'win32') {
     args.push(`--settings=${JSON.stringify(settingsFlag)}`);
   }
 
