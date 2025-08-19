@@ -16,6 +16,7 @@ import createWriteStream from "pino-rotating-file-stream";
 import { HOME_DIR } from "./constants";
 import { configureLogging } from "./utils/log";
 import { sessionUsageCache } from "./utils/cache";
+import Stream from "node:stream";
 
 async function initializeClaudeConfig() {
   const homeDir = homedir();
@@ -133,32 +134,50 @@ async function run(options: RunOptions = {}) {
       router(req, reply, config);
     }
   });
-  server.addHook("onSend", async (req, reply, payload) => {
+  server.addHook("onSend", (req, reply, payload, done) => {
     if (req.sessionId && req.url.startsWith("/v1/messages")) {
       if (payload instanceof ReadableStream) {
         const [originalStream, clonedStream] = payload.tee();
-        const reader1 = clonedStream.getReader();
-        while (true) {
-          const { done, value } = await reader1.read();
-          if (done) break;
-          // Process the value if needed
-          const dataStr = new TextDecoder().decode(value);
-          if (!dataStr.startsWith("event: message_delta")) {
-            continue;
+        const read = async (stream: ReadableStream) => {
+          const reader = stream.getReader();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            // Process the value if needed
+            const dataStr = new TextDecoder().decode(value);
+            if (!dataStr.startsWith("event: message_delta")) {
+              continue;
+            }
+            const str = dataStr.slice(27);
+            try {
+              const message = JSON.parse(str);
+              sessionUsageCache.put(req.sessionId, message.usage);
+            } catch {}
           }
-          const str = dataStr.slice(27);
-          try {
-            const message = JSON.parse(str);
-            sessionUsageCache.put(req.sessionId, message.usage);
-          } catch {}
         }
-
-        return originalStream;
+        read(clonedStream);
+        done(originalStream)
       } else {
+        req.log.debug({payload}, 'onSend Hook')
         sessionUsageCache.put(req.sessionId, payload.usage);
+        if (payload instanceof Buffer || payload instanceof Response) {
+          done(null, payload);
+        } else if(typeof payload === "object") {
+          done(null, JSON.stringify(payload));
+        } else {
+          done(null, payload);
+        }
+      }
+    } else {
+      if(payload instanceof Buffer || payload instanceof Response || payload === null || payload instanceof ReadableStream || payload instanceof Stream) {
+        done(null, payload);
+      } else if(typeof payload === "object") {
+        req.log.debug({payload}, 'onSend Hook')
+        done(null, JSON.stringify(payload));
+      } else {
+        done(null, payload);
       }
     }
-    return payload;
   });
   server.start();
 }

@@ -16,18 +16,15 @@ export async function executeCodeCommand(args: string[] = []) {
     ANTHROPIC_BASE_URL: `http://127.0.0.1:${config.PORT || 3456}`,
     API_TIMEOUT_MS: String(config.API_TIMEOUT_MS ?? 600000), // Default to 10 minutes if not set
   };
-
-  const settingsFlag: Record<string, any> = {
-    env,
-  };
+  let settingsFlag: Record<string, any> | undefined;
   if (config?.StatusLine?.enabled) {
-    settingsFlag.statusLine = {
-      type: "command",
-      command: "ccr statusline",
-      padding: 0,
-    };
-  }
-  if (Object.keys(settingsFlag).length > 0 && process.platform !== 'win32') {
+    settingsFlag = {
+      statusLine: {
+        type: "command",
+        command: "ccr statusline",
+        padding: 0,
+      }
+    }
     args.push(`--settings=${JSON.stringify(settingsFlag)}`);
   }
 
