@@ -156,7 +156,7 @@ async function run(options: RunOptions = {}) {
           }
         }
         read(clonedStream);
-        done(originalStream)
+        done(null, originalStream)
       } else {
         req.log.debug({payload}, 'onSend Hook')
         sessionUsageCache.put(req.sessionId, payload.usage);
