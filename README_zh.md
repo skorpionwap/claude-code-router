@@ -465,6 +465,7 @@ jobs:
 非常感谢所有赞助商的慷慨支持！
 
 - [AIHubmix](https://aihubmix.com/)
+- [BurnCloud](https://ai.burncloud.com)
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)
 - [@vrgitadmin](https://github.com/vrgitadmin)
@@ -520,6 +521,11 @@ jobs:
 - @\*明
 - @S\*y
 - @f\*o
+- @\*智
+- @F\*t
+- @r\*c
+- [@qierkang](http://github.com/qierkang)
+- @\*军
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 

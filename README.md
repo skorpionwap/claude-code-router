@@ -495,6 +495,7 @@ A huge thank you to all our sponsors for their generous support!
 
 
 - [AIHubmix](https://aihubmix.com/)
+- [BurnCloud](https://ai.burncloud.com)
 - @Simon Leischnig
 - [@duanshuaimin](https://github.com/duanshuaimin)
 - [@vrgitadmin](https://github.com/vrgitadmin)
@@ -551,5 +552,10 @@ A huge thank you to all our sponsors for their generous support!
 - @\*明
 - @S\*y
 - @f\*o
+- @\*智
+- @F\*t
+- @r\*c
+- [@qierkang](http://github.com/qierkang)
+- @\*军
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
