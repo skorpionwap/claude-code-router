@@ -4,6 +4,10 @@
 
 > 一款强大的工具，可将 Claude Code 请求路由到不同的模型，并自定义任何请求。
 
+> 现在你可以通过[心流平台](https://platform.iflow.cn/docs/api-mode)免费使用`GLM-4.5`、`Kimi-K2`、`Qwen3-Coder-480B-A35B`、`DeepSeek v3.1`等模型。     
+> 你可以使用`ccr ui`命令在UI中直接导入`iflow`模板，值得注意的是心流限制每位用户的并发数为1，意味着你需要将`background`路由到其他模型。      
+> 如果你想获得更好的体验，可以尝试[iFlow CLI](https://github.com/iflow-ai/iflow-cli)。      
+
 ![](blog/images/claude-code.png)
 
 ## ✨ 功能
@@ -526,6 +530,7 @@ jobs:
 - @r\*c
 - [@qierkang](http://github.com/qierkang)
 - @\*军
+- [@snrise-z](http://github.com/snrise-z)
 
 （如果您的名字被屏蔽，请通过我的主页电子邮件与我联系，以便使用您的 GitHub 用户名进行更新。）
 

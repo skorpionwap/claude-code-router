@@ -7,6 +7,10 @@ I am seeking funding support for this project to better sustain its development.
 
 > A powerful tool to route Claude Code requests to different models and customize any request.
 
+> Now you can use models such as `GLM-4.5`, `Kimi-K2`, `Qwen3-Coder-480B-A35B`, and `DeepSeek v3.1` for free through the [iFlow Platform](https://platform.iflow.cn/docs/api-mode).     
+> You can use the `ccr ui` command to directly import the `iflow` template in the UI. It’s worth noting that iFlow limits each user to a concurrency of 1, which means you’ll need to route background requests to other models.      
+> If you’d like a better experience, you can try [iFlow CLI](https://github.com/iflow-ai/iflow-cli).
+
 ![](blog/images/claude-code.png)
 
 ## ✨ Features
@@ -557,5 +561,6 @@ A huge thank you to all our sponsors for their generous support!
 - @r\*c
 - [@qierkang](http://github.com/qierkang)
 - @\*军
+- [@snrise-z](http://github.com/snrise-z)
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
