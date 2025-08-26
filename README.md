@@ -9,7 +9,7 @@ I am seeking funding support for this project to better sustain its development.
 
 > Now you can use models such as `GLM-4.5`, `Kimi-K2`, `Qwen3-Coder-480B-A35B`, and `DeepSeek v3.1` for free through the [iFlow Platform](https://platform.iflow.cn/docs/api-mode).     
 > You can use the `ccr ui` command to directly import the `iflow` template in the UI. It’s worth noting that iFlow limits each user to a concurrency of 1, which means you’ll need to route background requests to other models.      
-> If you’d like a better experience, you can try [iFlow CLI](https://github.com/iflow-ai/iflow-cli).
+> If you’d like a better experience, you can try [iFlow CLI](https://cli.iflow.cn).
 
 ![](blog/images/claude-code.png)
 
@@ -548,7 +548,7 @@ A huge thank you to all our sponsors for their generous support!
 - @\*光
 - @W\*l
 - [@kesku](https://github.com/kesku)
-- @水\*丫
+- [@biguncle](https://github.com/biguncle)
 - @二吉吉
 - @a\*g
 - @\*林

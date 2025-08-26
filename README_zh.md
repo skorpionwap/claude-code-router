@@ -6,7 +6,7 @@
 
 > 现在你可以通过[心流平台](https://platform.iflow.cn/docs/api-mode)免费使用`GLM-4.5`、`Kimi-K2`、`Qwen3-Coder-480B-A35B`、`DeepSeek v3.1`等模型。     
 > 你可以使用`ccr ui`命令在UI中直接导入`iflow`模板，值得注意的是心流限制每位用户的并发数为1，意味着你需要将`background`路由到其他模型。      
-> 如果你想获得更好的体验，可以尝试[iFlow CLI](https://github.com/iflow-ai/iflow-cli)。      
+> 如果你想获得更好的体验，可以尝试[iFlow CLI](https://cli.iflow.cn)。      
 
 ![](blog/images/claude-code.png)
 
@@ -517,7 +517,7 @@ jobs:
 - @\*光
 - @W\*l
 - [@kesku](https://github.com/kesku)
-- @水\*丫
+- [@biguncle](https://github.com/biguncle)
 - @二吉吉
 - @a\*g
 - @\*林
