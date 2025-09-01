@@ -563,5 +563,9 @@ A huge thank you to all our sponsors for their generous support!
 - [@qierkang](http://github.com/qierkang)
 - @\*军
 - [@snrise-z](http://github.com/snrise-z)
+- @\*王
+- [@greatheart1000](http://github.com/greatheart1000)
+- @\*王
+- @zcutlip
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)
