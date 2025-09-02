@@ -350,8 +350,9 @@ The `Router` object defines which model to use for different scenarios:
 - `longContext`: A model for handling long contexts (e.g., > 60K tokens).
 - `longContextThreshold` (optional): The token count threshold for triggering the long context model. Defaults to 60000 if not specified.
 - `webSearch`: Used for handling web search tasks and this requires the model itself to support the feature. If you're using openrouter, you need to add the `:online` suffix after the model name.
+- `image` (beta): Used for handling image-related tasks (supported by CCR’s built-in agent). If the model does not support tool calling, you need to set the `config.forceUseImageAgent` property to `true`.
 
-You can also switch models dynamically in Claude Code with the `/model` command:
+- You can also switch models dynamically in Claude Code with the `/model` command:
 `/model provider_name,model_name`
 Example: `/model openrouter,anthropic/claude-3.5-sonnet`
 
@@ -567,5 +568,8 @@ A huge thank you to all our sponsors for their generous support!
 - [@greatheart1000](http://github.com/greatheart1000)
 - @\*王
 - @zcutlip
+- [@Peng-YM](http://github.com/Peng-YM)
+- @\*更
+
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)

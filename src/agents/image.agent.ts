@@ -64,10 +64,8 @@ export class ImageAgent implements IAgent {
   shouldHandle(req: any, config: any): boolean {
     if (!config.Router.image) return false;
     const lastMessage = req.body.messages[req.body.messages.length - 1]
-    if (lastMessage.role === 'user' && Array.isArray(lastMessage.content) &&lastMessage.content.find((item: any) => item.type === 'image')) {
-      if (config.Router.image) {
-        req.body.model = config.Router.image
-      }
+    if (!config.forceUseImageAgent && lastMessage.role === 'user' && Array.isArray(lastMessage.content) &&lastMessage.content.find((item: any) => item.type === 'image')) {
+      req.body.model = config.Router.image
       return false;
     }
     return req.body.messages.some((msg: any) => msg.role === 'user' && Array.isArray(msg.content) && msg.content.some((item: any) => item.type === 'image'))

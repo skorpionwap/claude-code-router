@@ -1,4 +1,8 @@
 {
+  "common": {
+    "yes": "Yes",
+    "no": "No"
+  },
   "app": {
     "title": "Claude Code Router",
     "save": "Save",
@@ -107,6 +111,8 @@
     "longContext": "Long Context",
     "longContextThreshold": "Context Threshold",
     "webSearch": "Web Search",
+    "image": "Image",
+    "forceUseImageAgent": "Force Use Image Agent",
     "selectModel": "Select a model...",
     "searchModel": "Search model...",
     "noModelFound": "No model found."

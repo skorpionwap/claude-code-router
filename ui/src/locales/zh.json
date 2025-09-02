@@ -1,4 +1,8 @@
 {
+  "common": {
+    "yes": "是",
+    "no": "否"
+  },
   "app": {
     "title": "Claude Code Router",
     "save": "保存",
@@ -107,6 +111,8 @@
     "longContext": "长上下文",
     "longContextThreshold": "上下文阈值",
     "webSearch": "网络搜索",
+    "image": "图像",
+    "forceUseImageAgent": "强制使用图像代理",
     "selectModel": "选择一个模型...",
     "searchModel": "搜索模型...",
     "noModelFound": "未找到模型."
