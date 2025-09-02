@@ -148,6 +148,9 @@ async function run(options: RunOptions = {}) {
 
           // append agent tools
           if (agent.tools.size) {
+            if (!req.body?.tools?.length) {
+              req.body.tools = []
+            }
             req.body.tools.unshift(...Array.from(agent.tools.values()).map(item => {
               return {
                 name: item.name,
@@ -211,6 +214,7 @@ async function run(options: RunOptions = {}) {
                   req,
                   config
                 });
+                console.log('result', toolResult)
                 toolMessages.push({
                   "tool_use_id": currentToolId,
                   "type": "tool_result",

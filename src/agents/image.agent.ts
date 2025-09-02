@@ -17,15 +17,8 @@ class ImageCache {
     });
   }
 
-  calculateHash(base64Image: string): string {
-    const hash = createHash('sha256');
-    hash.update(base64Image);
-    return hash.digest('hex');
-  }
-
   storeImage(id: string, source: any): void {
     if (this.hasImage(id)) return;
-    const base64Image = source.data
     this.cache.set(id, {
       source,
       timestamp: Date.now(),
@@ -62,7 +55,7 @@ export class ImageAgent implements IAgent {
   }
 
   shouldHandle(req: any, config: any): boolean {
-    if (!config.Router.image) return false;
+    if (!config.Router.image || req.body.model === config.Router.image) return false;
     const lastMessage = req.body.messages[req.body.messages.length - 1]
     if (!config.forceUseImageAgent && lastMessage.role === 'user' && Array.isArray(lastMessage.content) &&lastMessage.content.find((item: any) => item.type === 'image')) {
       req.body.model = config.Router.image
@@ -109,6 +102,7 @@ export class ImageAgent implements IAgent {
         "required": ["imageId", "task"]
       },
       handler: async (args, context) => {
+        console.log('args', JSON.stringify(args, null, 2))
         const imageMessages = [];
         let imageId;
 
@@ -127,7 +121,6 @@ export class ImageAgent implements IAgent {
           delete args.imageId;
         }
 
-        // Add text message with the response
         if (Object.keys(args).length > 0) {
           imageMessages.push({
             type: "text",
@@ -146,7 +139,10 @@ export class ImageAgent implements IAgent {
             model: context.config.Router.image,
             system: [{
               type: 'text',
-              text: `你需要按照任务去解析图片`
+              text: `You must interpret and analyze images strictly according to the assigned task.  
+When an image placeholder is provided, your role is to parse the image content only within the scope of the user’s instructions.  
+Do not ignore or deviate from the task.  
+Always ensure that your response reflects a clear, accurate interpretation of the image aligned with the given objective.`
             }],
             messages: [
               {
@@ -159,6 +155,7 @@ export class ImageAgent implements IAgent {
         }).then(res => res.json()).catch(err => {
           return null;
         });
+        console.log(agentResponse.content);
         if (!agentResponse || !agentResponse.content) {
           return 'analyzeImage Error';
         }
