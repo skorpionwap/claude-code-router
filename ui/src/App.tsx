@@ -8,6 +8,7 @@ import { Router } from "@/components/Router";
 import { JsonEditor } from "@/components/JsonEditor";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { MissionControlTab } from "@/components/dashboard/tabs/MissionControlTab";
+import { DashboardWrapper } from "@/components/advanced/DashboardWrapper";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
 import api from "@/lib/api";
@@ -27,7 +28,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 // import "@/styles/animations.css"; // TODO: Add this file if needed
-// Theme styles are imported in index.css as dashboard-advanced.css
+// Theme styles are imported in dashboard-theme.css for Advanced theme
 // import "@/styles/charts-enhancement.css"; // TODO: Add this file if needed
 
 function App() {
@@ -432,7 +433,13 @@ function App() {
 function AppWithTheme() {
   return (
     <ThemeProvider>
-      <App />
+      <DashboardWrapper
+        onOpenSettings={() => {}}
+        onSaveConfig={() => {}}
+        onSaveAndRestart={() => {}}
+      >
+        <App />
+      </DashboardWrapper>
     </ThemeProvider>
   );
 }

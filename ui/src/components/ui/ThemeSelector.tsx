@@ -43,36 +43,23 @@ const themeOptions: ThemeOption[] = [
     }
   },
   {
-    id: 'advanced-light',
-    label: 'Advanced Light',
-    mode: 'light',
+    id: 'advanced',
+    label: '🚀 Advanced Space',
+    mode: 'light', // irrelevant for advanced
     variant: 'advanced',
     previewColors: {
-      primary: 'rgba(255, 255, 255, 0.1)',
-      secondary: 'rgba(243, 244, 246, 0.05)',
-      accent: 'rgba(59, 130, 246, 0.8)',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: 'rgba(229, 231, 235, 0.1)'
-    }
-  },
-  {
-    id: 'advanced-dark',
-    label: 'Advanced Dark',
-    mode: 'dark',
-    variant: 'advanced',
-    previewColors: {
-      primary: 'rgba(31, 41, 55, 0.1)',
-      secondary: 'rgba(55, 65, 81, 0.05)',
-      accent: 'rgba(96, 165, 250, 0.8)',
-      background: 'rgba(17, 24, 39, 0.05)',
-      border: 'rgba(75, 85, 99, 0.1)'
+      primary: 'rgba(42, 42, 62, 0.9)',
+      secondary: 'rgba(38, 49, 78, 0.8)',
+      accent: 'rgba(31, 68, 112, 0.9)',
+      background: 'linear-gradient(135deg, #2a2a3e, #26314e, #1f4470)',
+      border: 'rgba(255, 255, 255, 0.2)'
     }
   }
 ];
 
 const ThemeSelector: React.FC = () => {
   const { theme, setTheme } = useTheme();
-  const currentThemeId = `${theme.variant}-${theme.mode}`;
+  const currentThemeId = theme.variant === 'advanced' ? 'advanced' : `${theme.variant}-${theme.mode}`;
 
   const handleThemeChange = (themeOption: ThemeOption) => {
     setTheme({
