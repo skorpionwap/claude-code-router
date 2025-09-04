@@ -6,9 +6,9 @@ import { Transformers } from "@/components/Transformers";
 import { Providers } from "@/components/Providers";
 import { Router } from "@/components/Router";
 import { JsonEditor } from "@/components/JsonEditor";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { MissionControlTab } from "@/components/dashboard/tabs/MissionControlTab";
-import { DashboardWrapper } from "@/components/advanced/DashboardWrapper";
+import { Dashboard as AdvancedDashboard } from "@/components/advanced/Dashboard";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
 import api from "@/lib/api";
@@ -35,6 +35,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { config, error } = useConfig();
+  const { theme } = useTheme();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'dashboard' | 'analytics'>('dashboard');
@@ -271,6 +272,17 @@ function App() {
     );
   }
 
+  // If Advanced theme is selected, show the space dashboard directly
+  if (theme.variant === 'advanced') {
+    return (
+      <AdvancedDashboard 
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onSaveConfig={saveConfig}
+        onSaveAndRestart={saveConfigAndRestart}
+      />
+    );
+  }
+
   return (
     <div className="h-screen bg-background font-sans">
       <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
@@ -433,13 +445,7 @@ function App() {
 function AppWithTheme() {
   return (
     <ThemeProvider>
-      <DashboardWrapper
-        onOpenSettings={() => {}}
-        onSaveConfig={() => {}}
-        onSaveAndRestart={() => {}}
-      >
-        <App />
-      </DashboardWrapper>
+      <App />
     </ThemeProvider>
   );
 }
