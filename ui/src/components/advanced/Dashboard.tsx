@@ -207,8 +207,8 @@ export function Dashboard({
   const renderTabContent = () => {
     if (activeTab === 'analytics') {
       return (
-        <div className="glass-card h-full p-6">
-          <div className="flex items-center space-x-3 mb-6">
+        <div className="h-full">
+          <div className="flex items-center space-x-3 mb-6 px-6">
             <BarChart3 className="h-6 w-6 text-blue-400" />
             <h2 className="text-2xl font-bold text-white">Analytics</h2>
           </div>
