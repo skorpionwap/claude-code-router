@@ -1,6 +1,6 @@
 {
   "name": "@musistudio/claude-code-router",
-  "version": "1.0.46-enhanced",
+  "version": "1.0.47-enhanced",
   "description": "Use Claude Code without an Anthropics account and route it to another LLM provider - Enhanced with comprehensive analytics dashboard",
   "bin": {
     "ccr": "./dist/cli.js"
