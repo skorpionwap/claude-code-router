@@ -20,11 +20,11 @@
   "license": "MIT",
   "dependencies": {
     "@fastify/static": "^8.2.0",
-    "@musistudio/llms": "^1.0.30",
+    "@musistudio/llms": "^1.0.31",
     "dotenv": "^16.4.7",
     "json5": "^2.2.3",
     "openurl": "^1.1.1",
-    "pino-rotating-file-stream": "^0.0.2",
+    "rotating-file-stream": "^3.2.7",
     "tiktoken": "^1.0.21",
     "uuid": "^11.1.0"
   },
