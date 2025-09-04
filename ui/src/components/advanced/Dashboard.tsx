@@ -29,8 +29,7 @@ import {
 } from '@/components/ui/dialog';
 import { Toast } from '@/components/ui/toast';
 import '@/styles/dashboard.css';
-import '@/styles/animations.css';
-import '@/styles/dashboard-theme.css';
+import '@/styles/widget-enhancements.css';
 
 interface DashboardProps {
   className?: string;
