@@ -118,7 +118,7 @@ export function MissionControlTab() {
   ]);
 
   // Real stats from config
-  const providers = config?.Providers || [];
+  const providers = Array.isArray(config?.Providers) ? config.Providers : [];
   const totalProviders = providers.length;
   const configuredProviders = providers.filter(p => p.api_key).length;
   const totalModels = providers.reduce((acc, provider) => acc + (provider.models?.length || 0), 0);
@@ -146,7 +146,8 @@ export function MissionControlTab() {
         : routeStats?.[route.key];
 
       // Filtrează activitatea recentă pentru această rută
-      const routeActivity = liveActivity.filter(activity => {
+      const safeActivity = Array.isArray(liveActivity) ? liveActivity : [];
+      const routeActivity = safeActivity.filter(activity => {
         // Verifică dacă activitatea aparține acestei rute prin diverse metode
         if (activity.route === route.key) return true;
         
@@ -246,7 +247,7 @@ export function MissionControlTab() {
   
   // Filter activities based on time range and limit
   const filteredActivities = useMemo(() => {
-    if (!liveActivity) return [];
+    if (!liveActivity || !Array.isArray(liveActivity)) return [];
     
     let filtered = [...liveActivity];
     

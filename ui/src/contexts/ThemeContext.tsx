@@ -28,26 +28,27 @@ const getThemeClasses = (theme: Theme): string => {
   return `theme-${theme.mode} theme-${theme.variant}`;
 };
 
-export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme);
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    try {
-      const savedTheme = localStorage.getItem('claude-router-theme');
-      if (savedTheme) {
-        const parsedTheme = JSON.parse(savedTheme);
-        // Validate the parsed theme
-        if (parsedTheme.mode && parsedTheme.variant && 
-            ['light', 'dark'].includes(parsedTheme.mode) && 
-            ['classic', 'advanced'].includes(parsedTheme.variant)) {
-          setThemeState(parsedTheme);
-        }
+// Initialize theme from localStorage synchronously
+const getInitialTheme = (): Theme => {
+  try {
+    const savedTheme = localStorage.getItem('claude-router-theme');
+    if (savedTheme) {
+      const parsedTheme = JSON.parse(savedTheme);
+      // Validate the parsed theme
+      if (parsedTheme.mode && parsedTheme.variant && 
+          ['light', 'dark'].includes(parsedTheme.mode) && 
+          ['classic', 'advanced'].includes(parsedTheme.variant)) {
+        return parsedTheme;
       }
-    } catch (error) {
-      console.warn('Failed to load theme from localStorage:', error);
     }
-  }, []);
+  } catch (error) {
+    console.warn('Failed to load theme from localStorage:', error);
+  }
+  return defaultTheme;
+};
+
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   // Apply theme to document element
   useEffect(() => {
