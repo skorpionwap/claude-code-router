@@ -939,7 +939,7 @@ export function ModelsTab() {
                 </div>
               </div>
 
-              <div className="text-xs text-gray-500 mb-4 pl-7">
+              <div className="text-xs text-muted-foreground mb-4 pl-7">
                 {provider.api_base_url}
               </div>
             </motion.div>
@@ -1003,8 +1003,8 @@ export function ModelsTab() {
               {/* Empty State for Provider */}
               {(!provider.models || provider.models.length === 0) && (
                 <div className="aspect-square flex flex-col items-center justify-center p-3 border border-dashed border-gray-600 rounded-lg">
-                  <i className="fas fa-plus text-gray-500 text-lg mb-2"></i>
-                  <span className="text-xs text-gray-500 text-center">No models</span>
+                  <i className="fas fa-plus text-muted-foreground text-lg mb-2"></i>
+                  <span className="text-xs text-muted-foreground text-center">No models</span>
                 </div>
               )}
             </motion.div>

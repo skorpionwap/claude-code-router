@@ -1,0 +1,109 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+
+// TypeScript types
+export type ThemeMode = 'light' | 'dark';
+export type ThemeVariant = 'classic' | 'advanced';
+
+export interface Theme {
+  mode: ThemeMode;
+  variant: ThemeVariant;
+}
+
+interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  setThemeMode: (mode: ThemeMode) => void;
+  setThemeVariant: (variant: ThemeVariant) => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+const defaultTheme: Theme = {
+  mode: 'light',
+  variant: 'classic'
+};
+
+const getThemeClasses = (theme: Theme): string => {
+  return `theme-${theme.mode} theme-${theme.variant}`;
+};
+
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('claude-router-theme');
+      if (savedTheme) {
+        const parsedTheme = JSON.parse(savedTheme);
+        // Validate the parsed theme
+        if (parsedTheme.mode && parsedTheme.variant && 
+            ['light', 'dark'].includes(parsedTheme.mode) && 
+            ['classic', 'advanced'].includes(parsedTheme.variant)) {
+          setThemeState(parsedTheme);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load theme from localStorage:', error);
+    }
+  }, []);
+
+  // Apply theme to document element
+  useEffect(() => {
+    const documentElement = document.documentElement;
+    
+    // Remove all theme classes
+    documentElement.classList.remove('theme-light', 'theme-dark', 'theme-classic', 'theme-advanced');
+    
+    // Add new theme classes
+    const classes = getThemeClasses(theme);
+    classes.split(' ').forEach(cls => {
+      if (cls.trim()) {
+        documentElement.classList.add(cls.trim());
+      }
+    });
+    
+    // Save theme to localStorage
+    try {
+      localStorage.setItem('claude-router-theme', JSON.stringify(theme));
+    } catch (error) {
+      console.warn('Failed to save theme to localStorage:', error);
+    }
+  }, [theme]);
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+  };
+
+  const setThemeMode = (mode: ThemeMode) => {
+    setThemeState(prev => ({ ...prev, mode }));
+  };
+
+  const setThemeVariant = (variant: ThemeVariant) => {
+    setThemeState(prev => ({ ...prev, variant }));
+  };
+
+  const value: ThemeContextType = {
+    theme,
+    setTheme,
+    setThemeMode,
+    setThemeVariant
+  };
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+export default ThemeContext;

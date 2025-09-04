@@ -588,35 +588,35 @@ export function MissionControlTab() {
                       <motion.div
                         key={card.route}
                         className={`
-                          relative overflow-hidden rounded-xl border-2 bg-slate-800/40 backdrop-blur-sm
-                          hover:scale-105 transition-all duration-300 cursor-pointer
-                          ${card.status === 'healthy' ? 'border-green-500/30 hover:border-green-400/60' : 
-                            card.status === 'warning' ? 'border-yellow-500/30 hover:border-yellow-400/60' :
-                            card.status === 'error' ? 'border-red-500/30 hover:border-red-400/60' :
-                            'border-gray-600/30 hover:border-gray-500/60'}
+                          theme-advanced glass-card hover:scale-105 transition-all duration-300 cursor-pointer
+                          ${card.status === 'healthy' ? 'border-green-500/40 hover:border-green-400/70' : 
+                            card.status === 'warning' ? 'border-yellow-500/40 hover:border-yellow-400/70' :
+                            card.status === 'error' ? 'border-red-500/40 hover:border-red-400/70' :
+                            'border-gray-600/40 hover:border-gray-500/70'}
+                          border-2
                         `}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
-                        whileHover={{ y: -5 }}
+                        whileHover={{ y: -8 }}
                       >
                         {/* Header */}
                         <div className="p-6 pb-4">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                              <div className={`w-12 h-12 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
+                              <div className={`w-12 h-12 rounded-lg bg-${color}-500/20 flex items-center justify-center service-icon`}>
                                 <i className={`${icon} text-${color}-400 text-xl`}></i>
                               </div>
                               <div>
-                                <h4 className="text-lg font-bold text-white">{card.displayName}</h4>
+                                <h4 className="text-xl font-bold text-white">{card.displayName}</h4>
                                 <p className="text-sm text-gray-400">{card.config.description}</p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className={`text-3xl font-bold ${scoreColor}`}>
+                              <div className={`text-4xl font-bold stat-number`}>
                                 {card.score}
                               </div>
-                              <div className="text-xs text-gray-400">Score</div>
+                              <div className="text-xs text-gray-400 stat-label">Score</div>
                             </div>
                           </div>
                           
@@ -637,16 +637,16 @@ export function MissionControlTab() {
 
                         {/* Model Configuration */}
                         <div className="px-6 pb-4">
-                          <div className="bg-slate-700/50 rounded-lg p-3">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-400">Model Configurat:</span>
-                              <span className={`font-bold text-${color}-400`}>
+                          <div className="glass-card p-4">
+                            <div className="flex items-center justify-between text-sm mb-2">
+                              <span className="text-gray-400 stat-label">Model Configurat:</span>
+                              <span className={`font-bold text-${color}-400 stat-number`}>
                                 {card.config.model || 'N/A'}
                               </span>
                             </div>
-                            <div className="flex items-center justify-between text-sm mt-1">
-                              <span className="text-gray-400">Provider:</span>
-                              <span className="font-semibold text-white">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-400 stat-label">Provider:</span>
+                              <span className="font-semibold text-white stat-number">
                                 {card.config.provider || 'N/A'}
                               </span>
                             </div>
@@ -657,21 +657,21 @@ export function MissionControlTab() {
                         {card.stats && (
                           <div className="px-6 pb-4">
                             <div className="grid grid-cols-3 gap-3">
-                              <div className={`bg-${color}-500/10 p-3 rounded-lg border border-${color}-500/20`}>
-                                <div className={`text-xs text-${color}-400 mb-1`}>Requests</div>
-                                <div className="text-lg font-bold text-white">
+                              <div className={`stats-card border-${color}-500/30`}>
+                                <div className={`text-xs text-${color}-400 mb-1 stat-label`}>Requests</div>
+                                <div className="text-2xl font-bold text-white stat-number">
                                   {card.stats.totalRequests.toLocaleString()}
                                 </div>
                               </div>
-                              <div className="bg-green-500/10 p-3 rounded-lg border border-green-500/20">
-                                <div className="text-xs text-green-400 mb-1">Success</div>
-                                <div className="text-lg font-bold text-white">
+                              <div className="stats-card border-green-500/30">
+                                <div className="text-xs text-green-400 mb-1 stat-label">Success</div>
+                                <div className="text-2xl font-bold text-white stat-number">
                                   {card.stats.successRate.toFixed(1)}%
                                 </div>
                               </div>
-                              <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20">
-                                <div className="text-xs text-blue-400 mb-1">Timp</div>
-                                <div className="text-lg font-bold text-white">
+                              <div className="stats-card border-blue-500/30">
+                                <div className="text-xs text-blue-400 mb-1 stat-label">Timp</div>
+                                <div className="text-2xl font-bold text-white stat-number">
                                   {formatResponseTime(card.stats.avgResponseTime)}
                                 </div>
                               </div>
@@ -683,15 +683,15 @@ export function MissionControlTab() {
                         {/* Recent Activity */}
                         <div className="px-6 pb-6">
                           <div className="flex items-center justify-between mb-3">
-                            <h5 className="text-sm font-semibold text-white">Activitate Recentă</h5>
-                            <span className="text-xs text-gray-400">
+                            <h5 className="text-sm font-semibold text-white stat-label">Activitate Recentă</h5>
+                            <span className="text-xs text-gray-400 stat-label">
                               {card.recentActivity.length} evenimente
                             </span>
                           </div>
-                          <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                          <div className="space-y-1.5 max-h-36 overflow-y-auto glass-card p-3">
                             {card.recentActivity.length > 0 ? (
                               card.recentActivity.map((activity, idx) => (
-                                <div key={`${activity.id}-${idx}`} className="p-2 bg-slate-700/30 rounded-md">
+                                <div key={`${activity.id}-${idx}`} className="p-2 bg-slate-700/30 rounded-md stats-card">
                                   {/* First row: Status + Time + Model */}
                                   <div className="flex items-center justify-between text-xs mb-1">
                                     <div className="flex items-center gap-2">
@@ -732,8 +732,8 @@ export function MissionControlTab() {
                         </div>
 
                         {/* Decorative Elements */}
-                        <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}-500/5 rounded-bl-full`}></div>
-                        <div className={`absolute bottom-0 left-0 w-16 h-16 bg-${color}-500/5 rounded-tr-full`}></div>
+                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500/10 rounded-bl-full`}></div>
+                        <div className={`absolute bottom-0 left-0 w-20 h-20 bg-${color}-500/10 rounded-tr-full`}></div>
                       </motion.div>
                     );
                   })}
