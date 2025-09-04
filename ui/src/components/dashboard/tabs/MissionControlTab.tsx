@@ -4,8 +4,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useMissionControl, type Activity } from '@/hooks/useMissionControl';
 import { useRealTimeMissionControl, useProviderHistory } from '@/hooks/useMissionControlData';
 import { useConfig } from '@/components/ConfigProvider';
-import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor } from '@/lib/formatters';
+import { useTheme } from '@/contexts/ThemeContext';
+import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';
 import type { MissionControlData, ModelStat, HealthHistoryData } from '@/types/missionControl';
+import api from '@/lib/api';
+import { analyticsAPI } from '@/lib/analytics';
+import type { RealtimeStats, ModelStats } from '@/lib/analytics';
 
 interface RouteCardData {
   route: string;
@@ -49,6 +53,14 @@ interface RequestLog {
   tokens: number;
 }
 
+interface ServiceStatus {
+  name: string;
+  status: 'online' | 'offline' | 'loading';
+  port?: string;
+  icon: string;
+  details: string;
+}
+
 export function MissionControlTab() {
     const [activeTab, setActiveTab] = useState<'routes' | 'overview' | 'providers' | 'analytics' | 'activity'>('routes');
   
@@ -56,6 +68,10 @@ export function MissionControlTab() {
   const { routerConfig, routeStats, liveActivity, loading: basicLoading, error: basicError } = useMissionControl();
   const { data: missionControlData, loading: mcLoading, error: mcError } = useRealTimeMissionControl();
   const { data: providerHistory, loading: historyLoading } = useProviderHistory();
+  
+  // Theme context
+  const { theme } = useTheme();
+  const isAdvanced = theme.variant === 'advanced';
   
   // Analytics state
   const { config } = useConfig();
@@ -67,6 +83,47 @@ export function MissionControlTab() {
   // Activity logs state
   const [activityTimeRange, setActivityTimeRange] = useState<'10m' | '1h' | '6h' | '24h' | 'all'>('1h');
   const [activityLimit, setActivityLimit] = useState<number>(50);
+
+  // Overview state - integrated from OverviewTab
+  const [realtimeStats, setRealtimeStats] = useState<RealtimeStats | null>(null);
+  const [modelStats, setModelStats] = useState<ModelStats[]>([]);
+  const [overviewLoading, setOverviewLoading] = useState(true);
+  const [services, setServices] = useState<ServiceStatus[]>([
+    {
+      name: 'Proxy Service',
+      status: 'loading',
+      port: '8001',
+      icon: 'exchange-alt',
+      details: 'AI Request Proxy'
+    },
+    {
+      name: 'Web Interface',
+      status: 'online',
+      port: '3456',
+      icon: 'globe',
+      details: 'Management UI'
+    },
+    {
+      name: 'Socket Connections',
+      status: 'loading',
+      icon: 'plug',
+      details: 'WebSocket'
+    },
+    {
+      name: 'API Endpoints',
+      status: 'loading',
+      icon: 'code',
+      details: 'REST API'
+    }
+  ]);
+
+  // Real stats from config
+  const providers = config?.Providers || [];
+  const totalProviders = providers.length;
+  const configuredProviders = providers.filter(p => p.api_key).length;
+  const totalModels = providers.reduce((acc, provider) => acc + (provider.models?.length || 0), 0);
+  const activeModel = config?.Router?.default || 'None selected';
+  const hasActiveModel = activeModel !== 'None selected' && activeModel !== '';
 
   // Procesează datele pentru cardurile de rute
   const routeCards: RouteCardData[] = useMemo(() => {
@@ -346,6 +403,72 @@ export function MissionControlTab() {
     }
   }, [isLiveMode, timeRange, config, activeTab]);
 
+  // Overview data loading effect - integrated from OverviewTab
+  useEffect(() => {
+    let cleanup: (() => void) | null = null;
+
+    const loadOverviewData = async () => {
+      if (activeTab !== 'overview') return;
+      
+      try {
+        setOverviewLoading(true);
+        
+        // Load initial data
+        const [realtimeData, modelData] = await Promise.all([
+          analyticsAPI.getRealtimeStats(),
+          analyticsAPI.getModelStats()
+        ]);
+
+        setRealtimeStats(realtimeData);
+        setModelStats(modelData);
+
+        // Check service statuses
+        await checkServices();
+
+        // Set up real-time subscription
+        cleanup = analyticsAPI.subscribeToRealtimeStats((stats) => {
+          setRealtimeStats(stats);
+        }, 30000); // Update every 30 seconds
+
+      } catch (error) {
+        console.error('Error loading overview analytics data:', error);
+        // Fallback to config-only data if analytics fail
+      } finally {
+        setOverviewLoading(false);
+      }
+    };
+
+    loadOverviewData();
+
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [activeTab]);
+
+  const checkServices = async () => {
+    try {
+      // Test if we can reach the API (since we're using it)
+      await api.getConfig();
+      
+      setServices(prev => prev.map(service => {
+        if (service.name === 'API Endpoints') {
+          return { ...service, status: 'online' };
+        }
+        if (service.name === 'Proxy Service') {
+          return { ...service, status: 'online' }; // Assume online if we can reach API
+        }
+        // For other services, mark as online if we can reach the API, otherwise offline
+        return { ...service, status: 'online' };
+      }));
+    } catch (error) {
+      console.error('Error checking services:', error);
+      setServices(prev => prev.map(service => ({
+        ...service,
+        status: service.name === 'Web Interface' ? 'online' : 'offline'
+      })));
+    }
+  };
+
   // Analytics calculations
   const totalRequests = chartData.reduce((sum, data) => sum + data.requests, 0);
   const totalErrors = chartData.reduce((sum, data) => sum + data.errors, 0);
@@ -365,13 +488,39 @@ export function MissionControlTab() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-400 bg-green-500/20 border-green-500/30';
-      case 'warning': return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
-      case 'error': return 'text-red-400 bg-red-500/20 border-red-500/30';
-      case 'low_success': return 'text-orange-400 bg-orange-500/20 border-orange-500/30';
-      case 'slow_response': return 'text-purple-400 bg-purple-500/20 border-purple-500/30';
-      case 'inactive': return 'text-gray-400 bg-gray-500/20 border-gray-500/30';
-      default: return 'text-gray-400 bg-gray-500/20 border-gray-500/30';
+      case 'healthy': 
+        return 'text-green-400 border-green-400/30';
+      case 'warning': 
+        return 'text-yellow-400 border-yellow-400/30';
+      case 'error': 
+        return 'text-red-400 border-red-400/30';
+      case 'low_success': 
+        return 'text-orange-400 border-orange-400/30';
+      case 'slow_response': 
+        return 'text-blue-400 border-blue-400/30';
+      case 'inactive': 
+        return 'text-gray-400 border-gray-400/30';
+      default: 
+        return 'text-gray-400 border-gray-400/30';
+    }
+  };
+
+  const getStatusBg = (status: string) => {
+    switch (status) {
+      case 'healthy': 
+        return 'bg-green-400/10 hover:bg-green-400/20';
+      case 'warning': 
+        return 'bg-yellow-400/10 hover:bg-yellow-400/20';
+      case 'error': 
+        return 'bg-red-400/10 hover:bg-red-400/20';
+      case 'low_success': 
+        return 'bg-orange-400/10 hover:bg-orange-400/20';
+      case 'slow_response': 
+        return 'bg-blue-400/10 hover:bg-blue-400/20';
+      case 'inactive': 
+        return 'bg-gray-400/10 hover:bg-gray-400/20';
+      default: 
+        return 'bg-gray-400/10 hover:bg-gray-400/20';
     }
   };
 
@@ -379,6 +528,19 @@ export function MissionControlTab() {
     if (score >= 80) return 'text-green-400';
     if (score >= 60) return 'text-yellow-400';
     return 'text-red-400';
+  };
+
+  const getActivityStatusColor = (type: string) => {
+    switch (type) {
+      case 'success': 
+        return 'bg-green-400';
+      case 'error': 
+        return 'bg-red-400';
+      case 'warning': 
+        return 'bg-yellow-400';
+      default: 
+        return 'bg-blue-400';
+    }
   };
 
   // Loading state combinat
@@ -389,58 +551,83 @@ export function MissionControlTab() {
     <div className="space-y-8">
       {/* Header */}
       <motion.div
-        className="glass-card p-6"
+        className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6 mb-6"}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-3xl font-bold text-white">Mission Control</h1>
-        <p className="text-gray-300 mt-1">Monitorizare completă a sistemului în timp real.</p>
+        <h1 className="text-3xl font-bold text-foreground">Mission Control</h1>
+        <p className="text-muted-foreground mt-1">Monitorizare completă a sistemului în timp real.</p>
       </motion.div>
 
       {/* Navigation */}
-      <div className="flex bg-slate-800/50 rounded-lg p-1">
+      <div className={isAdvanced ? "nav-tabs" : "flex bg-card border border-border rounded-lg p-2 mb-6 overflow-x-auto"}>
         <button
           onClick={() => setActiveTab('routes')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-            activeTab === 'routes' ? 'bg-green-500/20 text-green-400' : 'text-gray-300 hover:bg-slate-700/50'
-          }`}
+          className={isAdvanced 
+            ? `nav-tab ${activeTab === 'routes' ? 'active' : ''}` 
+            : `flex-1 min-w-[150px] px-4 py-3 text-center border-none rounded-lg cursor-pointer transition-all duration-300 font-medium ${
+                activeTab === 'routes' 
+                ? 'bg-primary text-primary-foreground shadow-md' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`
+          }
         >
           <i className="fas fa-route mr-2"></i>
           Live Routes
         </button>
         <button
           onClick={() => setActiveTab('overview')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-            activeTab === 'overview' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-300 hover:bg-slate-700/50'
-          }`}
+          className={isAdvanced 
+            ? `nav-tab ${activeTab === 'overview' ? 'active' : ''}` 
+            : `flex-1 min-w-[150px] px-4 py-3 text-center border-none rounded-lg cursor-pointer transition-all duration-300 font-medium ${
+                activeTab === 'overview' 
+                ? 'bg-primary text-primary-foreground shadow-md' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`
+          }
         >
           <i className="fas fa-chart-line mr-2"></i>
           Overview
         </button>
         <button
           onClick={() => setActiveTab('providers')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-            activeTab === 'providers' ? 'bg-purple-500/20 text-purple-400' : 'text-gray-300 hover:bg-slate-700/50'
-          }`}
+          className={isAdvanced 
+            ? `nav-tab ${activeTab === 'providers' ? 'active' : ''}` 
+            : `flex-1 min-w-[150px] px-4 py-3 text-center border-none rounded-lg cursor-pointer transition-all duration-300 font-medium ${
+                activeTab === 'providers' 
+                ? 'bg-primary text-primary-foreground shadow-md' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`
+          }
         >
           <i className="fas fa-server mr-2"></i>
           Providers
         </button>
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-            activeTab === 'analytics' ? 'bg-orange-500/20 text-orange-400' : 'text-gray-300 hover:bg-slate-700/50'
-          }`}
+          className={isAdvanced 
+            ? `nav-tab ${activeTab === 'analytics' ? 'active' : ''}` 
+            : `flex-1 min-w-[150px] px-4 py-3 text-center border-none rounded-lg cursor-pointer transition-all duration-300 font-medium ${
+                activeTab === 'analytics' 
+                ? 'bg-primary text-primary-foreground shadow-md' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`
+          }
         >
           <i className="fas fa-chart-line mr-2"></i>
           Analytics
         </button>
         <button
           onClick={() => setActiveTab('activity')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-            activeTab === 'activity' ? 'bg-red-500/20 text-red-400' : 'text-gray-300 hover:bg-slate-700/50'
-          }`}
+          className={isAdvanced 
+            ? `nav-tab ${activeTab === 'activity' ? 'active' : ''}` 
+            : `flex-1 min-w-[150px] px-4 py-3 text-center border-none rounded-lg cursor-pointer transition-all duration-300 font-medium ${
+                activeTab === 'activity' 
+                ? 'bg-primary text-primary-foreground shadow-md' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`
+          }
         >
           <i className="fas fa-stream mr-2"></i>
           Activitate
@@ -451,109 +638,246 @@ export function MissionControlTab() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          className="glass-card p-6"
+          className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6"}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {isLoading && <div className="text-center text-gray-400">Se încarcă datele...</div>}
-          {error && <div className="text-center text-red-500">Eroare: {error}</div>}
+          {isLoading && <div className="text-center text-muted-foreground">Se încarcă datele...</div>}
+          {error && <div className="text-center text-destructive">Eroare: {error}</div>}
 
-          {/* Overview Tab */}
+          {/* Enhanced Overview Tab - Integrated from OverviewTab */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {!aggregatedStats && !isLoading && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-lg">
-                  <p className="text-yellow-400">
-                    <i className="fas fa-exclamation-triangle mr-2"></i>
-                    Nu s-au putut încărca statisticile agregate. Verificați conexiunea API.
-                  </p>
+            <div className="space-y-8">
+              {/* System Overview - Real Stats from Config and Analytics */}
+              <motion.div 
+                className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6 mb-6"}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <i className="fas fa-tachometer-alt text-2xl text-primary"></i>
+                  <h2 className="text-2xl font-bold">System Overview</h2>
+                  {overviewLoading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="w-3 h-3 animate-spin rounded-full border border-current border-t-transparent"></div>
+                      Loading real-time data...
+                    </div>
+                  )}
                 </div>
-              )}
-              
-              {aggregatedStats && (
-                <>
-                  {/* Statistici Generale */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-cyan-500/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-400">Total Requests</p>
-                          <p className="text-2xl font-bold text-cyan-400">{aggregatedStats.totalRequests.toLocaleString()}</p>
-                        </div>
-                        <i className="fas fa-chart-bar text-cyan-400 text-2xl opacity-50"></i>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-green-500/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-400">Success Rate</p>
-                          <p className="text-2xl font-bold text-green-400">{aggregatedStats.successRate.toFixed(1)}%</p>
-                        </div>
-                        <i className="fas fa-check-circle text-green-400 text-2xl opacity-50"></i>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-blue-500/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-400">Avg Response Time</p>
-                          <p className="text-2xl font-bold text-blue-400">{formatResponseTime(aggregatedStats.avgResponseTime)}</p>
-                        </div>
-                        <i className="fas fa-clock text-blue-400 text-2xl opacity-50"></i>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-500/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-400">Active Models</p>
-                          <p className="text-2xl font-bold text-purple-400">{aggregatedStats.modelStats.length}</p>
-                        </div>
-                        <i className="fas fa-microchip text-purple-400 text-2xl opacity-50"></i>
-                      </div>
-                    </div>
-                  </div>
+                
+                {/* Real Stats from Config and Analytics */}
+                <div className={isAdvanced ? "stats-grid" : "grid grid-cols-2 lg:grid-cols-4 gap-4"}>
+                  <motion.div 
+                    className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{realtimeStats?.last24h.totalRequests || 0}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Total Requests (24h)</div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{totalProviders}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Total Providers</div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{formatResponseTime(realtimeStats?.last24h.avgResponseTime || 0)}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Avg Response Time</div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{formatSuccessRate(realtimeStats?.last24h.errorRate || 0)}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Success Rate</div>
+                  </motion.div>
+                </div>
 
-                  {/* Top Performant Models */}
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-4">Top Performant Models</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {aggregatedStats.modelStats.slice(0, 6).map((model, index) => (
-                        <div key={model.model} className="bg-slate-800/50 p-4 rounded-lg border border-slate-600/50">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-cyan-400">{model.model}</h4>
-                            <span className="text-xs bg-slate-700 px-2 py-1 rounded">{model.provider}</span>
+                {/* Live Performance Metrics */}
+                {realtimeStats && (
+                  <div className="mt-8">
+                    <div className="flex items-center gap-4 mb-6">
+                      <i className="fas fa-pulse text-xl text-chart-1"></i>
+                      <h3 className="text-xl font-bold">Live Performance</h3>
+                      <span className="text-sm text-chart-1">● Live</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="bg-card/50 p-4 rounded-lg border border-border">
+                        <h4 className="text-lg font-semibold text-card-foreground mb-2">Current Activity</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Active Requests:</span>
+                            <span className="text-chart-1 font-mono">{realtimeStats.current.activeRequests}</span>
                           </div>
-                          <div className="grid grid-cols-3 gap-2 text-sm">
-                            <div>
-                              <span className="text-gray-400">Req:</span>
-                              <span className="font-bold text-white ml-1">{model.totalRequests}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">Rate:</span>
-                              <span className="font-bold text-green-400 ml-1">{((model.successfulRequests / model.totalRequests) * 100).toFixed(1)}%</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">Time:</span>
-                              <span className="font-bold text-white ml-1">{formatResponseTime(model.avgResponseTime)}</span>
-                            </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Avg Response:</span>
+                            <span className={`font-mono ${getResponseTimeColor(realtimeStats.current.avgResponseTime)}`}>
+                              {formatResponseTime(realtimeStats.current.avgResponseTime)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Error Rate:</span>
+                            <span className={`font-mono ${getErrorRateColor(realtimeStats?.current?.errorRate || 0)}`}>
+                              {formatPercentage(realtimeStats?.current?.errorRate || 0)}
+                            </span>
                           </div>
                         </div>
-                      ))}
+                      </div>
+
+                      <div className="bg-card/50 p-4 rounded-lg border border-border">
+                        <h4 className="text-lg font-semibold text-card-foreground mb-2">Last Hour</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Total Requests:</span>
+                            <span className="text-primary font-mono">{realtimeStats.last1h.totalRequests}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Avg Response:</span>
+                            <span className={`font-mono ${getResponseTimeColor(realtimeStats.last1h.avgResponseTime)}`}>
+                              {formatResponseTime(realtimeStats.last1h.avgResponseTime)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Top Model:</span>
+                            <span className="text-chart-1 font-mono text-sm">
+                              {realtimeStats.last1h.topModels[0]?.model.substring(0, 15) || 'None'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-card/50 p-4 rounded-lg border border-border">
+                        <h4 className="text-lg font-semibold text-card-foreground mb-2">Top Models (24h)</h4>
+                        <div className="space-y-2">
+                          {realtimeStats?.last24h?.topModels && Array.isArray(realtimeStats.last24h.topModels) ? 
+                            realtimeStats.last24h.topModels.slice(0, 3).map((model, index) => (
+                              <div key={index} className="flex justify-between items-center">
+                                <span className="text-muted-foreground text-sm">{model.model.substring(0, 12)}:</span>
+                                <span className="text-primary font-mono text-sm">{model.count}</span>
+                              </div>
+                            )) : (
+                              <div className="text-muted text-sm">No data available</div>
+                            )
+                          }
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </>
-              )}
-              
-              {!aggregatedStats && !isLoading && (
-                <div className="text-center py-8">
-                  <i className="fas fa-chart-line text-gray-600 text-4xl mb-4"></i>
-                  <p className="text-gray-400">Nu sunt disponibile statistici</p>
-                  <p className="text-gray-500 text-sm mt-2">Verificați conexiunea la API</p>
+                )}
+
+                {/* Current Configuration Summary */}
+                <div className="mt-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <i className="fas fa-cog text-xl text-primary"></i>
+                    <h3 className="text-xl font-bold">Current Configuration</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Active Model */}
+                    <div className="bg-card/50 p-4 rounded-lg border border-border">
+                      <h4 className="text-lg font-semibold text-card-foreground mb-2">Active Router</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Default Model:</span>
+                          <span className={`font-mono ${hasActiveModel ? 'text-chart-1' : 'text-destructive'}`}>
+                            {activeModel}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Background Model:</span>
+                          <span className="text-foreground font-mono">{config?.Router?.background || 'Not set'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Long Context:</span>
+                          <span className="text-foreground font-mono">{config?.Router?.longContext || 'Not set'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Provider Summary */}
+                    <div className="bg-card/50 p-4 rounded-lg border border-border">
+                      <h4 className="text-lg font-semibold text-card-foreground mb-2">Provider Status</h4>
+                      <div className="space-y-2">
+                        {providers.slice(0, 3).map((provider, index) => (
+                          <div key={index} className="flex justify-between items-center">
+                            <span className="text-muted-foreground">{provider.name || `Provider ${index + 1}`}:</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${provider.api_key ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                              <span className="text-sm text-foreground">{provider.models?.length || 0} models</span>
+                            </div>
+                          </div>
+                        ))}
+                        {providers.length > 3 && (
+                          <div className="text-sm text-muted text-center pt-2">
+                            +{providers.length - 3} more providers
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
+              </motion.div>
+
+              {/* Services Status */}
+              <motion.div 
+                className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6"}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <i className="fas fa-server text-2xl text-chart-1"></i>
+                    <h2 className="text-2xl font-bold">Services Status</h2>
+                  </div>
+                  <button 
+                    onClick={checkServices}
+                    className="px-4 py-2 bg-blue-500/20 text-primary rounded-lg border border-blue-500/30 hover:bg-blue-500/30 transition-colors"
+                  >
+                    <i className="fas fa-sync-alt mr-2"></i>
+                    Refresh
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {services.map((service, index) => (
+                    <motion.div
+                      key={service.name}
+                      className={isAdvanced ? "service-status-card" : "bg-card/50 border border-border rounded-lg p-4 flex items-center gap-4 hover:bg-card/70 transition-colors"}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <div className="service-icon">
+                        <i className={`fas fa-${service.icon}`}></i>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-bold text-foreground">{service.name}</h4>
+                        <p className="text-muted-foreground text-sm">{service.details}</p>
+                        {service.port && <p className="text-muted text-xs">Port {service.port}</p>}
+                      </div>
+                      <span className={`service-badge ${service.status}`}>
+                        {service.status === 'loading' ? 'Checking...' : service.status}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </div>
           )}
 
@@ -561,15 +885,15 @@ export function MissionControlTab() {
           {activeTab === 'routes' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Live Route Monitoring</h3>
-                <div className="text-sm text-gray-400">
+                <h3 className="text-2xl font-bold text-foreground">Live Route Monitoring</h3>
+                <div className="text-sm text-muted-foreground">
                   Actualizat în timp real • {routeCards.length} rute active
                 </div>
               </div>
               
               {!routerConfig && !isLoading && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-lg">
-                  <p className="text-yellow-400">
+                <div className="bg-chart-4/10 border border-chart-4/30 p-4 rounded-lg">
+                  <p className="text-chart-4">
                     <i className="fas fa-exclamation-triangle mr-2"></i>
                     Nu s-au putut încărca configurațiile rutelor. Verificați conexiunea API.
                   </p>
@@ -588,45 +912,44 @@ export function MissionControlTab() {
                       <motion.div
                         key={card.route}
                         className={`
-                          theme-advanced glass-card hover:scale-105 transition-all duration-300 cursor-pointer
-                          ${card.status === 'healthy' ? 'border-green-500/40 hover:border-green-400/70' : 
-                            card.status === 'warning' ? 'border-yellow-500/40 hover:border-yellow-400/70' :
-                            card.status === 'error' ? 'border-red-500/40 hover:border-red-400/70' :
-                            'border-gray-600/40 hover:border-gray-500/70'}
-                          border-2
+                          relative overflow-hidden rounded-xl border-2 
+                          ${isAdvanced ? 'backdrop-blur-sm bg-glass-bg/50 border-glass-border' : 'bg-card/90 border-border/50'}
+                          hover:scale-105 transition-all duration-300 cursor-pointer
+                          ${getStatusBg(card.status)} ${statusColors}
+                          shadow-lg hover:shadow-xl
                         `}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
-                        whileHover={{ y: -8 }}
+                        whileHover={{ y: -5 }}
                       >
                         {/* Header */}
                         <div className="p-6 pb-4">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                              <div className={`w-12 h-12 rounded-lg bg-${color}-500/20 flex items-center justify-center service-icon`}>
+                              <div className={`w-12 h-12 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
                                 <i className={`${icon} text-${color}-400 text-xl`}></i>
                               </div>
                               <div>
-                                <h4 className="text-xl font-bold text-white">{card.displayName}</h4>
-                                <p className="text-sm text-gray-400">{card.config.description}</p>
+                                <h4 className="text-lg font-bold text-foreground">{card.displayName}</h4>
+                                <p className="text-sm text-muted-foreground">{card.config.description}</p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className={`text-4xl font-bold stat-number`}>
+                              <div className={`text-3xl font-bold ${scoreColor}`}>
                                 {card.score}
                               </div>
-                              <div className="text-xs text-gray-400 stat-label">Score</div>
+                              <div className="text-xs text-muted-foreground">Score</div>
                             </div>
                           </div>
                           
                           {/* Status Badge */}
-                          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusColors}`}>
-                            <div className={`w-2 h-2 rounded-full mr-2 ${
-                              card.status === 'healthy' ? 'bg-green-400' :
-                              card.status === 'warning' ? 'bg-yellow-400' :
-                              card.status === 'error' ? 'bg-red-400' : 'bg-gray-400'
-                            }`}></div>
+                          <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${statusColors} ${getStatusBg(card.status)} border`}>
+                            <div className={`w-3 h-3 rounded-full mr-2 animate-pulse ${getActivityStatusColor(
+                              card.status === 'healthy' ? 'success' :
+                              card.status === 'warning' ? 'warning' :
+                              card.status === 'error' ? 'error' : 'info'
+                            )}`}></div>
                             {card.status === 'healthy' ? 'Sănătos' :
                              card.status === 'warning' ? 'Atenție' :
                              card.status === 'error' ? 'Eroare' :
@@ -637,16 +960,16 @@ export function MissionControlTab() {
 
                         {/* Model Configuration */}
                         <div className="px-6 pb-4">
-                          <div className="glass-card p-4">
-                            <div className="flex items-center justify-between text-sm mb-2">
-                              <span className="text-gray-400 stat-label">Model Configurat:</span>
-                              <span className={`font-bold text-${color}-400 stat-number`}>
+                          <div className="bg-slate-700/50 rounded-lg p-3">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Model Configurat:</span>
+                              <span className={`font-bold text-${color}-400`}>
                                 {card.config.model || 'N/A'}
                               </span>
                             </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-400 stat-label">Provider:</span>
-                              <span className="font-semibold text-white stat-number">
+                            <div className="flex items-center justify-between text-sm mt-1">
+                              <span className="text-muted-foreground">Provider:</span>
+                              <span className="font-semibold text-foreground">
                                 {card.config.provider || 'N/A'}
                               </span>
                             </div>
@@ -657,21 +980,21 @@ export function MissionControlTab() {
                         {card.stats && (
                           <div className="px-6 pb-4">
                             <div className="grid grid-cols-3 gap-3">
-                              <div className={`stats-card border-${color}-500/30`}>
-                                <div className={`text-xs text-${color}-400 mb-1 stat-label`}>Requests</div>
-                                <div className="text-2xl font-bold text-white stat-number">
+                              <div className={`theme-advanced:bg-${color}-500/20 theme-classic:bg-${color}-500/10 p-3 rounded-lg theme-advanced:border-${color}-500/30 theme-classic:border-${color}-500/20 transition-all duration-200 hover:scale-105 hover:shadow-md`}>
+                                <div className={`text-xs text-${color}-400 mb-1 transition-all duration-200 hover:scale-110`}>Requests</div>
+                                <div className="text-lg font-bold text-foreground">
                                   {card.stats.totalRequests.toLocaleString()}
                                 </div>
                               </div>
-                              <div className="stats-card border-green-500/30">
-                                <div className="text-xs text-green-400 mb-1 stat-label">Success</div>
-                                <div className="text-2xl font-bold text-white stat-number">
+                              <div className="theme-advanced:bg-chart-1/20 theme-classic:bg-chart-1/10 p-3 rounded-lg theme-advanced:border-chart-1/30 theme-classic:border-chart-1/20 transition-all duration-200 hover:scale-105 hover:shadow-md">
+                                <div className="text-xs text-chart-1 mb-1 transition-all duration-200 hover:scale-110">Success</div>
+                                <div className="text-lg font-bold text-foreground">
                                   {card.stats.successRate.toFixed(1)}%
                                 </div>
                               </div>
-                              <div className="stats-card border-blue-500/30">
-                                <div className="text-xs text-blue-400 mb-1 stat-label">Timp</div>
-                                <div className="text-2xl font-bold text-white stat-number">
+                              <div className="theme-advanced:bg-primary/20 theme-classic:bg-primary/10 p-3 rounded-lg theme-advanced:border-primary/30 theme-classic:border-primary/20 transition-all duration-200 hover:scale-105 hover:shadow-md">
+                                <div className="text-xs text-primary mb-1 transition-all duration-200 hover:scale-110">Timp</div>
+                                <div className="text-lg font-bold text-foreground">
                                   {formatResponseTime(card.stats.avgResponseTime)}
                                 </div>
                               </div>
@@ -683,23 +1006,22 @@ export function MissionControlTab() {
                         {/* Recent Activity */}
                         <div className="px-6 pb-6">
                           <div className="flex items-center justify-between mb-3">
-                            <h5 className="text-sm font-semibold text-white stat-label">Activitate Recentă</h5>
-                            <span className="text-xs text-gray-400 stat-label">
+                            <h5 className="text-sm font-semibold text-foreground">Activitate Recentă</h5>
+                            <span className="text-xs text-muted-foreground">
                               {card.recentActivity.length} evenimente
                             </span>
                           </div>
-                          <div className="space-y-1.5 max-h-36 overflow-y-auto glass-card p-3">
+                          <div className="space-y-1.5 max-h-36 overflow-y-auto">
                             {card.recentActivity.length > 0 ? (
                               card.recentActivity.map((activity, idx) => (
-                                <div key={`${activity.id}-${idx}`} className="p-2 bg-slate-700/30 rounded-md stats-card">
+                                <div key={`${activity.id}-${idx}`} className={`p-3 rounded-lg border transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
+                                  isAdvanced ? 'bg-glass-bg/30 border-glass-border/50 backdrop-blur-sm' : 'bg-card/60 border-border/50'
+                                } ${getStatusBg(activity.type === 'success' ? 'healthy' : activity.type === 'error' ? 'error' : 'warning')}`}>
                                   {/* First row: Status + Time + Model */}
-                                  <div className="flex items-center justify-between text-xs mb-1">
+                                  <div className="flex items-center justify-between text-xs mb-2">
                                     <div className="flex items-center gap-2">
-                                      <span className={`w-2 h-2 rounded-full ${
-                                        activity.type === 'success' ? 'bg-green-500' : 
-                                        activity.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-                                      }`}></span>
-                                      <span className="text-gray-400 font-mono text-[10px]">
+                                      <span className={`w-3 h-3 rounded-full animate-pulse shadow-sm ${getActivityStatusColor(activity.type)}`}></span>
+                                      <span className="text-muted-foreground font-mono text-[10px]">
                                         {new Date(activity.timestamp).toLocaleTimeString('ro-RO', {
                                           hour: '2-digit',
                                           minute: '2-digit',
@@ -708,23 +1030,23 @@ export function MissionControlTab() {
                                       </span>
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px]">
-                                      <span className="text-cyan-400 font-mono max-w-[60px] truncate">
+                                      <span className="text-primary font-mono max-w-[60px] truncate transition-all duration-200 hover:scale-110">
                                         {activity.actualModel}
                                       </span>
-                                      <span className="text-gray-500 font-mono">
+                                      <span className="text-muted font-mono transition-all duration-200 hover:scale-110">
                                         {formatResponseTime(activity.responseTime)}
                                       </span>
                                     </div>
                                   </div>
                                   {/* Second row: Message (truncated) */}
-                                  <div className="text-[11px] text-gray-300 truncate" title={activity.message}>
+                                  <div className="text-[11px] text-foreground truncate transition-all duration-200 hover:scale-105" title={activity.message}>
                                     {activity.message.replace('Request successful', '✓ Success').replace('Request failed', '✗ Failed')}
                                   </div>
                                 </div>
                               ))
                             ) : (
-                              <div className="text-xs text-gray-500 text-center py-3">
-                                <i className="fas fa-clock text-gray-600 mb-1"></i>
+                              <div className="text-xs text-muted text-center py-3">
+                                <i className="fas fa-clock text-muted mb-1"></i>
                                 <div>Nicio activitate recentă</div>
                               </div>
                             )}
@@ -732,8 +1054,8 @@ export function MissionControlTab() {
                         </div>
 
                         {/* Decorative Elements */}
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${color}-500/10 rounded-bl-full`}></div>
-                        <div className={`absolute bottom-0 left-0 w-20 h-20 bg-${color}-500/10 rounded-tr-full`}></div>
+                        <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}-500/5 rounded-bl-full`}></div>
+                        <div className={`absolute bottom-0 left-0 w-16 h-16 bg-${color}-500/5 rounded-tr-full`}></div>
                       </motion.div>
                     );
                   })}
@@ -742,9 +1064,9 @@ export function MissionControlTab() {
               
               {routeCards.length === 0 && !isLoading && (
                 <div className="text-center py-12">
-                  <i className="fas fa-route text-gray-600 text-6xl mb-4"></i>
-                  <h3 className="text-xl font-bold text-white mb-2">Nu sunt configurate rute</h3>
-                  <p className="text-gray-400">Configurați rutele pentru a vedea monitorizarea în timp real</p>
+                  <i className="fas fa-route text-muted text-6xl mb-4"></i>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Nu sunt configurate rute</h3>
+                  <p className="text-muted-foreground">Configurați rutele pentru a vedea monitorizarea în timp real</p>
                 </div>
               )}
             </div>
@@ -753,11 +1075,11 @@ export function MissionControlTab() {
           {/* Providers Tab */}
           {activeTab === 'providers' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white mb-4">Status Providers</h3>
+              <h3 className="text-xl font-bold text-foreground mb-4">Status Providers</h3>
               
               {!providerStatus.length && !isLoading && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-lg">
-                  <p className="text-yellow-400">
+                <div className="bg-chart-4/10 border border-chart-4/30 p-4 rounded-lg">
+                  <p className="text-chart-4">
                     <i className="fas fa-exclamation-triangle mr-2"></i>
                     Nu s-au putut încărca informațiile despre provideri. Verificați conexiunea API.
                   </p>
@@ -768,17 +1090,17 @@ export function MissionControlTab() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {providerStatus.map((provider) => (
                     <div key={provider.provider} className={`p-4 rounded-lg border-2 ${
-                      provider.status === 'healthy' ? 'border-green-500/50' : 
-                      provider.status === 'recovery' ? 'border-yellow-500/50' : 'border-red-500/50'
-                    } bg-slate-800/30`}>
+                      provider.status === 'healthy' ? 'border-chart-1/50' : 
+                      provider.status === 'recovery' ? 'border-chart-4/50' : 'border-destructive/50'
+                    } bg-card/30`}>
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg font-bold text-white">{provider.provider}</h4>
+                        <h4 className="text-lg font-bold text-foreground">{provider.provider}</h4>
                         <div className="flex items-center gap-2">
                           <div className={`w-3 h-3 rounded-full ${
-                            provider.status === 'healthy' ? 'bg-green-500' : 
-                            provider.status === 'recovery' ? 'bg-yellow-500' : 'bg-red-500'
+                            provider.status === 'healthy' ? 'bg-chart-1' : 
+                            provider.status === 'recovery' ? 'bg-chart-4' : 'bg-destructive'
                           }`}></div>
-                          <span className="text-sm font-semibold text-white">
+                          <span className="text-sm font-semibold text-foreground">
                             {provider.healthScore}%
                           </span>
                         </div>
@@ -786,12 +1108,12 @@ export function MissionControlTab() {
                       
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400">Failures:</span>
-                          <span className="font-bold text-red-400 ml-2">{provider.failureCount}</span>
+                          <span className="text-muted-foreground">Failures:</span>
+                          <span className="font-bold text-destructive ml-2">{provider.failureCount}</span>
                         </div>
                         <div>
-                          <span className="text-gray-400">Recovering:</span>
-                          <span className="font-bold text-yellow-400 ml-2">{provider.inRecovery ? 'Da' : 'Nu'}</span>
+                          <span className="text-muted-foreground">Recovering:</span>
+                          <span className="font-bold text-chart-4 ml-2">{provider.inRecovery ? 'Da' : 'Nu'}</span>
                         </div>
                       </div>
                     </div>
@@ -801,9 +1123,9 @@ export function MissionControlTab() {
               
               {!providerStatus.length && !isLoading && (
                 <div className="text-center py-8">
-                  <i className="fas fa-server text-gray-600 text-4xl mb-4"></i>
-                  <p className="text-gray-400">Nu sunt disponibile informații despre provideri</p>
-                  <p className="text-gray-500 text-sm mt-2">Verificați conexiunea la API</p>
+                  <i className="fas fa-server text-muted text-4xl mb-4"></i>
+                  <p className="text-muted-foreground">Nu sunt disponibile informații despre provideri</p>
+                  <p className="text-muted text-sm mt-2">Verificați conexiunea la API</p>
                 </div>
               )}
             </div>
@@ -814,30 +1136,30 @@ export function MissionControlTab() {
             <div className="space-y-8">
               {/* Controls */}
               <motion.div 
-                className="glass-card"
+                className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6 mb-6"}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <i className="fas fa-chart-line text-2xl text-blue-500"></i>
+                    <i className="fas fa-chart-line text-2xl text-primary"></i>
                     <h2 className="text-2xl font-bold">Request Tracking</h2>
                   </div>
                   
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-400">Live Mode</span>
+                      <span className="text-sm text-muted-foreground">Live Mode</span>
                       <button
                         onClick={() => setIsLiveMode(!isLiveMode)}
-                        className={`toggle-switch ${isLiveMode ? 'active' : ''}`}
+                        className={`toggle-switch ${isLiveMode ? 'active' : ''} transition-all duration-200 hover:scale-110`}
                       ></button>
                     </div>
                     
                     <select
                       value={timeRange}
                       onChange={(e) => setTimeRange(e.target.value)}
-                      className="px-3 py-1 bg-black/20 border border-white/20 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
+                      className="px-3 py-1 bg-card/50 border border-white/20 rounded-lg text-foreground text-sm focus:border-primary focus:outline-none"
                     >
                       <option value="1h">Last Hour</option>
                       <option value="6h">Last 6 Hours</option>
@@ -848,22 +1170,22 @@ export function MissionControlTab() {
                 </div>
 
                 {/* Tracking Stats */}
-                <div className="stats-grid grid-cols-4">
-                  <div className="stat-card">
-                    <div className="stat-number">{totalRequests > 999 ? formatTokens(totalRequests) : totalRequests}</div>
-                    <div className="stat-label">Total Requests</div>
+                <div className={isAdvanced ? "stats-grid" : "grid grid-cols-2 lg:grid-cols-4 gap-4"}>
+                  <div className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}>
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{totalRequests > 999 ? formatTokens(totalRequests) : totalRequests}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Total Requests</div>
                   </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{totalErrors}</div>
-                    <div className="stat-label">Errors</div>
+                  <div className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}>
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{totalErrors}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Errors</div>
                   </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{formatResponseTime(avgLatency)}</div>
-                    <div className="stat-label">Avg Latency</div>
+                  <div className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}>
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{formatResponseTime(avgLatency)}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Avg Latency</div>
                   </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{formatPercentage(errorRate)}</div>
-                    <div className="stat-label">Error Rate</div>
+                  <div className={isAdvanced ? "stat-card" : "bg-card/50 border border-border rounded-lg p-4 text-center hover:bg-card/70 transition-colors"}>
+                    <div className={isAdvanced ? "stat-number" : "text-2xl font-bold text-primary mb-2"}>{formatPercentage(errorRate)}</div>
+                    <div className={isAdvanced ? "stat-label" : "text-sm text-muted-foreground font-medium"}>Error Rate</div>
                   </div>
                 </div>
               </motion.div>
@@ -872,13 +1194,13 @@ export function MissionControlTab() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Request Volume Chart */}
                 <motion.div 
-                  className="glass-card"
+                  className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6"}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
                   <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i className="fas fa-chart-area text-green-500"></i>
+                    <i className="fas fa-chart-area text-chart-1"></i>
                     Request Volume
                   </h3>
                   <ResponsiveContainer width="100%" height={250}>
@@ -901,13 +1223,13 @@ export function MissionControlTab() {
 
                 {/* Latency Chart */}
                 <motion.div 
-                  className="glass-card"
+                  className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6"}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
                 >
                   <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i className="fas fa-clock text-yellow-500"></i>
+                    <i className="fas fa-clock text-chart-4"></i>
                     Response Latency
                   </h3>
                   <ResponsiveContainer width="100%" height={250}>
@@ -936,19 +1258,19 @@ export function MissionControlTab() {
 
 <div className="space-y-6">
               {/* Controls */}
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 bg-card/50 rounded-lg border border-slate-700/50">
                 <div>
-                  <h3 className="text-2xl font-bold text-white">Detailed Activity Logs</h3>
-                  <p className="text-sm text-gray-400 mt-1">Filtrează și navighează prin logs</p>
+                  <h3 className="text-2xl font-bold text-foreground">Detailed Activity Logs</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Filtrează și navighează prin logs</p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Interval:</span>
+                    <span className="text-sm text-muted-foreground">Interval:</span>
                     <select
                       value={activityTimeRange}
                       onChange={(e) => setActivityTimeRange(e.target.value as any)}
-                      className="px-3 py-1 bg-black/20 border border-white/20 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
+                      className="px-3 py-1 bg-card/50 border border-white/20 rounded-lg text-foreground text-sm focus:border-primary focus:outline-none"
                     >
                       <option value="10m">10 minute</option>
                       <option value="1h">1 oră</option>
@@ -959,11 +1281,11 @@ export function MissionControlTab() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Limită:</span>
+                    <span className="text-sm text-muted-foreground">Limită:</span>
                     <select
                       value={activityLimit}
                       onChange={(e) => setActivityLimit(Number(e.target.value))}
-                      className="px-3 py-1 bg-black/20 border border-white/20 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
+                      className="px-3 py-1 bg-card/50 border border-white/20 rounded-lg text-foreground text-sm focus:border-primary focus:outline-none"
                     >
                       <option value={50}>50</option>
                       <option value={100}>100</option>
@@ -974,7 +1296,7 @@ export function MissionControlTab() {
                   
                   <button 
                     onClick={() => window.location.reload()}
-                    className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/30 hover:bg-blue-500/30 transition-colors flex items-center gap-2"
+                    className="px-4 py-2 bg-primary/20 text-primary rounded-lg border border-primary/30 hover:bg-primary/30 transition-colors flex items-center gap-2"
                   >
                     <i className="fas fa-sync-alt"></i>
                     Refresh
@@ -982,7 +1304,7 @@ export function MissionControlTab() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between text-sm text-gray-400">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <div>Afișare: {activityLimit === 0 ? 'Toate' : activityLimit} logs</div>
                 <div>{filteredActivities.length} evenimente găsite</div>
               </div>
@@ -991,27 +1313,27 @@ export function MissionControlTab() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left p-3 text-gray-400">Time</th>
-                      <th className="text-left p-3 text-gray-400">Type</th>
-                      <th className="text-left p-3 text-gray-400">Provider</th>
-                      <th className="text-left p-3 text-gray-400">Model</th>
-                      <th className="text-left p-3 text-gray-400">Route</th>
-                      <th className="text-left p-3 text-gray-400">Message</th>
-                      <th className="text-left p-3 text-gray-400">Response Time</th>
-                      <th className="text-left p-3 text-gray-400">Tokens</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left p-3 text-muted-foreground">Time</th>
+                      <th className="text-left p-3 text-muted-foreground">Type</th>
+                      <th className="text-left p-3 text-muted-foreground">Provider</th>
+                      <th className="text-left p-3 text-muted-foreground">Model</th>
+                      <th className="text-left p-3 text-muted-foreground">Route</th>
+                      <th className="text-left p-3 text-muted-foreground">Message</th>
+                      <th className="text-left p-3 text-muted-foreground">Response Time</th>
+                      <th className="text-left p-3 text-muted-foreground">Tokens</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredActivities.map((activity: Activity) => (
                       <motion.tr
                         key={activity.id}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                        className="border-b border-border/50 hover:bg-white/5 transition-colors"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <td className="p-3 font-mono text-gray-400">
+                        <td className="p-3 font-mono text-muted-foreground">
                           {new Date(activity.timestamp).toLocaleString('ro-RO', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -1019,32 +1341,33 @@ export function MissionControlTab() {
                           })}
                         </td>
                         <td className="p-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-2 ${
                             activity.type === 'success' 
-                              ? 'bg-green-500/20 text-green-400' 
+                              ? 'bg-green-400/20 text-green-400 border border-green-400/30' 
                               : activity.type === 'error'
-                              ? 'bg-red-500/20 text-red-400'
-                              : 'bg-yellow-500/20 text-yellow-400'
+                              ? 'bg-red-400/20 text-red-400 border border-red-400/30'
+                              : 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30'
                           }`}>
+                            <span className={`w-2 h-2 rounded-full ${getActivityStatusColor(activity.type)}`}></span>
                             {activity.type}
                           </span>
                         </td>
-                        <td className="p-3 font-mono text-orange-400">
+                        <td className="p-3 font-mono text-accent-foreground">
                           {activity.provider || 'N/A'}
                         </td>
-                        <td className="p-3 font-mono text-cyan-400">
+                        <td className="p-3 font-mono text-primary">
                           {activity.actualModel}
                         </td>
-                        <td className="p-3 text-purple-400">
+                        <td className="p-3 text-chart-3">
                           {activity.route || 'N/A'}
                         </td>
-                        <td className="p-3 text-gray-300 max-w-xs truncate" title={activity.message}>
+                        <td className="p-3 text-foreground max-w-xs truncate" title={activity.message}>
                           {activity.message}
                         </td>
                         <td className={`p-3 ${getResponseTimeColor(activity.responseTime || 0)}`}>
                           {activity.responseTime ? formatResponseTime(activity.responseTime) : 'N/A'}
                         </td>
-                        <td className="p-3 text-gray-300">
+                        <td className="p-3 text-foreground">
                           {activity.tokens !== undefined && activity.tokens !== null ? formatTokens(activity.tokens) : 'N/A'}
                         </td>
                       </motion.tr>
@@ -1055,9 +1378,9 @@ export function MissionControlTab() {
 
               {filteredActivities.length === 0 && (
                 <div className="text-center py-12">
-                  <i className="fas fa-inbox text-gray-600 text-4xl mb-4"></i>
-                  <h3 className="text-xl font-bold text-white mb-2">No Activity Logs</h3>
-                  <p className="text-gray-400">Waiting for system activity...</p>
+                  <i className="fas fa-inbox text-muted text-4xl mb-4"></i>
+                  <h3 className="text-xl font-bold text-foreground mb-2">No Activity Logs</h3>
+                  <p className="text-muted-foreground">Waiting for system activity...</p>
                 </div>
               )}
             </div>

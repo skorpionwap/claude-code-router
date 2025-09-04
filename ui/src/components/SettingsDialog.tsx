@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Combobox } from "@/components/ui/combobox";
 import { useConfig } from "./ConfigProvider";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
+import ThemeSelector from "./ui/ThemeSelector";
 import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
 
@@ -211,6 +212,11 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
               onChange={(e) => setConfig({ ...config, APIKEY: e.target.value })}
               className="transition-all-ease focus:scale-[1.01]"
             />
+          </div>
+          
+          {/* Theme Configuration */}
+          <div className="border-t pt-4">
+            <ThemeSelector />
           </div>
         </div>
         <DialogFooter className="p-4 pt-0">

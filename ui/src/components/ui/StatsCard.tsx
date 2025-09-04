@@ -70,31 +70,31 @@ export function StatsCard({
     });
   };
 
-  // Get trend icon
+  // Get trend icon - using semantic colors
   const getTrendIcon = (trendType: 'up' | 'down' | 'stable') => {
     switch (trendType) {
       case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-600" />;
+        return <TrendingUp className="h-4 w-4 text-success" />;
       case 'down':
-        return <TrendingDown className="h-4 w-4 text-red-600" />;
+        return <TrendingDown className="h-4 w-4 text-destructive" />;
       case 'stable':
-        return <Minus className="h-4 w-4 text-gray-600" />;
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
       default:
         return null;
     }
   };
 
-  // Get trend classes
+  // Get trend classes - using semantic colors
   const getTrendClasses = (type: 'positive' | 'negative' | 'neutral') => {
     switch (type) {
       case 'positive':
-        return 'text-green-600';
+        return 'text-green-500';
       case 'negative':
-        return 'text-red-600';
+        return 'text-destructive';
       case 'neutral':
-        return 'text-gray-600';
+        return 'text-muted-foreground';
       default:
-        return 'text-gray-600';
+        return 'text-muted-foreground';
     }
   };
 
@@ -108,13 +108,13 @@ export function StatsCard({
 
   const containerClasses = [
     'stats-card',
-    'bg-white',
+    'bg-card',
     'border',
-    'border-gray-200',
+    'border-border',
     'rounded-lg',
+    'shadow-sm',
     'transition-all',
     'duration-200',
-    'hover:border-gray-300',
     'hover:shadow-md',
     sizeClasses[size].container,
     className,
@@ -125,8 +125,8 @@ export function StatsCard({
       {/* Header with icon and status */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          {icon && <div className="text-gray-400">{icon}</div>}
-          <h3 className={`stats-card-title ${sizeClasses[size].title} text-gray-600`}>
+          {icon && <div className="text-muted-foreground">{icon}</div>}
+          <h3 className={`stats-card-title ${sizeClasses[size].title} text-muted-foreground`}>
             {title}
           </h3>
         </div>
@@ -138,7 +138,7 @@ export function StatsCard({
       </div>
 
       {/* Value */}
-      <div className={`stats-card-value ${sizeClasses[size].value} font-bold text-gray-900 mb-2`}>
+      <div className={`stats-card-value ${sizeClasses[size].value} font-bold text-card-foreground mb-2`}>
         {formatValue(value)}
       </div>
 
@@ -153,7 +153,7 @@ export function StatsCard({
             </span>
           )}
           {change.label && (
-            <span className="text-gray-500">
+            <span className="text-muted-foreground">
               {change.label}
             </span>
           )}
@@ -220,13 +220,13 @@ export function StatsCardChart({
 
   const containerClasses = [
     'stats-card',
-    'bg-white',
+    'bg-card',
     'border',
-    'border-gray-200',
+    'border-border',
     'rounded-lg',
+    'shadow-sm',
     'transition-all',
     'duration-200',
-    'hover:border-gray-300',
     'hover:shadow-md',
     'p-4',
     className,
@@ -237,8 +237,8 @@ export function StatsCardChart({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          {icon && <div className="text-gray-400">{icon}</div>}
-          <h3 className={`text-sm text-gray-600`}>{title}</h3>
+          {icon && <div className="text-muted-foreground">{icon}</div>}
+          <h3 className={`text-sm text-muted-foreground`}>{title}</h3>
         </div>
         
         <div className={`status-indicator ${status} text-xs`}>
@@ -248,7 +248,7 @@ export function StatsCardChart({
       </div>
 
       {/* Value */}
-      <div className={`${sizeClasses[size].value} font-bold text-gray-900 mb-3`}>
+      <div className={`${sizeClasses[size].value} font-bold text-card-foreground mb-3`}>
         {formatValue(value)}
       </div>
 
@@ -264,10 +264,10 @@ export function StatsCardChart({
               return (
                 <div key={index} className="flex-1 flex flex-col items-center justify-end">
                   <div
-                    className="w-full bg-blue-500 rounded-t transition-all duration-300 hover:bg-blue-600"
+                    className="w-full bg-primary rounded-t transition-all duration-300 hover:opacity-80"
                     style={{ height: `${height}px` }}
                   />
-                  <div className="text-xs text-gray-500 mt-1 text-center">
+                  <div className="text-xs text-muted-foreground mt-1 text-center">
                     {point.label}
                   </div>
                 </div>
@@ -280,10 +280,10 @@ export function StatsCardChart({
       {/* Change indicator */}
       {change && (
         <div className="flex items-center gap-2 text-xs">
-          {trend === 'up' && <TrendingUp className="h-3 w-3 text-green-600" />}
-          {trend === 'down' && <TrendingDown className="h-3 w-3 text-red-600" />}
-          {trend === 'stable' && <Minus className="h-3 w-3 text-gray-600" />}
-          <span className="text-gray-600">
+          {trend === 'up' && <TrendingUp className="h-3 w-3 text-success" />}
+          {trend === 'down' && <TrendingDown className="h-3 w-3 text-destructive" />}
+          {trend === 'stable' && <Minus className="h-3 w-3 text-muted-foreground" />}
+          <span className="text-muted-foreground">
             {change.value}% {change.label}
           </span>
         </div>
