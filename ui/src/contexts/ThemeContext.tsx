@@ -25,6 +25,9 @@ const defaultTheme: Theme = {
 };
 
 const getThemeClasses = (theme: Theme): string => {
+  if (theme.variant === 'advanced') {
+    return 'theme-advanced';
+  }
   return `theme-${theme.mode} theme-${theme.variant}`;
 };
 
@@ -35,10 +38,15 @@ const getInitialTheme = (): Theme => {
     if (savedTheme) {
       const parsedTheme = JSON.parse(savedTheme);
       // Validate the parsed theme
-      if (parsedTheme.mode && parsedTheme.variant && 
-          ['light', 'dark'].includes(parsedTheme.mode) && 
-          ['classic', 'advanced'].includes(parsedTheme.variant)) {
-        return parsedTheme;
+      if (parsedTheme.variant && ['classic', 'advanced'].includes(parsedTheme.variant)) {
+        // For classic themes, mode is required
+        if (parsedTheme.variant === 'classic' && parsedTheme.mode && ['light', 'dark'].includes(parsedTheme.mode)) {
+          return parsedTheme;
+        }
+        // For advanced theme, mode is ignored
+        if (parsedTheme.variant === 'advanced') {
+          return { mode: 'light', variant: 'advanced' }; // mode is irrelevant for advanced
+        }
       }
     }
   } catch (error) {
