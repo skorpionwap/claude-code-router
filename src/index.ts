@@ -12,7 +12,7 @@ import {
   savePid,
 } from "./utils/processCheck";
 import { CONFIG_FILE } from "./constants";
-import createWriteStream from "pino-rotating-file-stream";
+import { createStream } from 'rotating-file-stream';
 import { HOME_DIR } from "./constants";
 import { configureLogging } from "./utils/log";
 import { sessionUsageCache } from "./utils/cache";
@@ -22,7 +22,9 @@ import {rewriteStream} from "./utils/rewriteStream";
 import JSON5 from "json5";
 import { IAgent } from "./agents/type";
 import agentsManager from "./agents";
+import { EventEmitter } from "node:events";
 
+const event = new EventEmitter()
 
 async function initializeClaudeConfig() {
   const homeDir = homedir();
@@ -95,15 +97,28 @@ async function run(options: RunOptions = {}) {
     : port;
 
   // Configure logger based on config settings
+  const pad = num => (num > 9 ? "" : "0") + num;
+  const generator = (time, index) => {
+    if (!time) {
+      time = new Date()
+    }
+
+    var month = time.getFullYear() + "" + pad(time.getMonth() + 1);
+    var day = pad(time.getDate());
+    var hour = pad(time.getHours());
+    var minute = pad(time.getMinutes());
+
+    return `./logs/ccr-${month}${day}${hour}${minute}${pad(time.getSeconds())}${index ? `_${index}` : ''}.log`;
+  };
   const loggerConfig =
     config.LOG !== false
       ? {
           level: config.LOG_LEVEL || "debug",
-          stream: createWriteStream({
+          stream: createStream(generator, {
             path: HOME_DIR,
-            filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
             maxFiles: 3,
             interval: "1d",
+            compress: 'gzip'
           }),
         }
       : false;
@@ -165,9 +180,15 @@ async function run(options: RunOptions = {}) {
       if (useAgents.length) {
         req.agents = useAgents;
       }
-      await router(req, reply, config);
+      await router(req, reply, {
+        config,
+        event
+      });
     }
   });
+  server.addHook("onError", async (request, reply, error) => {
+    event.emit('onError', request, reply, error);
+  })
   server.addHook("onSend", (req, reply, payload, done) => {
     if (req.sessionId && req.url.startsWith("/v1/messages")) {
       if (payload instanceof ReadableStream) {
@@ -335,10 +356,16 @@ async function run(options: RunOptions = {}) {
       sessionUsageCache.put(req.sessionId, payload.usage);
     }
     if (typeof payload ==='object' && payload.error) {
-      done(payload.error, null)
+      return done(payload.error, null)
     }
     done(null, payload)
   });
+  server.addHook("onSend", async (req, reply, payload) => {
+    console.log('主应用onSend')
+    event.emit('onSend', req, reply, payload);
+    return payload;
+  })
+
 
   server.start();
 }

@@ -140,7 +140,8 @@ const getUseModel = async (
   return config.Router!.default;
 };
 
-export const router = async (req: any, _res: any, config: any) => {
+export const router = async (req: any, _res: any, context: any) => {
+  const { config, event } = context;
   // Parse sessionId from metadata.user_id
   if (req.body.metadata?.user_id) {
     const parts = req.body.metadata.user_id.split("_session_");
@@ -162,7 +163,9 @@ export const router = async (req: any, _res: any, config: any) => {
       try {
         const customRouter = require(config.CUSTOM_ROUTER_PATH);
         req.tokenCount = tokenCount; // Pass token count to custom router
-        model = await customRouter(req, config);
+        model = await customRouter(req, config, {
+          event
+        });
       } catch (e: any) {
         log("failed to load custom router", e.message);
       }
