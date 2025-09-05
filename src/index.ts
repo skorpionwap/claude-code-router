@@ -776,15 +776,18 @@ async function run(options: RunOptions = {}) {
         done(null, payload);
       } else if(typeof payload === "object" && payload !== null) {
         req.log.debug({payload}, 'onSend Hook')
-        done(null, JSON.stringify(payload));
-      } else {
-        done(null, payload);
+        if (payload && payload.usage) sessionUsageCache.put(req.sessionId, payload.usage);
       }
     }
+    if (typeof payload ==='object' && payload.error) {
+      return done(payload.error, null)
+    }
+    done(null, payload)
   });
 
   // Add onSend hook for event emission
   server.addHook("onSend", async (req: any, reply: any, payload: any) => {
+    console.log('主应用onSend');
     event.emit('onSend', req, reply, payload);
     return payload;
   });

@@ -86,25 +86,38 @@ export const readConfigFile = async () => {
   } catch (readError: any) {
     if (readError.code === "ENOENT") {
       // Config file doesn't exist, prompt user for initial setup
-      const name = await question("Enter Provider Name: ");
-      const APIKEY = await question("Enter Provider API KEY: ");
-      const baseUrl = await question("Enter Provider URL: ");
-      const model = await question("Enter MODEL Name: ");
-      const config = Object.assign({}, DEFAULT_CONFIG, {
-        Providers: [
-          {
-            name,
-            api_base_url: baseUrl,
-            api_key: APIKEY,
-            models: [model],
-          },
-        ],
-        Router: {
-          default: `${name},${model}`,
-        },
-      });
-      await writeConfigFile(config);
-      return config;
+      try {
+        // Initialize directories
+        await initDir();
+
+        // Backup existing config file if it exists
+        const backupPath = await backupConfigFile();
+        if (backupPath) {
+          console.log(
+              `Backed up existing configuration file to ${backupPath}`
+          );
+        }
+        const config = {
+          PORT: 3456,
+          Providers: [],
+          Router: {},
+        }
+        // Create a minimal default config file
+        await writeConfigFile(config);
+        console.log(
+            "Created minimal default configuration file at ~/.claude-code-router/config.json"
+        );
+        console.log(
+            "Please edit this file with your actual configuration."
+        );
+        return config
+      } catch (error: any) {
+        console.error(
+            "Failed to create default configuration:",
+            error.message
+        );
+        process.exit(1);
+      }
     } else {
       console.error(`Failed to read config file at ${CONFIG_FILE}`);
       console.error("Error details:", readError.message);
