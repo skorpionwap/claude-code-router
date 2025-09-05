@@ -113,7 +113,7 @@ function generateProviderHealthDataFromAnalytics(config: any, analyticsInstance:
   
   return providerHealthData;
 }
-import createWriteStream from "pino-rotating-file-stream";
+import { createStream } from 'rotating-file-stream';
 import Stream from "node:stream";
 
 declare const ReadableStream: any;
@@ -158,12 +158,33 @@ async function run(options: RunOptions = {}) {
   process.on("SIGTERM", () => { cleanupPidFile(); process.exit(0); });
   console.log(HOST);
 
+  // Use port from environment variable if set (for background process)
   const servicePort = process.env.SERVICE_PORT ? parseInt(process.env.SERVICE_PORT) : port;
+
+  // Configure logger based on config settings
+  const pad = (num: number) => (num > 9 ? "" : "0") + num;
+  const generator = (time: number | Date, index?: number) => {
+    if (!time) {
+      time = new Date()
+    }
+    if (typeof time === 'number') {
+      time = new Date(time);
+    }
+
+    var month = time.getFullYear() + "" + pad(time.getMonth() + 1);
+    var day = pad(time.getDate());
+    var hour = pad(time.getHours());
+    var minute = pad(time.getMinutes());
+
+    return `./logs/ccr-${month}${day}${hour}${minute}${pad(time.getSeconds())}${index ? `_${index}` : ''}.log`;
+  };
   const loggerConfig = config.LOG !== false ? {
           level: config.LOG_LEVEL || "debug",
-          stream: createWriteStream({
-            path: HOME_DIR, filename: config.LOGNAME || `./logs/ccr-${+new Date()}.log`,
-            maxFiles: 3, interval: "1d",
+          stream: createStream(generator, {
+            path: HOME_DIR,
+            maxFiles: 3,
+            interval: "1d",
+            compress: 'gzip'
           }),
         } : false;
 
