@@ -141,11 +141,11 @@ class ApiClient {
   }
 
   async checkForUpdates(): Promise<{ hasUpdate: boolean; version?: string; latestVersion?: string; changelog?: string }> {
-    return this.get<{ hasUpdate: boolean; version?: string; latestVersion?: string; changelog?: string }>('/updates/check');
+    return this.get<{ hasUpdate: boolean; version?: string; latestVersion?: string; changelog?: string }>('/update/check');
   }
 
   async performUpdate(): Promise<{ success: boolean; message?: string }> {
-    return this.post<{ success: boolean; message?: string }>('/updates/perform');
+    return this.post<{ success: boolean; message?: string }>('/update/perform');
   }
 
   // Execution Guard specific methods

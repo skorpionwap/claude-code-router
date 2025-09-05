@@ -59,10 +59,10 @@ async function fetchData(url: string): Promise<any> {
         return result;
     }
     
-    // API /api/v1/mission-control/live-activity returnează direct array-ul de activități
+    // API /api/v1/mission-control/live-activity returnează {success: true, data: Array}
     if (url === '/api/v1/mission-control/live-activity') {
-        console.log(`✅ Using direct response for ${url}`);
-        return result;
+        console.log(`✅ Extracting data array from response for ${url}`);
+        return result.data || [];
     }
     
     if (!result.success) {

@@ -61,7 +61,7 @@ function generateProviderHealthData(config: any, analyticsInstance: any, realtim
     }
   };
   
-  console.log(`[DEBUG] Returning test provider data with ${Object.keys(testData).length} providers`);
+  // console.log(`[DEBUG] Returning test provider data with ${Object.keys(testData).length} providers`);
   
   return testData;
 }
@@ -73,7 +73,7 @@ export async function missionControlRoutes(fastify: FastifyInstance) {
    * Returns complete Mission Control statistics for the dashboard
    */
   fastify.get('/api/v1/mission-control/stats', async (request, reply) => {
-    console.log(`[DEBUG] Mission Control stats endpoint called!`);
+    // console.log(`[DEBUG] Mission Control stats endpoint called!`);
     try {
       const realtimeStats = analytics.getRealtimeStats();
       // ExecutionGuard functionality now handled by OAuth CLI providers
@@ -114,7 +114,7 @@ export async function missionControlRoutes(fastify: FastifyInstance) {
           providers: (() => {
             // OVERRIDE: Ignore execution guard providers and use only our analytics-based data
             const analyticsProviders = generateProviderHealthData(config, analytics, realtimeStats);
-            console.log(`[DEBUG] Using analytics providers only:`, Object.keys(analyticsProviders));
+            // console.log(`[DEBUG] Using analytics providers only:`, Object.keys(analyticsProviders));
             return analyticsProviders;
           })(),
         },
@@ -600,7 +600,14 @@ export async function missionControlRoutes(fastify: FastifyInstance) {
       const realtimeStats = analytics.getRealtimeStats();
       
       // Generate threat analysis based on system metrics
-      const threats = [];
+      const threats: Array<{
+        id: string;
+        level: string;
+        type: string;
+        description: string;
+        impact: string;
+        recommendation: string;
+      }> = [];
       
       if (executionStats.rateLimiting.circuitBreakerState === 'OPEN') {
         threats.push({

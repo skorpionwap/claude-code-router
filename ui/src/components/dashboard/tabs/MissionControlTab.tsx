@@ -66,7 +66,7 @@ export function MissionControlTab() {
   
   // Hook-uri pentru date în timp real
   const { routerConfig, routeStats, liveActivity, loading: basicLoading, error: basicError } = useMissionControl();
-  const { data: missionControlData, loading: mcLoading, error: mcError } = useRealTimeMissionControl();
+  const { data: missionControlData, loading: mcLoading, error: mcError } = useRealTimeMissionControl(); // Too aggressive - 2s polling
   const { data: providerHistory, loading: historyLoading } = useProviderHistory();
   
   // Theme context

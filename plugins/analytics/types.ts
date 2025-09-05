@@ -2,9 +2,10 @@ import { FastifyInstance } from 'fastify';
 
 export interface AnalyticsPluginConfig {
   enabled: boolean;
+  batchSize?: number;
+  saveFrequency?: number;
+  enableRealTimeUpdates?: boolean;
   dataRetentionDays?: number;
-  realTimeUpdates?: boolean;
-  missionControlEnabled?: boolean;
 }
 
 export interface Plugin {

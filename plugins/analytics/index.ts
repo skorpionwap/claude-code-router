@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { analyticsRoutes } from './routes/analytics';
 import { missionControlRoutes } from './routes/mission-control';
 import { analytics } from './manager';
+import { trackingStartMiddleware, trackingEndMiddleware } from './middleware/tracking';
 
 export default class AnalyticsPlugin {
   private analytics: any;
@@ -21,27 +22,15 @@ export default class AnalyticsPlugin {
     server.register(missionControlRoutes);
     console.log('✅ Mission Control routes registered');
     
-    // Add analytics tracking hooks
-    server.addHook('onSend', this.handleResponse.bind(this));
-    server.addHook('onError', this.handleError.bind(this));
+    // Add REAL tracking middleware (like in advanced-theme-redesign)
+    server.addHook('preHandler', (request: any, reply: any, done: any) => {
+      trackingStartMiddleware(request, reply, done);
+    });
+    server.addHook('onSend', (request: any, reply: any, payload: any, done: any) => {
+      trackingEndMiddleware(request, reply, payload, done);
+    });
+    console.log('✅ Analytics tracking middleware registered');
     
     console.log('✅ Analytics Plugin installed successfully');
-  }
-  
-  private async handleResponse(req: any, reply: any, payload: any) {
-    // Handle analytics tracking on response
-    if (req.sessionId && req.url.startsWith("/v1/messages")) {
-      // Track usage for analytics
-      if (typeof payload === 'object' && payload?.usage) {
-        // Track the usage data
-        // This is handled by existing cache mechanism
-      }
-    }
-    return payload;
-  }
-  
-  private async handleError(request: any, reply: any, error: any) {
-    // Handle error tracking for analytics
-    console.error('Analytics Plugin - Error tracked:', error.message);
   }
 }

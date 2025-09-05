@@ -48,6 +48,23 @@ interface DailyStats {
   modelBreakdown: Record<string, number>;
 }
 
+interface TimeSeriesData {
+  timestamp: number;
+  time: string;
+  requests: number;
+  successRate: number;
+  avgResponseTime: number;
+  errors: number;
+}
+
+interface ProviderHistoricalData {
+  timestamp: string;
+  successRate: number;
+  avgResponseTime: number;
+  errorRate: number;
+  requests: number;
+}
+
 class AnalyticsManager {
   private dataDir: string;
   private metricsFile: string;
@@ -63,6 +80,8 @@ class AnalyticsManager {
   private saveFrequency: number;
   private lastSave: number;
   private analyticsEnabled: boolean;
+  private enableRealTimeUpdates: boolean;
+  private dataRetentionDays: number;
 
   constructor(config?: any) {
     this.dataDir = join(homedir(), '.claude-code-router', 'analytics');
@@ -70,11 +89,16 @@ class AnalyticsManager {
     this.statsFile = join(this.dataDir, 'model-stats.json');
     this.dailyStatsFile = join(this.dataDir, 'daily-stats.json');
     
-    // Initialize optimization settings from config
-    const optimization = config?.optimization || {};
-    this.analyticsEnabled = optimization.analyticsEnabled !== false;
-    this.batchSize = optimization.batchSize || 10;
-    this.saveFrequency = optimization.saveFrequency || 5000; // 5 seconds
+    // Configurația unificată - totul sub plugins.analytics.*
+    const pluginConfig = config?.plugins?.analytics || {};
+    
+    // Toate setările din plugin config
+    this.analyticsEnabled = pluginConfig.enabled ?? true;
+    this.batchSize = pluginConfig.batchSize ?? 10;
+    this.saveFrequency = pluginConfig.saveFrequency ?? 5000; // 5 seconds
+    this.enableRealTimeUpdates = pluginConfig.enableRealTimeUpdates ?? true;
+    this.dataRetentionDays = pluginConfig.dataRetentionDays ?? 30;
+    
     this.lastSave = Date.now();
     this.pendingBatch = [];
     
@@ -363,7 +387,7 @@ class AnalyticsManager {
   }
 
   // Get time-series data for charts
-  getTimeSeriesData(hours: number = 24) {
+  getTimeSeriesData(hours: number = 24): TimeSeriesData[] {
     // Safeguard against invalid or empty metrics cache
     if (!this.cache.metrics || !Array.isArray(this.cache.metrics) || this.cache.metrics.length === 0) {
       console.warn('Analytics metrics cache is empty or invalid. Returning empty time series data.');
@@ -373,7 +397,7 @@ class AnalyticsManager {
     const start = now - (hours * 60 * 60 * 1000);
     const interval = hours <= 1 ? 5 * 60 * 1000 : hours <= 6 ? 15 * 60 * 1000 : 60 * 60 * 1000; // 5min, 15min, or 1h intervals
     
-    const data = [];
+    const data: TimeSeriesData[] = [];
     for (let time = start; time <= now; time += interval) {
       const windowStart = time;
       const windowEnd = time + interval;
@@ -598,14 +622,31 @@ class AnalyticsManager {
 
   // Update analytics settings from config
   updateConfig(config: any) {
-    const optimization = config?.optimization || {};
-    this.analyticsEnabled = optimization.analyticsEnabled !== false;
-    this.batchSize = optimization.batchSize || 10;
-    this.saveFrequency = optimization.saveFrequency || 5000;
+    // Configurația unificată - totul sub plugins.analytics.*
+    const pluginConfig = config?.plugins?.analytics || {};
+    
+    this.analyticsEnabled = pluginConfig.enabled ?? true;
+    this.batchSize = pluginConfig.batchSize ?? 10;
+    this.saveFrequency = pluginConfig.saveFrequency ?? 5000;
+    this.enableRealTimeUpdates = pluginConfig.enableRealTimeUpdates ?? true;
+    this.dataRetentionDays = pluginConfig.dataRetentionDays ?? 30;
+    
+    console.log('Analytics config updated (unified):', {
+      analyticsEnabled: this.analyticsEnabled,
+      batchSize: this.batchSize,
+      saveFrequency: this.saveFrequency,
+      enableRealTimeUpdates: this.enableRealTimeUpdates,
+      dataRetentionDays: this.dataRetentionDays
+    });
     
     // Flush any pending batch when settings change
     if (this.analyticsEnabled && this.pendingBatch.length > 0) {
       this.flushBatch();
+    }
+    
+    // Start cleanup if data retention is enabled
+    if (this.dataRetentionDays > 0) {
+      this.startDataCleanup();
     }
   }
   
@@ -613,6 +654,56 @@ class AnalyticsManager {
   forceFlush() {
     if (this.pendingBatch.length > 0) {
       this.flushBatch();
+    }
+  }
+
+  // Start automatic data cleanup based on retention policy
+  private startDataCleanup() {
+    // Rulează cleanup la fiecare 24 ore
+    setInterval(() => {
+      this.cleanupOldData();
+    }, 24 * 60 * 60 * 1000);
+    
+    // Rulează cleanup imediat la start
+    this.cleanupOldData();
+  }
+
+  // Clean up old data based on dataRetentionDays setting
+  private cleanupOldData() {
+    if (this.dataRetentionDays <= 0) {
+      return; // Cleanup disabled
+    }
+
+    const cutoffTime = Date.now() - (this.dataRetentionDays * 24 * 60 * 60 * 1000);
+    
+    // Cleanup metrics cache
+    if (this.cache.metrics) {
+      const originalCount = this.cache.metrics.length;
+      this.cache.metrics = this.cache.metrics.filter(m => m.timestamp >= cutoffTime);
+      const cleanedCount = originalCount - this.cache.metrics.length;
+      
+      if (cleanedCount > 0) {
+        console.log(`Analytics cleanup: removed ${cleanedCount} old metrics (older than ${this.dataRetentionDays} days)`);
+        this.saveData(); // Save updated cache
+      }
+    }
+
+    // Cleanup daily stats
+    if (this.cache.dailyStats) {
+      const cutoffDate = new Date(cutoffTime).toISOString().split('T')[0];
+      const originalKeys = Object.keys(this.cache.dailyStats);
+      
+      for (const date of originalKeys) {
+        if (date < cutoffDate) {
+          delete this.cache.dailyStats[date];
+        }
+      }
+      
+      const cleanedKeys = originalKeys.length - Object.keys(this.cache.dailyStats).length;
+      if (cleanedKeys > 0) {
+        console.log(`Analytics cleanup: removed ${cleanedKeys} old daily stats`);
+        this.saveData(); // Save updated stats
+      }
     }
   }
 
@@ -736,7 +827,7 @@ class AnalyticsManager {
       : 0;
 
     // Calculate historical snapshots
-    const historical = [];
+    const historical: ProviderHistoricalData[] = [];
     for (let time = start; time <= now; time += interval) {
       const windowStart = time;
       const windowEnd = time + interval;
