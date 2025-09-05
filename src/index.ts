@@ -14,10 +14,13 @@ import { trackingStartMiddleware, trackingEndMiddleware } from "./middleware/tra
 // Rate limiting and execution control handled by individual providers
 import { configureLogging, info } from "./utils/log";
 import { sessionUsageCache } from "./utils/cache";
+import { EventEmitter } from "node:events";
 
 // --- Importuri standard din proiect ---
 import { cleanupPidFile, isServiceRunning, savePid } from "./utils/processCheck";
 import { CONFIG_FILE, HOME_DIR } from "./constants";
+
+const event = new EventEmitter();
 
 /**
  * Generate provider health data based on config and analytics
@@ -210,7 +213,10 @@ async function run(options: RunOptions = {}) {
 
     try {
       // Run the router to determine the appropriate model
-      await router(req, reply, config);
+      await router(req, reply, {
+        config,
+        event
+      });
       // After this point, req.body.model is updated with the selected provider,model
     } catch (error: any) {
       // Handle routing errors gracefully
@@ -234,6 +240,11 @@ async function run(options: RunOptions = {}) {
       const done = (err?: Error) => { if (err) reject(err); else resolve(); };
       apiKeyAuth(config)(req, reply, done).catch(reject);
     });
+  });
+
+  // Add error handling hook
+  server.addHook("onError", async (request: any, reply: any, error: any) => {
+    event.emit('onError', request, reply, error);
   });
 
   server.addHook("preHandler", async (req: any, reply: any) => {
@@ -770,6 +781,12 @@ async function run(options: RunOptions = {}) {
         done(null, payload);
       }
     }
+  });
+
+  // Add onSend hook for event emission
+  server.addHook("onSend", async (req: any, reply: any, payload: any) => {
+    event.emit('onSend', req, reply, payload);
+    return payload;
   });
   
   server.addHook("onResponse", async (req: any, _reply: any) => {
