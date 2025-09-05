@@ -800,7 +800,20 @@ async function run(options: RunOptions = {}) {
       // The trackingEndMiddleware in middleware/tracking.ts handles all analytics
     }
   });
-  
+
+  server.addHook("onSend", async (req, reply, payload) => {
+    console.log('主应用onSend')
+    event.emit('onSend', req, reply, payload);
+    return payload;
+  })
+
+  // Plugin loading system
+  const pluginsConfig = config.plugins || {};
+  if (pluginsConfig.analytics?.enabled) {
+    const AnalyticsPlugin = require('../plugins/analytics').default;
+    new AnalyticsPlugin().install(server.app, config);
+  }
+
   server.start();
 }
 

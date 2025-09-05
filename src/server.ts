@@ -3,9 +3,7 @@ import { readConfigFile, writeConfigFile, backupConfigFile } from "./utils";
 import { checkForUpdates, performUpdate } from "./utils";
 import { join } from "path";
 import fastifyStatic from "@fastify/static";
-import { analyticsRoutes } from "./routes/analytics";
 import { strategyRoutes } from './routes/strategy';
-import { missionControlRoutes } from './routes/mission-control';
 import routes from './routes/routes';
 import cost from './routes/cost';
 import performance from './routes/performance';
@@ -33,13 +31,7 @@ export const createServer = (config: any): any => {
     lastRequestTimestamp = Date.now();
   });
 
-  // Register valuable analytics routes for dashboard  
-  analyticsRoutes(server.app);
   strategyRoutes(server.app);
-  
-  
-  // Register Mission Control v2 routes
-  server.app.register(missionControlRoutes);
   
   server.app.register(routes, { prefix: '/api/v1/routes' });
   server.app.register(cost, { prefix: '/api/v1/cost' });
