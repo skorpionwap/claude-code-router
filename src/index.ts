@@ -745,6 +745,9 @@ async function run(options: RunOptions = {}) {
   // (Am eliminat vechiul `preHandler` care conținea `guardedExecute` și l-am înlocuit cu cel de sus)
 
   server.addHook("onSend", (req: any, reply: any, payload: any, done: any) => {
+    // Emit event first for analytics
+    event.emit('onSend', req, reply, payload);
+    
     if (req.sessionId && req.url.startsWith("/v1/messages")) {
       if (payload instanceof ReadableStream) {
         const [originalStream, clonedStream] = payload.tee();
@@ -777,19 +780,15 @@ async function run(options: RunOptions = {}) {
       } else if(typeof payload === "object" && payload !== null) {
         req.log.debug({payload}, 'onSend Hook')
         if (payload && payload.usage) sessionUsageCache.put(req.sessionId, payload.usage);
+        done(null, payload);
+      } else {
+        done(null, payload);
       }
     }
+    
     if (typeof payload ==='object' && payload.error) {
       return done(payload.error, null)
     }
-    done(null, payload)
-  });
-
-  // Add onSend hook for event emission
-  server.addHook("onSend", async (req: any, reply: any, payload: any) => {
-    console.log('主应用onSend');
-    event.emit('onSend', req, reply, payload);
-    return payload;
   });
   
   server.addHook("onResponse", async (req: any, _reply: any) => {

@@ -472,35 +472,35 @@
   /* Space Theme Colors - Enhanced for better visibility */
   --background: oklch(0.08 0.05 280);
   --foreground: oklch(0.95 0.02 270);
-  --card: oklch(0.28 0.06 280);
+  --card: rgba(255, 255, 255, 0.15);
   --card-foreground: oklch(0.92 0.02 270);
-  --popover: oklch(0.25 0.07 280);
+  --popover: rgba(255, 255, 255, 0.2);
   --popover-foreground: oklch(0.95 0.02 270);
   --primary: oklch(0.7 0.25 280);
   --primary-foreground: oklch(0.08 0.05 280);
-  --secondary: oklch(0.35 0.08 280);
+  --secondary: rgba(255, 255, 255, 0.26);
   --secondary-foreground: oklch(0.85 0.03 270);
-  --muted: oklch(0.22 0.06 280);
+  --muted: rgba(255, 255, 255, 0.13);
   --muted-foreground: oklch(0.65 0.05 280);
   --accent: oklch(0.75 0.2 320);
   --accent-foreground: oklch(0.08 0.05 280);
   --destructive: oklch(0.7 0.3 20);
   --destructive-foreground: oklch(0.95 0.02 270);
-  --border: oklch(0.32 0.08 280);
-  --input: oklch(0.3 0.07 280);
+  --border: rgba(255, 255, 255, 0.38);
+  --input: rgba(255, 255, 255, 0.2);
   --ring: oklch(0.7 0.25 280);
   --chart-1: oklch(0.6 0.3 160);
   --chart-2: oklch(0.7 0.25 210);
   --chart-3: oklch(0.5 0.2 260);
   --chart-4: oklch(0.8 0.25 60);
   --chart-5: oklch(0.75 0.3 340);
-  --sidebar: oklch(0.25 0.06 280);
+  --sidebar: rgba(255, 255, 255, 0.15);
   --sidebar-foreground: oklch(0.9 0.03 270);
   --sidebar-primary: oklch(0.7 0.25 280);
   --sidebar-primary-foreground: oklch(0.08 0.05 280);
-  --sidebar-accent: oklch(0.3 0.08 280);
+  --sidebar-accent: rgba(255, 255, 255, 0.26);
   --sidebar-accent-foreground: oklch(0.85 0.03 270);
-  --sidebar-border: oklch(0.35 0.1 280);
+  --sidebar-border: rgba(255, 255, 255, 0.31);
   --sidebar-ring: oklch(0.7 0.25 280);
   
   /* Advanced Space Theme Specific Variables - OPTIMIZED */
@@ -520,7 +520,7 @@
   /* Enhanced glassmorphism variables for components - OPTIMIZED OPACITY */
   --glass-bg-strong: rgba(255, 255, 255, 0.22);
   --glass-border-strong: rgba(255, 255, 255, 0.35);
-  --component-bg: rgba(255, 255, 255, 0.18);
+  --component-bg: rgba(255, 255, 255, 0.25);
   --component-border: rgba(255, 255, 255, 0.3);
   --input-bg: rgba(255, 255, 255, 0.2);
   --button-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
@@ -1143,25 +1143,26 @@
 
 /* CLASSIC DARK THEME NOTIFICATIONS */
 :root.theme-dark.theme-classic .notification {
-  background: rgba(32, 32, 32, 0.95);
-  border-color: var(--border);
-  color: var(--foreground);
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #1f2937;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 :root.theme-dark.theme-classic .notification.success {
-  background: rgba(22, 101, 52, 0.2);
-  border-color: rgba(74, 222, 128, 0.3);
-  color: #4ade80;
+  background: rgba(21, 55, 31, 0.9);
+  border-color: rgba(74, 222, 128, 0.5);
+  color: #1f2937;
 }
 
 :root.theme-dark.theme-classic .notification.success::before {
-  background: #4ade80;
+  background: #22c55e;
 }
 
 :root.theme-dark.theme-classic .notification.error {
-  background: rgba(153, 27, 27, 0.2);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  background: rgba(55, 25, 25, 0.9);
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #1f2937;
 }
 
 :root.theme-dark.theme-classic .notification.error::before {
@@ -1169,19 +1170,19 @@
 }
 
 :root.theme-dark.theme-classic .notification.warning {
-  background: rgba(146, 64, 14, 0.2);
-  border-color: rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
+  background: rgba(55, 40, 20, 0.9);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #1f2937;
 }
 
 :root.theme-dark.theme-classic .notification.warning::before {
-  background: #fbbf24;
+  background: #f59e0b;
 }
 
 :root.theme-dark.theme-classic .notification.info {
-  background: rgba(30, 64, 175, 0.2);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
+  background: rgba(25, 40, 65, 0.9);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #1f2937;
 }
 
 :root.theme-dark.theme-classic .notification.info::before {
@@ -1496,10 +1497,12 @@
 .theme-advanced .dialog-content,
 .theme-advanced .modal-content,
 .theme-advanced [data-dialog-content] {
-  background: rgba(70, 70, 100, 0.95) !important;
-  border: 1px solid var(--glass-border-strong) !important;
-  backdrop-filter: blur(20px);
-  color: var(--text-primary) !important;
+  background: linear-gradient(135deg, rgba(120, 130, 180, 0.15), rgba(75, 85, 130, 0.20), rgba(45, 55, 95, 0.25)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(25px) saturate(120%) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
 /* All input elements in advanced theme */

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useThemeStyles } from '../../hooks/useThemeStyles';
 
 interface ThemeOption {
   id: string;
@@ -59,6 +60,7 @@ const themeOptions: ThemeOption[] = [
 
 const ThemeSelector: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const styles = useThemeStyles();
   const currentThemeId = theme.variant === 'advanced' ? 'advanced' : `${theme.variant}-${theme.mode}`;
 
   const handleThemeChange = (themeOption: ThemeOption) => {
@@ -71,7 +73,7 @@ const ThemeSelector: React.FC = () => {
   return (
     <div className="theme-selector space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className={`text-sm font-medium ${styles.text.primary}`}>
           Select Theme
         </label>
         <div className="grid grid-cols-2 gap-3">
@@ -89,7 +91,7 @@ const ThemeSelector: React.FC = () => {
                 }
               `}
             >
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <div className={`text-sm font-medium ${styles.text.primary} mb-2`}>
                 {option.label}
               </div>
               
@@ -145,7 +147,7 @@ const ThemeSelector: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+      <div className={`text-xs ${styles.text.muted} mt-2`}>
         <p>
           <span className="font-medium">Current Theme:</span> {theme.variant} {theme.mode}
         </p>

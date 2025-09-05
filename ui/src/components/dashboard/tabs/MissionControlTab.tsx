@@ -914,11 +914,19 @@ export function MissionControlTab() {
                         key={card.route}
                         className={`
                           relative overflow-hidden rounded-xl border-2 
-                          ${isAdvanced ? 'backdrop-blur-sm bg-glass-bg/50 border-glass-border' : 'bg-card/90 border-border/50'}
-                          hover:scale-105 transition-all duration-300 cursor-pointer
-                          ${getStatusBg(card.status)} ${statusColors}
-                          shadow-lg hover:shadow-xl
+                          ${isAdvanced 
+                            ? 'backdrop-blur-sm border-route-card-border hover:border-glass-border-strong transition-all duration-300' 
+                            : 'bg-card/90 border-border/50 hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl'
+                          }
+                          ${!isAdvanced ? `${getStatusBg(card.status)} ${statusColors}` : ''}
+                          ${isAdvanced ? 'hover:backdrop-blur-md' : ''}
                         `}
+                        style={isAdvanced ? {
+                          background: 'var(--route-card-bg)',
+                          backdropFilter: 'blur(15px) saturate(110%)',
+                          border: '1px solid var(--route-card-border)',
+                          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                        } : {}}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -945,7 +953,11 @@ export function MissionControlTab() {
                           </div>
                           
                           {/* Status Badge */}
-                          <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${statusColors} ${getStatusBg(card.status)} border`}>
+                          <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border ${
+                            isAdvanced 
+                              ? 'bg-glass-bg-strong border-glass-border-strong text-foreground backdrop-blur-sm' 
+                              : `${statusColors} ${getStatusBg(card.status)}`
+                          }`}>
                             <div className={`w-3 h-3 rounded-full mr-2 animate-pulse ${getActivityStatusColor(
                               card.status === 'healthy' ? 'success' :
                               card.status === 'warning' ? 'warning' :
@@ -981,20 +993,38 @@ export function MissionControlTab() {
                         {card.stats && (
                           <div className="px-6 pb-4">
                             <div className="grid grid-cols-3 gap-3">
-                              <div className={`theme-advanced:bg-${color}-500/20 theme-classic:bg-${color}-500/10 p-3 rounded-lg theme-advanced:border-${color}-500/30 theme-classic:border-${color}-500/20 transition-all duration-200 hover:scale-105 hover:shadow-md`}>
-                                <div className={`text-xs text-${color}-400 mb-1 transition-all duration-200 hover:scale-110`}>Requests</div>
+                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                                isAdvanced 
+                                  ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
+                                  : `bg-${color}-500/10 border-${color}-500/20`
+                              }`}>
+                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-muted-foreground' : `text-${color}-400`
+                                }`}>Requests</div>
                                 <div className="text-lg font-bold text-foreground">
                                   {card.stats.totalRequests.toLocaleString()}
                                 </div>
                               </div>
-                              <div className="theme-advanced:bg-chart-1/20 theme-classic:bg-chart-1/10 p-3 rounded-lg theme-advanced:border-chart-1/30 theme-classic:border-chart-1/20 transition-all duration-200 hover:scale-105 hover:shadow-md">
-                                <div className="text-xs text-chart-1 mb-1 transition-all duration-200 hover:scale-110">Success</div>
+                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                                isAdvanced 
+                                  ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
+                                  : 'bg-chart-1/10 border-chart-1/20'
+                              }`}>
+                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-muted-foreground' : 'text-chart-1'
+                                }`}>Success</div>
                                 <div className="text-lg font-bold text-foreground">
                                   {card.stats.successRate.toFixed(1)}%
                                 </div>
                               </div>
-                              <div className="theme-advanced:bg-primary/20 theme-classic:bg-primary/10 p-3 rounded-lg theme-advanced:border-primary/30 theme-classic:border-primary/20 transition-all duration-200 hover:scale-105 hover:shadow-md">
-                                <div className="text-xs text-primary mb-1 transition-all duration-200 hover:scale-110">Timp</div>
+                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                                isAdvanced 
+                                  ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
+                                  : 'bg-primary/10 border-primary/20'
+                              }`}>
+                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-muted-foreground' : 'text-primary'
+                                }`}>Timp</div>
                                 <div className="text-lg font-bold text-foreground">
                                   {formatResponseTime(card.stats.avgResponseTime)}
                                 </div>
