@@ -1,5 +1,25 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { mockProviderHealth } from '../data/mockProviderHealthData';
+
+const mockProviderHealth = [
+  {
+    "provider": "OpenAI",
+    "status": "online",
+    "responseTime": 120,
+    "lastCheck": "2025-09-05T17:45:34.783Z"
+  },
+  {
+    "provider": "Anthropic", 
+    "status": "degraded",
+    "responseTime": 543,
+    "lastCheck": "2025-09-05T17:45:34.783Z"
+  },
+  {
+    "provider": "DeepSeek",
+    "status": "offline", 
+    "responseTime": 0,
+    "lastCheck": "2025-09-05T17:45:34.783Z"
+  }
+];
 
 export const getProviderHealth = async (request: FastifyRequest, reply: FastifyReply) => {
   return mockProviderHealth;

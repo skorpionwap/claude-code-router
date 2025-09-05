@@ -3,12 +3,7 @@ import { readConfigFile, writeConfigFile, backupConfigFile } from "./utils";
 import { checkForUpdates, performUpdate } from "./utils";
 import { join } from "path";
 import fastifyStatic from "@fastify/static";
-import { strategyRoutes } from './routes/strategy';
-import routes from './routes/routes';
-import cost from './routes/cost';
-import performance from './routes/performance';
 import providers from './routes/providers';
-import forecast from './routes/forecast';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 // Global Throttling configuration
@@ -31,15 +26,7 @@ export const createServer = (config: any): any => {
     lastRequestTimestamp = Date.now();
   });
 
-  strategyRoutes(server.app);
-  
-  server.app.register(routes, { prefix: '/api/v1/routes' });
-  server.app.register(cost, { prefix: '/api/v1/cost' });
-  server.app.register(performance, { prefix: '/api/v1/performance' });
   server.app.register(providers, { prefix: '/api/v1/providers' });
-  server.app.register(forecast, { prefix: '/api/v1/forecast' });
-  
-  // API Keys management now handled by OAuth CLI providers
 
   // Add endpoint to read config.json with access control
   server.app.get("/api/config", async (req: any, reply: any) => {
