@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { useMissionControl, type Activity } from '@/hooks/useMissionControl';
-import { useRealTimeMissionControl, useProviderHistory } from '@/hooks/useMissionControlData';
+import { useMissionControl, type Activity } from '@plugins/analytics/ui/hooks/useMissionControl';
+import { useRealTimeMissionControl, useProviderHistory } from '@plugins/analytics/ui/hooks/useMissionControlData';
 import { useConfig } from '@/components/ConfigProvider';
 import { useTheme } from '@/contexts/ThemeContext';
 import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';
@@ -66,7 +66,7 @@ export function MissionControlTab() {
   
   // Hook-uri pentru date în timp real
   const { routerConfig, routeStats, liveActivity, loading: basicLoading, error: basicError } = useMissionControl();
-  const { data: missionControlData, loading: mcLoading, error: mcError } = useRealTimeMissionControl();
+  const { data: missionControlData, loading: mcLoading, error: mcError } = useRealTimeMissionControl(); // Too aggressive - 2s polling
   const { data: providerHistory, loading: historyLoading } = useProviderHistory();
   
   // Theme context
