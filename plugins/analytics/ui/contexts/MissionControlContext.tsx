@@ -8,7 +8,7 @@ import type {
   SystemPreset,
   HealthHistoryData
 } from '@/types/missionControl';
-import { useMissionControlData, type UseMissionControlDataReturn } from '@/hooks/useMissionControlData';
+import { useMissionControlData, type UseMissionControlDataReturn } from '@plugins/analytics/ui/hooks/useMissionControlData';
 
 // Types for state
 interface MissionControlState {

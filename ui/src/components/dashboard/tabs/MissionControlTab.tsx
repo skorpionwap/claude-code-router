@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { useMissionControl, type Activity } from '@/hooks/useMissionControl';
-import { useRealTimeMissionControl, useProviderHistory } from '@/hooks/useMissionControlData';
+import { useMissionControl, type Activity } from '@plugins/analytics/ui/hooks/useMissionControl';
+import { useRealTimeMissionControl, useProviderHistory } from '@plugins/analytics/ui/hooks/useMissionControlData';
 import { useConfig } from '@/components/ConfigProvider';
 import { useTheme } from '@/contexts/ThemeContext';
 import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';

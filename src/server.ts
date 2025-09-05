@@ -3,7 +3,6 @@ import { readConfigFile, writeConfigFile, backupConfigFile } from "./utils";
 import { checkForUpdates, performUpdate } from "./utils";
 import { join } from "path";
 import fastifyStatic from "@fastify/static";
-import providers from './routes/providers';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 // Global Throttling configuration
@@ -25,8 +24,6 @@ export const createServer = (config: any): any => {
     }
     lastRequestTimestamp = Date.now();
   });
-
-  server.app.register(providers, { prefix: '/api/v1/providers' });
 
   // Add endpoint to read config.json with access control
   server.app.get("/api/config", async (req: any, reply: any) => {
