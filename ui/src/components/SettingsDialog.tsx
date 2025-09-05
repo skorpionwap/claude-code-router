@@ -16,6 +16,7 @@ import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
 import ThemeSelector from "./ui/ThemeSelector";
 import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
+  const styles = useThemeStyles();
 
   if (!config) {
     return null;
@@ -60,7 +62,11 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange} >
-      <DialogContent data-testid="settings-dialog" className="max-h-[80vh] flex flex-col p-0">
+      <DialogContent 
+        data-testid="settings-dialog" 
+        className={`${styles.dialog} max-h-[80vh] flex flex-col p-0`}
+        style={styles.dialogStyle}
+      >
         <DialogHeader className="p-4 pb-0">
           <DialogTitle>{t("toplevel.title")}</DialogTitle>
         </DialogHeader>

@@ -4,20 +4,22 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useConfig } from "./ConfigProvider";
 import { Combobox } from "./ui/combobox";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
 
 export function Router() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
+  const styles = useThemeStyles();
 
   // Handle case where config is null or undefined
   if (!config) {
     return (
-      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="text-lg">{t("router.title")}</CardTitle>
+      <Card className={styles.cardWithHeader}>
+        <CardHeader className={styles.header}>
+          <CardTitle className={styles.title}>{t("router.title")}</CardTitle>
         </CardHeader>
-        <CardContent className="flex-grow flex items-center justify-center p-4">
-          <div className="text-gray-500">Loading router configuration...</div>
+        <CardContent className={`${styles.content} flex-grow flex items-center justify-center`}>
+          <div className={styles.text.secondary}>Loading router configuration...</div>
         </CardContent>
       </Card>
     );
@@ -60,11 +62,11 @@ export function Router() {
   });
 
   return (
-    <Card className="flex h-full flex-col rounded-lg border shadow-sm">
-      <CardHeader className="border-b p-4">
-        <CardTitle className="text-lg">{t("router.title")}</CardTitle>
+    <Card className={styles.cardWithHeader}>
+      <CardHeader className={styles.header}>
+        <CardTitle className={styles.title}>{t("router.title")}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow space-y-5 overflow-y-auto p-4">
+      <CardContent className={`${styles.content} flex-grow space-y-5 overflow-y-auto`}>
         <div className="space-y-2">
           <Label>{t("router.default")}</Label>
           <Combobox

@@ -131,7 +131,7 @@ export function MissionControlTab() {
 
     const routes = [
       { key: 'default', name: 'Default Route', icon: 'fa-home', color: 'cyan' },
-      { key: 'background', name: 'Background Tasks', icon: 'fa-tasks', color: 'green' },
+      { key: 'background', name: 'Background Tasks', icon: 'fa-tasks', color: isAdvanced ? 'blue' : 'green' },
       { key: 'think', name: 'Thinking & Planning', icon: 'fa-brain', color: 'purple' },
       { key: 'longContext', name: 'Long Context', icon: 'fa-scroll', color: 'blue' },
       { key: 'webSearch', name: 'Web Search', icon: 'fa-search', color: 'orange' }
@@ -297,7 +297,7 @@ export function MissionControlTab() {
   const getRouteColor = (route: string) => {
     const colors = {
       default: 'cyan',
-      background: 'green', 
+      background: isAdvanced ? 'blue' : 'green', 
       think: 'purple',
       longContext: 'blue',
       webSearch: 'orange'
@@ -490,7 +490,7 @@ export function MissionControlTab() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': 
-        return 'text-green-400 border-green-400/30';
+        return isAdvanced ? 'text-blue-400 border-blue-400/30' : 'text-green-400 border-green-400/30';
       case 'warning': 
         return 'text-yellow-400 border-yellow-400/30';
       case 'error': 
@@ -509,7 +509,7 @@ export function MissionControlTab() {
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'healthy': 
-        return 'bg-green-400/10 hover:bg-green-400/20';
+        return isAdvanced ? 'bg-blue-400/10 hover:bg-blue-400/20' : 'bg-green-400/10 hover:bg-green-400/20';
       case 'warning': 
         return 'bg-yellow-400/10 hover:bg-yellow-400/20';
       case 'error': 
@@ -526,7 +526,7 @@ export function MissionControlTab() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400';
+    if (score >= 80) return isAdvanced ? 'text-blue-400' : 'text-green-400';
     if (score >= 60) return 'text-yellow-400';
     return 'text-red-400';
   };
@@ -534,7 +534,7 @@ export function MissionControlTab() {
   const getActivityStatusColor = (type: string) => {
     switch (type) {
       case 'success': 
-        return 'bg-green-400';
+        return isAdvanced ? 'bg-blue-400' : 'bg-green-400';
       case 'error': 
         return 'bg-red-400';
       case 'warning': 
@@ -817,7 +817,7 @@ export function MissionControlTab() {
                           <div key={index} className="flex justify-between items-center">
                             <span className="text-muted-foreground">{provider.name || `Provider ${index + 1}`}:</span>
                             <div className="flex items-center gap-2">
-                              <span className={`w-2 h-2 rounded-full ${provider.api_key ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                              <span className={`w-2 h-2 rounded-full ${provider.api_key ? (isAdvanced ? 'bg-blue-500' : 'bg-green-500') : 'bg-red-500'}`}></span>
                               <span className="text-sm text-foreground">{provider.models?.length || 0} models</span>
                             </div>
                           </div>
@@ -1344,7 +1344,7 @@ export function MissionControlTab() {
                         <td className="p-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-2 ${
                             activity.type === 'success' 
-                              ? 'bg-green-400/20 text-green-400 border border-green-400/30' 
+                              ? (isAdvanced ? 'bg-blue-400/20 text-blue-400 border border-blue-400/30' : 'bg-green-400/20 text-green-400 border border-green-400/30') 
                               : activity.type === 'error'
                               ? 'bg-red-400/20 text-red-400 border border-red-400/30'
                               : 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30'

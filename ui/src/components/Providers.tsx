@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "./ConfigProvider";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { ProviderList } from "./ProviderList";
 import {
   Dialog,
@@ -26,6 +27,7 @@ interface ProviderType extends Provider {}
 export function Providers() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
+  const styles = useThemeStyles();
   const [editingProviderIndex, setEditingProviderIndex] = useState<number | null>(null);
   const [deletingProviderIndex, setDeletingProviderIndex] = useState<number | null>(null);
   const [hasFetchedModels, setHasFetchedModels] = useState<Record<number, boolean>>({});
@@ -531,20 +533,30 @@ export function Providers() {
   });
 
   return (
-    <Card className="flex h-full flex-col rounded-lg border shadow-sm">
-      <CardHeader className="flex flex-col border-b p-4 gap-3">
+    <Card className={styles.cardWithHeader}>
+      <CardHeader className={`${styles.header} flex flex-col gap-3`}>
         <div className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">{t("providers.title")} <span className="text-sm font-normal text-gray-500">({filteredProviders.length}/{validProviders.length})</span></CardTitle>
-          <Button onClick={handleAddProvider}>{t("providers.add")}</Button>
+          <CardTitle className={styles.title}>
+            {t("providers.title")} 
+            <span className={`text-sm font-normal ${styles.text.secondary}`}>
+              ({filteredProviders.length}/{validProviders.length})
+            </span>
+          </CardTitle>
+          <Button 
+            onClick={handleAddProvider} 
+            className={styles.button('primary')}
+          >
+            {t("providers.add")}
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+            <Search className={`absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 ${styles.text.secondary}`} />
             <Input
               placeholder={t("providers.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
+              className={`${styles.input} pl-8`}
             />
           </div>
           {searchTerm && (
@@ -552,13 +564,14 @@ export function Providers() {
               variant="ghost" 
               size="icon"
               onClick={() => setSearchTerm("")}
+              className={styles.button('ghost')}
             >
               <XCircle className="h-4 w-4" />
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex-grow overflow-y-auto p-4">
+      <CardContent className={`${styles.content} flex-grow overflow-y-auto`}>
         <ProviderList
           providers={filteredProviders}
           onEdit={handleEditProvider}
@@ -572,7 +585,10 @@ export function Providers() {
           handleCancelAddProvider();
         }
       }}>
-        <DialogContent className="max-h-[80vh] flex flex-col sm:max-w-2xl">
+        <DialogContent 
+          className={`${styles.dialog} max-h-[80vh] flex flex-col sm:max-w-2xl`}
+          style={styles.dialogStyle}
+        >
           <DialogHeader>
             <DialogTitle>{t("providers.edit")}</DialogTitle>
           </DialogHeader>

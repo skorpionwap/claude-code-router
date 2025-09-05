@@ -80,10 +80,11 @@ const ThemeSelector: React.FC = () => {
               key={option.id}
               onClick={() => handleThemeChange(option)}
               className={`
+                theme-selector-card
                 relative p-3 rounded-lg border-2 transition-all duration-200
                 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500
                 ${currentThemeId === option.id 
-                  ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
+                  ? 'selected border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }
               `}
