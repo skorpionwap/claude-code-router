@@ -4,22 +4,20 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useConfig } from "./ConfigProvider";
 import { Combobox } from "./ui/combobox";
-import { useThemeStyles } from "@/hooks/useThemeStyles";
 
 export function Router() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
-  const styles = useThemeStyles();
 
   // Handle case where config is null or undefined
   if (!config) {
     return (
-      <Card className={styles.cardWithHeader}>
-        <CardHeader className={styles.header}>
-          <CardTitle className={styles.title}>{t("router.title")}</CardTitle>
+      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+        <CardHeader className="border-b p-4">
+          <CardTitle className="text-lg">{t("router.title")}</CardTitle>
         </CardHeader>
-        <CardContent className={`${styles.content} flex-grow flex items-center justify-center`}>
-          <div className={styles.text.secondary}>Loading router configuration...</div>
+        <CardContent className="flex-grow flex items-center justify-center p-4">
+          <div className="text-gray-500">Loading router configuration...</div>
         </CardContent>
       </Card>
     );
@@ -32,7 +30,8 @@ export function Router() {
     think: "",
     longContext: "",
     longContextThreshold: 60000,
-    webSearch: ""
+    webSearch: "",
+    image: ""
   };
 
   const handleRouterChange = (field: string, value: string | number) => {
@@ -40,6 +39,10 @@ export function Router() {
     const currentRouter = config.Router || {};
     const newRouter = { ...currentRouter, [field]: value };
     setConfig({ ...config, Router: newRouter });
+  };
+
+  const handleForceUseImageAgentChange = (value: boolean) => {
+    setConfig({ ...config, forceUseImageAgent: value });
   };
 
   // Handle case where config.Providers might be null or undefined
@@ -62,11 +65,11 @@ export function Router() {
   });
 
   return (
-    <Card className={styles.cardWithHeader}>
-      <CardHeader className={styles.header}>
-        <CardTitle className={styles.title}>{t("router.title")}</CardTitle>
+    <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+      <CardHeader className="border-b p-4">
+        <CardTitle className="text-lg">{t("router.title")}</CardTitle>
       </CardHeader>
-      <CardContent className={`${styles.content} flex-grow space-y-5 overflow-y-auto`}>
+      <CardContent className="flex-grow space-y-5 overflow-y-auto p-4">
         <div className="space-y-2">
           <Label>{t("router.default")}</Label>
           <Combobox
@@ -134,6 +137,33 @@ export function Router() {
             searchPlaceholder={t("router.searchModel")}
             emptyPlaceholder={t("router.noModelFound")}
           />
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label>{t("router.image")} (beta)</Label>
+              <Combobox
+                options={modelOptions}
+                value={routerConfig.image || ""}
+                onChange={(value) => handleRouterChange("image", value)}
+                placeholder={t("router.selectModel")}
+                searchPlaceholder={t("router.searchModel")}
+                emptyPlaceholder={t("router.noModelFound")}
+              />
+            </div>
+            <div className="w-48">
+              <Label htmlFor="forceUseImageAgent">{t("router.forceUseImageAgent")}</Label>
+              <select
+                id="forceUseImageAgent"
+                value={config.forceUseImageAgent ? "true" : "false"}
+                onChange={(e) => handleForceUseImageAgentChange(e.target.value === "true")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="false">{t("common.no")}</option>
+                <option value="true">{t("common.yes")}</option>
+              </select>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,15 +1,17 @@
 import { join } from "path";
-import { homedir } from "os";
+import { homedir, tmpdir } from "os";
+import * as path from "path";
+import * as os from "os";
 
 export const HOME_DIR = join(homedir(), ".claude-code-router");
 
-export const CONFIG_FILE = process.env.CCR_CONFIG_PATH || join(HOME_DIR, "config.json");
+export const CONFIG_FILE = path.join(HOME_DIR, "config.json");
 
-export const PLUGINS_DIR = join(HOME_DIR, "plugins");
+export const PLUGINS_DIR = path.join(HOME_DIR, "plugins");
 
-export const PID_FILE = join(HOME_DIR, '.claude-code-router.pid');
+export const PID_FILE = path.join(HOME_DIR, '.claude-code-router.pid');
 
-export const REFERENCE_COUNT_FILE = join(require('os').tmpdir(), "claude-code-reference-count.txt");
+export const REFERENCE_COUNT_FILE = path.join(tmpdir(), "claude-code-reference-count.txt");
 
 
 export const DEFAULT_CONFIG = {

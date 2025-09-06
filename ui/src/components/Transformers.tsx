@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { useConfig } from "./ConfigProvider";
 import { TransformerList } from "./TransformerList";
-import { useThemeStyles } from "@/hooks/useThemeStyles";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +19,6 @@ import {
 export function Transformers() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
-  const styles = useThemeStyles();
   const [editingTransformerIndex, setEditingTransformerIndex] = useState<number | null>(null);
   const [deletingTransformerIndex, setDeletingTransformerIndex] = useState<number | null>(null);
   const [newTransformer, setNewTransformer] = useState<{ name?: string; path: string; options: { [key: string]: string } } | null>(null);
@@ -28,12 +26,12 @@ export function Transformers() {
   // Handle case where config is null or undefined
   if (!config) {
     return (
-      <Card className={styles.cardWithHeader}>
-        <CardHeader className={`${styles.header} flex flex-row items-center justify-between`}>
-          <CardTitle className={styles.title}>{t("transformers.title")}</CardTitle>
+      <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between border-b p-4">
+          <CardTitle className="text-lg">{t("transformers.title")}</CardTitle>
         </CardHeader>
-        <CardContent className={`${styles.content} flex-grow flex items-center justify-center`}>
-          <div className={styles.text.secondary}>Loading transformers configuration...</div>
+        <CardContent className="flex-grow flex items-center justify-center p-4">
+          <div className="text-gray-500">Loading transformers configuration...</div>
         </CardContent>
       </Card>
     );
@@ -103,22 +101,12 @@ export function Transformers() {
   };
 
   return (
-    <Card className={styles.cardWithHeader}>
-      <CardHeader className={`${styles.header} flex flex-row items-center justify-between`}>
-        <CardTitle className={styles.title}>
-          {t("transformers.title")} 
-          <span className={`text-sm font-normal ${styles.text.secondary}`}>
-            ({validTransformers.length})
-          </span>
-        </CardTitle>
-        <Button 
-          onClick={handleAddTransformer}
-          className={styles.button('primary')}
-        >
-          {t("transformers.add")}
-        </Button>
+    <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between border-b p-4">
+        <CardTitle className="text-lg">{t("transformers.title")} <span className="text-sm font-normal text-gray-500">({validTransformers.length})</span></CardTitle>
+        <Button onClick={handleAddTransformer}>{t("transformers.add")}</Button>
       </CardHeader>
-      <CardContent className={`${styles.content} flex-grow overflow-y-auto`}>
+      <CardContent className="flex-grow overflow-y-auto p-4">
         <TransformerList
           transformers={validTransformers}
           onEdit={setEditingTransformerIndex}
@@ -128,10 +116,7 @@ export function Transformers() {
 
       {/* Edit Dialog */}
       <Dialog open={editingTransformerIndex !== null} onOpenChange={handleCancelTransformer}>
-        <DialogContent 
-          className={styles.dialog}
-          style={styles.dialogStyle}
-        >
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("transformers.edit")}</DialogTitle>
           </DialogHeader>

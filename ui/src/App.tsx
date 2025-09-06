@@ -6,11 +6,9 @@ import { Transformers } from "@/components/Transformers";
 import { Providers } from "@/components/Providers";
 import { Router } from "@/components/Router";
 import { JsonEditor } from "@/components/JsonEditor";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-import { MissionControlTab } from "@/components/dashboard/tabs/MissionControlTab";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import { Settings, Languages, Save, RefreshCw, FileJson, CircleArrowUp } from "lucide-react";
 import {
   Popover,
@@ -26,17 +24,14 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-
+import "@/styles/animations.css";
 
 function App() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { config, error } = useConfig();
-  const { theme } = useTheme();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'analytics'>('dashboard');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   // 版本检查状态
@@ -247,16 +242,16 @@ function App() {
   
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-background font-sans flex items-center justify-center">
-        <div className="text-muted-foreground">Loading application...</div>
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-gray-500">Loading application...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="h-screen bg-background font-sans flex items-center justify-center">
-        <div className="text-destructive">Error: {error.message}</div>
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-red-500">Error: {error.message}</div>
       </div>
     );
   }
@@ -264,336 +259,102 @@ function App() {
   // Handle case where config is null or undefined
   if (!config) {
     return (
-      <div className="h-screen bg-background font-sans flex items-center justify-center">
-        <div className="text-muted-foreground">Loading configuration...</div>
+      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
+        <div className="text-gray-500">Loading configuration...</div>
       </div>
     );
   }
 
-  // Get theme-specific classes and layout
-  const getLayoutClasses = () => {
-    if (theme.variant === 'advanced') {
-      return 'dashboard-context dashboard-bg min-h-screen text-white';
-    }
-    return 'h-screen bg-background font-sans';
-  };
-
-  const isAdvancedTheme = theme.variant === 'advanced';
-
-  // Render Advanced Theme Layout
-  const renderAdvancedLayout = () => {
-    return (
-      <div className={getLayoutClasses()}>
-        <div className="max-w-7xl mx-auto p-6">
-          {/* Top Control Bar */}
-          <div className="flex items-center justify-between mb-6 glass-card p-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-                Claude Code Router
-              </h2>
-              <span className="text-sm text-gray-400">Configuration Panel</span>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {/* Language Selector */}
-              <div className="flex items-center gap-2">
-                <button
+  return (
+    <div className="h-screen bg-gray-50 font-sans">
+      <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+        <h1 className="text-xl font-semibold text-gray-800">{t('app.title')}</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="transition-all-ease hover:scale-110">
+            <Settings className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setIsJsonEditorOpen(true)} className="transition-all-ease hover:scale-110">
+            <FileJson className="h-5 w-5" />
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="transition-all-ease hover:scale-110">
+                <Languages className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-32 p-2">
+              <div className="space-y-1">
+                <Button
+                  variant={i18n.language.startsWith('en') ? 'default' : 'ghost'}
+                  className="w-full justify-start transition-all-ease hover:scale-[1.02]"
                   onClick={() => i18n.changeLanguage('en')}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    i18n.language.startsWith('en') 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-black/20 text-gray-400 hover:text-white hover:bg-black/40'
-                  }`}
                 >
-                  EN
-                </button>
-                <button
+                  English
+                </Button>
+                <Button
+                  variant={i18n.language.startsWith('zh') ? 'default' : 'ghost'}
+                  className="w-full justify-start transition-all-ease hover:scale-[1.02]"
                   onClick={() => i18n.changeLanguage('zh')}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    i18n.language.startsWith('zh') 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-black/20 text-gray-400 hover:text-white hover:bg-black/40'
-                  }`}
                 >
                   中文
-                </button>
-              </div>
-
-              {/* Control Buttons */}
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => checkForUpdates(true)}
-                  disabled={isCheckingUpdate}
-                  className="relative bg-purple-500/20 border-purple-500/30 text-purple-300 hover:bg-purple-500/30"
-                >
-                  <CircleArrowUp className="h-4 w-4 mr-2" />
-                  Updates
-                  {isNewVersionAvailable && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                  )}
-                </Button>
-
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsSettingsOpen(true)}
-                  className="bg-blue-500/20 border-blue-500/30 text-blue-300 hover:bg-blue-500/30"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  {t('app.settings')}
-                </Button>
-
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsJsonEditorOpen(true)}
-                  className="bg-green-500/20 border-green-500/30 text-green-300 hover:bg-green-500/30"
-                >
-                  <FileJson className="h-4 w-4 mr-2" />
-                  JSON
-                </Button>
-
-                <Button 
-                  onClick={saveConfig}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
-                  size="sm"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {t('app.save')}
-                </Button>
-                
-                <Button 
-                  onClick={saveConfigAndRestart}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
-                  size="sm"
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('app.save_and_restart')}
                 </Button>
               </div>
+            </PopoverContent>
+          </Popover>
+          {/* 更新版本按钮 */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => checkForUpdates(true)}
+            disabled={isCheckingUpdate}
+            className="transition-all-ease hover:scale-110 relative"
+          >
+            <div className="relative">
+              <CircleArrowUp className="h-5 w-5" />
+              {isNewVersionAvailable && !isCheckingUpdate && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+              )}
             </div>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="nav-tabs">
-            <button
-              className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              Dashboard
-            </button>
-            <button
-              className={`nav-tab ${activeTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => setActiveTab('analytics')}
-            >
-              Analytics
-            </button>
-          </div>
-
-          {/* Tab Content */}
-          <div key={activeTab} className="fade-in">
-            {activeTab === 'analytics' ? (
-              <div className="h-full">
-                <div className="flex items-center space-x-3 mb-6 px-6">
-                  <span className="h-6 w-6 text-blue-400">📊</span>
-                  <h2 className="text-2xl font-bold text-white">Analytics</h2>
-                </div>
-                <MissionControlTab />
-              </div>
-            ) : (
-              <div className="flex h-full gap-6">
-                {/* Providers Section - 3/5 width */}
-                <div className="w-3/5">
-                  <div className="glass-card h-full">
-                    <Providers />
-                  </div>
-                </div>
-                
-                {/* Router + Transformers Section - 2/5 width */}
-                <div className="flex w-2/5 flex-col gap-6">
-                  <div className="h-3/5">
-                    <div className="glass-card h-full">
-                      <Router />
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 overflow-hidden">
-                    <div className="glass-card h-full">
-                      <Transformers />
-                    </div>
-                  </div>
-                </div>
+            {isCheckingUpdate && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
               </div>
             )}
+          </Button>
+          <Button onClick={saveConfig} variant="outline" className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
+            <Save className="mr-2 h-4 w-4" />
+            {t('app.save')}
+          </Button>
+          <Button onClick={saveConfigAndRestart} className="transition-all-ease hover:scale-[1.02] active:scale-[0.98]">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            {t('app.save_and_restart')}
+          </Button>
+        </div>
+      </header>
+      <main className="flex h-[calc(100vh-4rem)] gap-4 p-4 overflow-hidden">
+        <div className="w-3/5">
+          <Providers />
+        </div>
+        <div className="flex w-2/5 flex-col gap-4">
+          <div className="h-3/5">
+            <Router />
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <Transformers />
           </div>
         </div>
-      </div>
-    );
-  };
-
-  // Render Classic Theme Layout
-  const renderClassicLayout = () => {
-    return (
-      <div className={getLayoutClasses()}>
-        {/* Centered container for all classic themes */}
-        <div className="max-w-7xl mx-auto p-6">
-          {/* Header with Control Bar */}
-          <div className="modern-card mb-6">
-            <div className="modern-header">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <h1 className="text-2xl font-bold text-foreground">{t('app.title')}</h1>
-                  <span className="text-sm text-muted-foreground">Configuration Panel</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  {/* Language Selector */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={i18n.language.startsWith('en') ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => i18n.changeLanguage('en')}
-                      className="text-xs"
-                    >
-                      EN
-                    </Button>
-                    <Button
-                      variant={i18n.language.startsWith('zh') ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => i18n.changeLanguage('zh')}
-                      className="text-xs"
-                    >
-                      中文
-                    </Button>
-                  </div>
-
-                  {/* Control Buttons */}
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => checkForUpdates(true)}
-                      disabled={isCheckingUpdate}
-                      className="relative"
-                    >
-                      <CircleArrowUp className="h-4 w-4 mr-2" />
-                      Updates
-                      {isNewVersionAvailable && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></div>
-                      )}
-                    </Button>
-
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsSettingsOpen(true)}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      {t('app.settings')}
-                    </Button>
-
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsJsonEditorOpen(true)}
-                    >
-                      <FileJson className="h-4 w-4 mr-2" />
-                      JSON
-                    </Button>
-
-                    <Button 
-                      onClick={saveConfig}
-                      size="sm"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      {t('app.save')}
-                    </Button>
-                    
-                    <Button 
-                      onClick={saveConfigAndRestart}
-                      variant="secondary"
-                      size="sm"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      {t('app.save_and_restart')}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Unified Tab Navigation */}
-          <div className="modern-tab-container">
-            <button
-              className={`modern-tab ${currentView === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setCurrentView('dashboard')}
-            >
-              Dashboard
-            </button>
-            <button
-              className={`modern-tab ${currentView === 'analytics' ? 'active' : ''}`}
-              onClick={() => setCurrentView('analytics')}
-            >
-              Analytics
-            </button>
-          </div>
-
-          {/* Tab Content with Animation */}
-          <div key={currentView} className="modern-tab-content fade-in">
-            {currentView === 'analytics' ? (
-              <div className="h-full p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl">📊</span>
-                  <h2 className="text-2xl font-bold text-foreground">Analytics</h2>
-                </div>
-                <MissionControlTab />
-              </div>
-            ) : (
-              <div className="flex h-full gap-6 p-6">
-                {/* Providers Section - 3/5 width */}
-                <div className="w-3/5">
-                  <Providers />
-                </div>
-                
-                {/* Router + Transformers Section - 2/5 width */}
-                <div className="flex w-2/5 flex-col gap-6">
-                  <div className="h-3/5">
-                    <Router />
-                  </div>
-                  
-                  <div className="flex-1 overflow-hidden">
-                    <Transformers />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <>
-      {/* Render theme-specific layout */}
-      {isAdvancedTheme ? renderAdvancedLayout() : renderClassicLayout()}
-      
-      {/* Shared Dialogs */}
+      </main>
       <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <JsonEditor 
         open={isJsonEditorOpen} 
         onOpenChange={setIsJsonEditorOpen} 
         showToast={(message, type) => setToast({ message, type })} 
       />
-      
-      {/* Version Update Dialog */}
+      {/* 版本更新对话框 */}
       <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
-        <DialogContent className={`max-w-2xl ${isAdvancedTheme ? 'bg-slate-900/95 border-purple-500/30 backdrop-blur-md' : ''}`}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className={isAdvancedTheme ? 'text-white' : ''}>
+            <DialogTitle>
               {t('app.new_version_available')}
               {newVersionInfo && (
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
@@ -629,7 +390,6 @@ function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {toast && (
         <Toast 
           message={toast.message} 
@@ -637,16 +397,8 @@ function App() {
           onClose={() => setToast(null)} 
         />
       )}
-    </>
+    </div>
   );
 }
 
-function AppWithTheme() {
-  return (
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  );
-}
-
-export default AppWithTheme;
+export default App;

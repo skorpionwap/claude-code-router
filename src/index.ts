@@ -138,18 +138,6 @@ async function run(options: RunOptions = {}) {
     },
     logger: loggerConfig,
   });
-
-  // Plugin loading system
-  const analyticsPluginConfig = config.plugins || {};
-  if (analyticsPluginConfig.analytics?.enabled) {
-    try {
-      const AnalyticsPlugin = require('../plugins/analytics').default;
-      new AnalyticsPlugin().install(server.app, config);
-      console.log('✅ Analytics plugin loaded successfully');
-    } catch (error: any) {
-      console.warn('⚠️ Analytics plugin not available:', error?.message || error);
-    }
-  }
   // Add async preHandler hook for authentication
   server.addHook("preHandler", async (req, reply) => {
     return new Promise((resolve, reject) => {
@@ -373,7 +361,7 @@ async function run(options: RunOptions = {}) {
     done(null, payload)
   });
   server.addHook("onSend", async (req, reply, payload) => {
-    // console.log('主应用onSend')
+    console.log('主应用onSend')
     event.emit('onSend', req, reply, payload);
     return payload;
   })

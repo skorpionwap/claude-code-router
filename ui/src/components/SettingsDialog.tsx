@@ -13,10 +13,8 @@ import { Switch } from "@/components/ui/switch";
 import { Combobox } from "@/components/ui/combobox";
 import { useConfig } from "./ConfigProvider";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
-import ThemeSelector from "./ui/ThemeSelector";
 import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
-import { useThemeStyles } from "@/hooks/useThemeStyles";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -27,7 +25,6 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
-  const styles = useThemeStyles();
 
   if (!config) {
     return null;
@@ -62,11 +59,7 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange} >
-      <DialogContent 
-        data-testid="settings-dialog" 
-        className={`${styles.dialog} max-h-[80vh] flex flex-col p-0`}
-        style={styles.dialogStyle}
-      >
+      <DialogContent data-testid="settings-dialog" className="max-h-[80vh] flex flex-col p-0">
         <DialogHeader className="p-4 pb-0">
           <DialogTitle>{t("toplevel.title")}</DialogTitle>
         </DialogHeader>
@@ -219,10 +212,20 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
               className="transition-all-ease focus:scale-[1.01]"
             />
           </div>
-          
-          {/* Theme Configuration */}
-          <div className="border-t pt-4">
-            <ThemeSelector />
+          <div className="space-y-2">
+            <Label
+              htmlFor="custom-router-path"
+              className="transition-all-ease hover:scale-[1.01] cursor-pointer"
+            >
+              {t("toplevel.custom_router_path")}
+            </Label>
+            <Input
+              id="custom-router-path"
+              value={config.CUSTOM_ROUTER_PATH || ""}
+              onChange={(e) => setConfig({ ...config, CUSTOM_ROUTER_PATH: e.target.value })}
+              placeholder={t("toplevel.custom_router_path_placeholder")}
+              className="transition-all-ease focus:scale-[1.01]"
+            />
           </div>
         </div>
         <DialogFooter className="p-4 pt-0">

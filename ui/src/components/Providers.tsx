@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "./ConfigProvider";
-import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { ProviderList } from "./ProviderList";
 import {
   Dialog,
@@ -19,7 +18,7 @@ import { X, Trash2, Plus, Eye, EyeOff, Search, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
 import { ComboInput } from "@/components/ui/combo-input";
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Provider } from "@/types";
 
 interface ProviderType extends Provider {}
@@ -27,7 +26,6 @@ interface ProviderType extends Provider {}
 export function Providers() {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
-  const styles = useThemeStyles();
   const [editingProviderIndex, setEditingProviderIndex] = useState<number | null>(null);
   const [deletingProviderIndex, setDeletingProviderIndex] = useState<number | null>(null);
   const [hasFetchedModels, setHasFetchedModels] = useState<Record<number, boolean>>({});
@@ -49,29 +47,7 @@ export function Providers() {
         const response = await fetch('https://pub-0dc3e1677e894f07bbea11b17a29e032.r2.dev/providers.json');
         if (response.ok) {
           const data = await response.json();
-          // Add custom Google provider template
-          const customTemplates = [
-            {
-              name: "google-custom",
-              api_base_url: "https://generativelanguage.googleapis.com/v1beta/models/",
-              api_key: "placeholder-key-managed-by-pool",
-              models: [
-                "gemini-2.5-pro",
-                "gemini-2.5-flash",
-                "gemini-2.5-flash-lite",
-                "gemini-2.0-flash",
-                "gemini-2.0-flash-lite"
-              ],
-              transformer: {
-                use: ["gemini"]
-              },
-              priority: 1,
-              useCustomProvider: true,
-              description: "🚀 Custom Google provider with API key pool management - bypasses @musistudio/llms limitations"
-            },
-            ...(data || [])
-          ];
-          setProviderTemplates(customTemplates);
+          setProviderTemplates(data || []);
         } else {
           console.error('Failed to fetch provider templates');
         }
@@ -533,30 +509,20 @@ export function Providers() {
   });
 
   return (
-    <Card className={styles.cardWithHeader}>
-      <CardHeader className={`${styles.header} flex flex-col gap-3`}>
+    <Card className="flex h-full flex-col rounded-lg border shadow-sm">
+      <CardHeader className="flex flex-col border-b p-4 gap-3">
         <div className="flex flex-row items-center justify-between">
-          <CardTitle className={styles.title}>
-            {t("providers.title")} 
-            <span className={`text-sm font-normal ${styles.text.secondary}`}>
-              ({filteredProviders.length}/{validProviders.length})
-            </span>
-          </CardTitle>
-          <Button 
-            onClick={handleAddProvider} 
-            className={styles.button('primary')}
-          >
-            {t("providers.add")}
-          </Button>
+          <CardTitle className="text-lg">{t("providers.title")} <span className="text-sm font-normal text-gray-500">({filteredProviders.length}/{validProviders.length})</span></CardTitle>
+          <Button onClick={handleAddProvider}>{t("providers.add")}</Button>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className={`absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 ${styles.text.secondary}`} />
+            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
             <Input
               placeholder={t("providers.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`${styles.input} pl-8`}
+              className="pl-8"
             />
           </div>
           {searchTerm && (
@@ -564,14 +530,13 @@ export function Providers() {
               variant="ghost" 
               size="icon"
               onClick={() => setSearchTerm("")}
-              className={styles.button('ghost')}
             >
               <XCircle className="h-4 w-4" />
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className={`${styles.content} flex-grow overflow-y-auto`}>
+      <CardContent className="flex-grow overflow-y-auto p-4">
         <ProviderList
           providers={filteredProviders}
           onEdit={handleEditProvider}
@@ -585,10 +550,7 @@ export function Providers() {
           handleCancelAddProvider();
         }
       }}>
-        <DialogContent 
-          className={`${styles.dialog} max-h-[80vh] flex flex-col sm:max-w-2xl`}
-          style={styles.dialogStyle}
-        >
+        <DialogContent className="max-h-[80vh] flex flex-col sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t("providers.edit")}</DialogTitle>
           </DialogHeader>

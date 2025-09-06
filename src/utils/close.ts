@@ -2,12 +2,9 @@ import { isServiceRunning, cleanupPidFile, getReferenceCount } from './processCh
 import { readFileSync } from 'fs';
 import { HOME_DIR } from '../constants';
 import { join } from 'path';
-import { exec } from 'child_process';
 
-export async function closeService(force: boolean = false) {
+export async function closeService() {
     const PID_FILE = join(HOME_DIR, '.claude-code-router.pid');
-    
-    console.log("🛑 Closing Claude Code Router service...");
     
     if (!isServiceRunning()) {
         console.log("ℹ️  No service is currently running.");
@@ -23,8 +20,8 @@ export async function closeService(force: boolean = false) {
         return;
     }
 
-    if (force && refCount > 0) {
-        console.log(`⚡ Force cleanup requested. Ignoring ${refCount} remaining references.`);
+    if (getReferenceCount() > 0) {
+        return;
     }
 
     try {
@@ -44,11 +41,7 @@ export async function closeService(force: boolean = false) {
         }, 2000);
         
         cleanupPidFile();
-        
-        // Force cleanup all remaining processes
-        await forceCleanupAllProcesses();
-        
-        console.log("✅ Claude Code Router service has been successfully stopped.");
+        console.log("claude code router service has been successfully stopped.");
     } catch (e) {
         console.log("⚠️  Failed to stop the main service. Attempting force cleanup...");
         cleanupPidFile();
