@@ -1,4 +1,4 @@
-import apiClient from './api';
+import { api } from './api';
 
 export interface CircuitBreakerResetResponse {
   success: boolean;
@@ -82,21 +82,21 @@ class MissionControlAPI {
    * Get provider health status
    */
   async getProviderHealth(): Promise<ProviderHealthResponse> {
-    return apiClient.get<ProviderHealthResponse>('/v1/mission-control/provider-health');
+    return api.get<ProviderHealthResponse>('/v1/mission-control/provider-health');
   }
 
   /**
    * Get provider health history
    */
   async getProviderHealthHistory(): Promise<HealthHistoryResponse> {
-    return apiClient.get<HealthHistoryResponse>('/v1/mission-control/provider-health-history');
+    return api.get<HealthHistoryResponse>('/v1/mission-control/provider-health-history');
   }
 
   /**
    * Reset the circuit breaker manually
    */
   async resetCircuitBreaker(): Promise<CircuitBreakerResetResponse> {
-    return apiClient.post<CircuitBreakerResetResponse>('/v1/mission-control/reset-circuit-breaker');
+    return api.post<CircuitBreakerResetResponse>('/v1/mission-control/reset-circuit-breaker', {});
   }
 
   /**
@@ -105,7 +105,7 @@ class MissionControlAPI {
   async updateExecutionGuardPreset(
     preset: 'economy' | 'balanced' | 'high-throughput'
   ): Promise<ExecutionGuardUpdateResponse> {
-    return apiClient.post<ExecutionGuardUpdateResponse>('/v1/mission-control/update-execution-guard', {
+    return api.post<ExecutionGuardUpdateResponse>('/v1/mission-control/update-execution-guard', {
       action: 'update-preset',
       preset,
     });
@@ -122,7 +122,7 @@ class MissionControlAPI {
       maxRetries: number;
     }>
   ): Promise<ExecutionGuardUpdateResponse> {
-    return apiClient.post<ExecutionGuardUpdateResponse>('/v1/mission-control/update-execution-guard', {
+    return api.post<ExecutionGuardUpdateResponse>('/v1/mission-control/update-execution-guard', {
       action: 'update-custom',
       config,
     });
@@ -135,7 +135,7 @@ class MissionControlAPI {
     routeName: string, 
     newModel: string
   ): Promise<RouteConfigUpdateResponse> {
-    return apiClient.post<RouteConfigUpdateResponse>('/v1/mission-control/update-route', {
+    return api.post<RouteConfigUpdateResponse>('/v1/mission-control/update-route', {
       routeName,
       newModel,
     });
@@ -145,7 +145,7 @@ class MissionControlAPI {
    * Test a provider connectivity
    */
   async testProvider(provider: string): Promise<ProviderTestResponse> {
-    return apiClient.post<ProviderTestResponse>('/v1/mission-control/test-provider', {
+    return api.post<ProviderTestResponse>('/v1/mission-control/test-provider', {
       provider,
       testAction: 'ping',
     });
@@ -155,70 +155,70 @@ class MissionControlAPI {
    * Get aggregated analytics data
    */
   async getAggregatedData(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/aggregated-data');
+    return api.get<any>('/v1/mission-control/aggregated-data');
   }
 
   /**
    * Get live activity feed
    */
   async getLiveActivity(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/live-activity');
+    return api.get<any>('/v1/mission-control/live-activity');
   }
 
   /**
    * Get system health status
    */
   async getSystemHealth(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/system-health');
+    return api.get<any>('/v1/mission-control/system-health');
   }
 
   /**
    * Get threat matrix data
    */
   async getThreatMatrix(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/threat-matrix');
+    return api.get<any>('/v1/mission-control/threat-matrix');
   }
 
   /**
    * Get route efficiency data
    */
   async getRouteEfficiency(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/route-efficiency');
+    return api.get<any>('/v1/mission-control/route-efficiency');
   }
 
   /**
    * Get model performance leaderboard
    */
   async getModelPerformance(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/model-performance');
+    return api.get<any>('/v1/mission-control/model-performance');
   }
 
   /**
    * Get historical performance data
    */
   async getHistoricalPerformance(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/historical-performance');
+    return api.get<any>('/v1/mission-control/historical-performance');
   }
 
   /**
    * Get ALL mission control data in a single unified endpoint
    */
   async getMissionControlStats(): Promise<any> {
-    return apiClient.get<any>('/v1/mission-control/stats');
+    return api.get<any>('/v1/mission-control/stats');
   }
 
   /**
    * Emergency stop all operations
    */
   async emergencyStop(): Promise<{ success: boolean; message: string }> {
-    return apiClient.post<{ success: boolean; message: string }>('/v1/mission-control/emergency-stop');
+    return api.post<{ success: boolean; message: string }>('/v1/mission-control/emergency-stop', {});
   }
 
   /**
    * Resume operations after emergency stop
    */
   async resumeOperations(): Promise<{ success: boolean; message: string }> {
-    return apiClient.post<{ success: boolean; message: string }>('/v1/mission-control/resume');
+    return api.post<{ success: boolean; message: string }>('/v1/mission-control/resume', {});
   }
 }
 

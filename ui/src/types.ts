@@ -21,6 +21,7 @@ export interface RouterConfig {
     longContext: string;
     longContextThreshold: number;
     webSearch: string;
+    image?: string;
     custom?: any;
 }
 
@@ -65,6 +66,8 @@ export interface Config {
   APIKEY: string;
   API_TIMEOUT_MS: string;
   PROXY_URL: string;
+  CUSTOM_ROUTER_PATH?: string;
+  forceUseImageAgent?: boolean;
 }
 
 export type AccessLevel = 'restricted' | 'full';

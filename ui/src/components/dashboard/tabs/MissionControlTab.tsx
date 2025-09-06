@@ -7,7 +7,7 @@ import { useConfig } from '@/components/ConfigProvider';
 import { useTheme } from '@/contexts/ThemeContext';
 import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';
 import type { MissionControlData, ModelStat, HealthHistoryData } from '@/types/missionControl';
-import api from '@/lib/api';
+import { api } from '@/lib/api';
 import { analyticsAPI } from '@/lib/analytics';
 import type { RealtimeStats, ModelStats } from '@/lib/analytics';
 
