@@ -1,0 +1,162 @@
+/**
+ * CSS Variables for Themes Plugin
+ * Unified system for 3 themes: Light, Dark, Advanced
+ */
+
+/* Base CSS Variables - Default light theme */
+:root {
+  /* Core spacing and dimensions */
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Animation and transitions */
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --transition-slow: 0.5s ease-out;
+  
+  /* Box shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Light Theme Variables */
+.theme-light {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.2 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.5 0.15 220);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.92 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.5 0.15 220);
+  
+  /* Status colors */
+  --success: oklch(0.6 0.15 145);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.7 0.15 85);
+  --warning-foreground: oklch(0.2 0 0);
+  --info: oklch(0.6 0.15 220);
+  --info-foreground: oklch(0.98 0 0);
+  
+  /* Interactive states */
+  --hover-opacity: 0.8;
+  --active-opacity: 0.9;
+  --disabled-opacity: 0.5;
+  
+  /* Specific component colors */
+  --toast-background: oklch(1 0 0);
+  --toast-border: oklch(0.85 0 0);
+  --button-shadow: rgba(0, 0, 0, 0.1);
+  --input-focus-ring: rgba(79, 124, 255, 0.2);
+}
+
+/* Dark Theme Variables */
+.theme-dark {
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.9 0 0);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.9 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.9 0 0);
+  --primary: oklch(0.65 0.15 200);
+  --primary-foreground: oklch(0.12 0 0);
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(0.9 0 0);
+  --muted: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.28 0 0);
+  --accent-foreground: oklch(0.9 0 0);
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.9 0 0);
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.22 0 0);
+  --ring: oklch(0.65 0.15 200);
+  
+  /* Status colors */
+  --success: oklch(0.7 0.15 145);
+  --success-foreground: oklch(0.12 0 0);
+  --warning: oklch(0.75 0.15 85);
+  --warning-foreground: oklch(0.12 0 0);
+  --info: oklch(0.7 0.15 200);
+  --info-foreground: oklch(0.12 0 0);
+  
+  /* Interactive states */
+  --hover-opacity: 0.8;
+  --active-opacity: 0.9;
+  --disabled-opacity: 0.4;
+  
+  /* Specific component colors */
+  --toast-background: oklch(0.22 0 0);
+  --toast-border: oklch(0.35 0 0);
+  --button-shadow: rgba(0, 0, 0, 0.3);
+  --input-focus-ring: rgba(99, 179, 237, 0.3);
+}
+
+/* Advanced Theme Variables - Glassmorphism */
+.theme-advanced {
+  --background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(20,40,70,0.95));
+  --foreground: oklch(0.95 0 0);
+  --card: rgba(255, 255, 255, 0.1);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: rgba(255, 255, 255, 0.15);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.75 0.2 340);
+  --primary-foreground: oklch(0.95 0 0);
+  --secondary: rgba(255, 255, 255, 0.2);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: oklch(0.7 0 0);
+  --accent: rgba(255, 255, 255, 0.15);
+  --accent-foreground: oklch(0.95 0 0);
+  --destructive: oklch(0.65 0.25 15);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: rgba(255, 255, 255, 0.2);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: oklch(0.75 0.2 340);
+  
+  /* Status colors with transparency */
+  --success: rgba(74, 222, 128, 0.8);
+  --success-foreground: oklch(0.95 0 0);
+  --warning: rgba(251, 191, 36, 0.8);
+  --warning-foreground: oklch(0.15 0 0);
+  --info: rgba(96, 165, 250, 0.8);
+  --info-foreground: oklch(0.95 0 0);
+  
+  /* Interactive states */
+  --hover-opacity: 0.9;
+  --active-opacity: 0.95;
+  --disabled-opacity: 0.3;
+  
+  /* Glassmorphism specific */
+  --glass-blur: blur(20px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-gradient: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  
+  /* Specific component colors */
+  --toast-background: rgba(255, 255, 255, 0.1);
+  --toast-border: rgba(255, 255, 255, 0.3);
+  --button-shadow: rgba(233, 69, 96, 0.3);
+  --input-focus-ring: rgba(233, 69, 96, 0.4);
+  
+  /* Animated gradients */
+  --gradient-primary: linear-gradient(45deg, #e94560, #ff6b9d);
+  --gradient-secondary: linear-gradient(45deg, #667eea, #764ba2);
+  --gradient-accent: linear-gradient(45deg, #f093fb, #f5576c);
+}
