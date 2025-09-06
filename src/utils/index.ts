@@ -1,5 +1,5 @@
-import fs from "node:fs/promises";
-import readline from "node:readline";
+import fs, { access, mkdir } from "node:fs/promises";
+import readline, { createInterface } from "node:readline";
 import JSON5 from "json5";
 import path from "node:path";
 import {
