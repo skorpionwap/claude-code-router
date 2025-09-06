@@ -138,6 +138,14 @@ async function run(options: RunOptions = {}) {
     },
     logger: loggerConfig,
   });
+  
+  // Plugin loading system
+  const pluginsConfig = config.plugins || {};
+  if (pluginsConfig.analytics?.enabled) {
+    const AnalyticsPlugin = require('../plugins/analytics').default;
+    new AnalyticsPlugin().install(server.app, config);
+  }
+
   // Add async preHandler hook for authentication
   server.addHook("preHandler", async (req, reply) => {
     return new Promise((resolve, reject) => {
@@ -365,7 +373,6 @@ async function run(options: RunOptions = {}) {
     event.emit('onSend', req, reply, payload);
     return payload;
   })
-
 
   server.start();
 }
