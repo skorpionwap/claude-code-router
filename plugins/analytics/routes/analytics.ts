@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { analytics } from '../manager';
 
 export async function analyticsRoutes(fastify: FastifyInstance) {

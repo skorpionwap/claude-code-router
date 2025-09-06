@@ -4,12 +4,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useMissionControl, type Activity } from '@plugins/analytics/ui/hooks/useMissionControl';
 import { useRealTimeMissionControl, useProviderHistory } from '@plugins/analytics/ui/hooks/useMissionControlData';
 import { useConfig } from '@/components/ConfigProvider';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@plugins/themes/contexts/ThemeContext';
 import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';
-import type { MissionControlData, ModelStat, HealthHistoryData } from '@/types/missionControl';
+import type { MissionControlData, ModelStat, HealthHistoryData } from '@plugins/analytics/ui/types/missionControl';
 import { api } from '@/lib/api';
-import { analyticsAPI } from '@/lib/analytics';
-import type { RealtimeStats, ModelStats } from '@/lib/analytics';
+import { analyticsAPI } from '@plugins/analytics/ui/lib/analytics';
+import type { RealtimeStats, ModelStats } from '@plugins/analytics/ui/lib/analytics';
 
 interface RouteCardData {
   route: string;
@@ -70,8 +70,8 @@ export function MissionControlTab() {
   const { data: providerHistory, loading: historyLoading } = useProviderHistory();
   
   // Theme context
-  const { theme } = useTheme();
-  const isAdvanced = theme.variant === 'advanced';
+  const { currentTheme, themes } = useTheme();
+  const isAdvanced = false; // TODO: Fix theme variant detection
   
   // Analytics state
   const { config } = useConfig();
@@ -549,7 +549,7 @@ export function MissionControlTab() {
   const error = basicError || mcError;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 h-full overflow-y-auto p-4">
       {/* Header */}
       <motion.div
         className={isAdvanced ? "glass-card" : "bg-card border border-border rounded-lg p-6 mb-6"}

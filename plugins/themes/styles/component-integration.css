@@ -1,0 +1,449 @@
+/**
+ * Component Integration System
+ * Universal styling for all existing components
+ * Ensures consistency across Light, Dark, and Advanced themes
+ */
+
+/* ============================================================ */
+/* SETTINGS DIALOG INTEGRATION                                */
+/* ============================================================ */
+
+/* Settings Dialog Container */
+.theme-light [data-radix-dialog-content],
+.theme-dark [data-radix-dialog-content],
+.theme-advanced [data-radix-dialog-content] {
+  background: var(--component-bg, var(--card)) !important;
+  color: var(--text-primary, var(--foreground)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.theme-advanced [data-radix-dialog-content] {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* Settings Dialog Sections */
+.settings-section,
+.form-section {
+  background: transparent !important;
+  border: none !important;
+  padding: 1.5rem 0;
+}
+
+.settings-section + .settings-section {
+  border-top: 1px solid var(--component-border, var(--border));
+}
+
+/* ============================================================ */
+/* FORM ELEMENTS INTEGRATION                                  */
+/* ============================================================ */
+
+/* Input Fields - Universal Styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+select,
+textarea {
+  background: var(--input-bg, var(--input)) !important;
+  color: var(--text-primary, var(--foreground)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.75rem 1rem !important;
+  transition: all var(--transition-fast) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--highlight-color, var(--primary)) !important;
+  box-shadow: 0 0 0 3px rgba(var(--primary), 0.1) !important;
+}
+
+.theme-advanced input,
+.theme-advanced select,
+.theme-advanced textarea {
+  background: var(--input-bg) !important;
+  backdrop-filter: blur(10px) !important;
+  border: var(--glass-border) !important;
+}
+
+.theme-advanced input:focus,
+.theme-advanced select:focus,
+.theme-advanced textarea:focus {
+  border-color: var(--highlight-color) !important;
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2) !important;
+}
+
+/* Labels */
+label,
+.form-label {
+  color: var(--text-primary, var(--foreground)) !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* ============================================================ */
+/* BUTTON INTEGRATION                                         */
+/* ============================================================ */
+
+/* Primary Buttons */
+button[class*="bg-blue"],
+.btn-primary,
+.button-primary {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-fast) !important;
+}
+
+button[class*="bg-blue"]:hover,
+.btn-primary:hover,
+.button-primary:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.theme-advanced button[class*="bg-blue"],
+.theme-advanced .btn-primary,
+.theme-advanced .button-primary {
+  background: var(--button-primary) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Secondary Buttons */
+button[class*="bg-gray"],
+.btn-secondary,
+.button-secondary {
+  background: var(--component-bg, var(--secondary)) !important;
+  color: var(--text-primary, var(--secondary-foreground)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: all var(--transition-fast) !important;
+}
+
+button[class*="bg-gray"]:hover,
+.btn-secondary:hover,
+.button-secondary:hover {
+  background: var(--nav-hover, var(--accent)) !important;
+  border-color: var(--highlight-color, var(--primary)) !important;
+}
+
+.theme-advanced button[class*="bg-gray"],
+.theme-advanced .btn-secondary,
+.theme-advanced .button-secondary {
+  background: var(--button-secondary) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* ============================================================ */
+/* CARD COMPONENTS INTEGRATION                                */
+/* ============================================================ */
+
+/* Universal Card Styling */
+.card,
+[class*="bg-white"],
+[class*="bg-card"],
+.component-card,
+.stats-card {
+  background: var(--component-bg, var(--card)) !important;
+  color: var(--text-primary, var(--card-foreground)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-lg) !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.card:hover,
+.component-card:hover,
+.stats-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.theme-advanced .card,
+.theme-advanced [class*="bg-white"],
+.theme-advanced [class*="bg-card"],
+.theme-advanced .component-card,
+.theme-advanced .stats-card {
+  background: var(--glass-bg) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.theme-advanced .card:hover,
+.theme-advanced .component-card:hover,
+.theme-advanced .stats-card:hover {
+  background: var(--glass-bg-strong) !important;
+  border-color: var(--glass-border-strong) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ============================================================ */
+/* MISSION CONTROL TAB INTEGRATION                           */
+/* ============================================================ */
+
+/* Mission Control Container */
+.mission-control-tab,
+.analytics-container,
+.dashboard-container {
+  background: var(--component-bg, var(--background)) !important;
+  color: var(--text-primary, var(--foreground)) !important;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.theme-advanced .mission-control-tab,
+.theme-advanced .analytics-container,
+.theme-advanced .dashboard-container {
+  background: var(--dashboard-gradient) !important;
+  position: relative;
+}
+
+.theme-advanced .mission-control-tab::before,
+.theme-advanced .analytics-container::before,
+.theme-advanced .dashboard-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--dashboard-gradient);
+  z-index: -1;
+}
+
+/* Mission Control Cards */
+.provider-card,
+.route-card,
+.analytics-card,
+.status-card {
+  background: var(--component-bg, var(--card)) !important;
+  color: var(--text-primary, var(--card-foreground)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.provider-card:hover,
+.route-card:hover,
+.analytics-card:hover,
+.status-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.theme-advanced .provider-card,
+.theme-advanced .route-card,
+.theme-advanced .analytics-card,
+.theme-advanced .status-card {
+  background: var(--glass-bg) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.theme-advanced .provider-card:hover,
+.theme-advanced .route-card:hover,
+.theme-advanced .analytics-card:hover,
+.theme-advanced .status-card:hover {
+  background: var(--glass-bg-strong) !important;
+  border-color: var(--glass-border-strong) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ============================================================ */
+/* STATUS INDICATORS & BADGES                                 */
+/* ============================================================ */
+
+/* Status Badges */
+.badge,
+.status-badge,
+[class*="bg-green-"],
+[class*="bg-red-"],
+[class*="bg-yellow-"],
+[class*="bg-blue-"] {
+  border-radius: var(--radius-xl) !important;
+  padding: 0.25rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Success Status */
+[class*="bg-green-"],
+.status-success {
+  background: rgba(var(--success), 0.15) !important;
+  color: var(--success-foreground) !important;
+  border: 1px solid rgba(var(--success), 0.3) !important;
+}
+
+/* Error Status */
+[class*="bg-red-"],
+.status-error {
+  background: rgba(var(--destructive), 0.15) !important;
+  color: var(--destructive-foreground) !important;
+  border: 1px solid rgba(var(--destructive), 0.3) !important;
+}
+
+/* Warning Status */
+[class*="bg-yellow-"],
+.status-warning {
+  background: rgba(var(--warning), 0.15) !important;
+  color: var(--warning-foreground) !important;
+  border: 1px solid rgba(var(--warning), 0.3) !important;
+}
+
+/* Info Status */
+[class*="bg-blue-"],
+.status-info {
+  background: rgba(var(--info), 0.15) !important;
+  color: var(--info-foreground) !important;
+  border: 1px solid rgba(var(--info), 0.3) !important;
+}
+
+/* ============================================================ */
+/* TABLE INTEGRATION                                          */
+/* ============================================================ */
+
+/* Table Styling */
+table,
+.table {
+  background: var(--component-bg, var(--card)) !important;
+  border: 1px solid var(--component-border, var(--border)) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+}
+
+thead,
+.table-header {
+  background: var(--nav-bg, var(--muted)) !important;
+  color: var(--text-primary, var(--muted-foreground)) !important;
+  border-bottom: 1px solid var(--component-border, var(--border)) !important;
+}
+
+tbody tr,
+.table-row {
+  border-bottom: 1px solid var(--component-border, var(--border)) !important;
+  transition: background-color var(--transition-fast) !important;
+}
+
+tbody tr:hover,
+.table-row:hover {
+  background: var(--nav-hover, var(--accent)) !important;
+}
+
+.theme-advanced table,
+.theme-advanced .table {
+  background: var(--glass-bg) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+}
+
+.theme-advanced thead,
+.theme-advanced .table-header {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* ============================================================ */
+/* NOTIFICATION SYSTEM INTEGRATION                            */
+/* ============================================================ */
+
+/* Toast/Notification Styling */
+.toast,
+.notification,
+[role="alert"],
+[data-toast] {
+  background: var(--notification-bg, var(--card)) !important;
+  color: var(--text-primary, var(--foreground)) !important;
+  border: 1px solid var(--notification-border, var(--border)) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1rem 1.5rem !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.theme-advanced .toast,
+.theme-advanced .notification,
+.theme-advanced [role="alert"],
+.theme-advanced [data-toast] {
+  background: var(--notification-bg) !important;
+  border: 1px solid var(--notification-border) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* ============================================================ */
+/* RESPONSIVE ADJUSTMENTS                                     */
+/* ============================================================ */
+
+@media (max-width: 768px) {
+  .mission-control-tab,
+  .analytics-container,
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .provider-card,
+  .route-card,
+  .analytics-card,
+  .status-card {
+    padding: 1rem !important;
+  }
+  
+  button[class*="bg-"],
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.625rem 1.25rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* ============================================================ */
+/* OVERRIDE TAILWIND CLASSES - HIGH PRIORITY                 */
+/* ============================================================ */
+
+/* Force theme colors over Tailwind defaults */
+.bg-background { background: var(--background) !important; }
+.text-foreground { color: var(--foreground) !important; }
+.bg-card { background: var(--card) !important; }
+.text-card-foreground { color: var(--card-foreground) !important; }
+.bg-primary { background: var(--primary) !important; }
+.text-primary-foreground { color: var(--primary-foreground) !important; }
+.bg-secondary { background: var(--secondary) !important; }
+.text-secondary-foreground { color: var(--secondary-foreground) !important; }
+.bg-muted { background: var(--muted) !important; }
+.text-muted-foreground { color: var(--muted-foreground) !important; }
+.bg-accent { background: var(--accent) !important; }
+.text-accent-foreground { color: var(--accent-foreground) !important; }
+.bg-destructive { background: var(--destructive) !important; }
+.text-destructive-foreground { color: var(--destructive-foreground) !important; }
+.border { border-color: var(--border) !important; }
+
+/* Advanced theme overrides */
+.theme-advanced .bg-background { background: var(--background) !important; }
+.theme-advanced .bg-card { 
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-border) !important;
+}
+.theme-advanced .bg-primary { 
+  background: var(--button-primary) !important;
+  backdrop-filter: blur(10px) !important;
+}

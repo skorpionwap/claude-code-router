@@ -7,7 +7,7 @@ import type {
   HistoricalDataPoint,
   SystemPreset,
   HealthHistoryData
-} from '@/types/missionControl';
+} from '@plugins/analytics/ui/types/missionControl';
 import { useMissionControlData, type UseMissionControlDataReturn } from '@plugins/analytics/ui/hooks/useMissionControlData';
 
 // Types for state

@@ -87,6 +87,7 @@ export interface ThemePluginAPI {
 declare global {
   interface Window {
     __THEMES_PLUGIN__?: ThemePluginAPI;
+    LayoutTransformer?: any;
   }
 }
 

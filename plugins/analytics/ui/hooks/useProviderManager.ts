@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Provider } from '@/types/dashboard';
-import { missionControlAPI } from '@/lib/missionControlAPI';
+import type { Provider } from '@plugins/analytics/ui/types/dashboard';
+import { missionControlAPI } from '@plugins/analytics/ui/lib/missionControlAPI';
 
 interface UseProviderManagerOptions {
   interval?: number; // milliseconds for polling

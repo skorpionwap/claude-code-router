@@ -112,12 +112,10 @@
 /* Override App.tsx hardcoded classes for advanced theme */
 .theme-advanced .h-screen {
   background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(20,40,70,0.95)) !important;
-}
-
-.theme-advanced .h-screen.theme-main-content {
   max-width: 1400px !important;
   margin: 0 auto !important;
   padding: 2rem !important;
+  min-height: calc(100vh - 4rem) !important;
 }
 
 /* Transform header for advanced theme */
@@ -125,6 +123,15 @@
   background: rgba(255, 255, 255, 0.1) !important;
   backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Logo gradient text for advanced theme */
+.theme-advanced h1 {
+  background: linear-gradient(135deg, #e879f9, #3b82f6) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
 }
 
 .theme-advanced .theme-navigation-container::before {
@@ -284,26 +291,45 @@
   transition: all 0.3s ease;
 }
 
-/* Transform white backgrounds to glass for advanced theme */
-.theme-advanced .bg-white {
+/* Transform ALL white backgrounds to glass for advanced theme */
+.theme-advanced .bg-white,
+.theme-advanced .bg-card,
+.theme-advanced .border,
+.theme-advanced .rounded-lg,
+.theme-advanced .rounded-xl {
   background: rgba(255, 255, 255, 0.1) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 16px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.theme-advanced .theme-enhanced {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 16px !important;
+/* Enhanced hover effects for glass elements */
+.theme-advanced .bg-white:hover,
+.theme-advanced .bg-card:hover,
+.theme-advanced .border:hover,
+.theme-advanced .rounded-lg:hover,
+.theme-advanced .rounded-xl:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(233, 69, 96, 0.5) !important;
+}
+
+/* Glass effect for buttons in advanced theme */
+.theme-advanced button {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
   transition: all 0.3s ease !important;
 }
 
-.theme-advanced .theme-enhanced:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
+.theme-advanced button:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
 }
 
 .theme-advanced .theme-dashboard-section:hover {

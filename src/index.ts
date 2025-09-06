@@ -145,7 +145,12 @@ async function run(options: RunOptions = {}) {
     const AnalyticsPlugin = require('../plugins/analytics').default;
     new AnalyticsPlugin().install(server.app, config);
   }
-
+  
+  if (pluginsConfig.themes?.enabled) {
+    const ThemesPlugin = require('../plugins/themes').default;
+    ThemesPlugin.register();
+    console.log('🎨 Themes Plugin loaded successfully');
+  }
   // Add async preHandler hook for authentication
   server.addHook("preHandler", async (req, reply) => {
     return new Promise((resolve, reject) => {

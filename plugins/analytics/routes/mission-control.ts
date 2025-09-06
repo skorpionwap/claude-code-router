@@ -3,7 +3,7 @@
  * Aggregates data from various system APIs for the Mission Control dashboard
  */
 
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { analytics } from '../manager';
 import { dynamicProviderDetector } from '../../../src/utils/dynamic-provider-detector';
 import { readConfigFile } from '../../../src/utils';

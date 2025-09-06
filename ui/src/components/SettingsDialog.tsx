@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import { createRoot } from 'react-dom/client';
 import {
   Dialog,
   DialogContent,
@@ -12,19 +14,53 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Combobox } from "@/components/ui/combobox";
 import { useConfig } from "./ConfigProvider";
+import { usePlugins } from "@/contexts/PluginContext";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
-import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
+import { api } from "@/lib/api";
 
 interface SettingsDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
 
+
 export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
+  const { plugins, registerPlugin } = usePlugins();
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
+
+  // Register plugins on mount
+  useEffect(() => {
+    const registerPlugins = async () => {
+      try {
+        // Register analytics plugin
+        const { AnalyticsSettings } = await import('@plugins/analytics/ui/AnalyticsSettings');
+        registerPlugin({
+          id: 'analytics',
+          name: 'Analytics',
+          description: 'Real-time analytics and Mission Control dashboard',
+          component: AnalyticsSettings,
+          enabled: localStorage.getItem('analytics-enabled') === 'true'
+        });
+
+        // Register themes plugin
+        const { ThemeSettings } = await import('@plugins/themes/ui/ThemeSettings');
+        registerPlugin({
+          id: 'themes',
+          name: 'Advanced Themes',
+          description: 'Glassmorphism effects and premium theming',
+          component: ThemeSettings,
+          enabled: localStorage.getItem('themes-enabled') === 'true'
+        });
+      } catch (error) {
+        console.warn('Failed to register plugins:', error);
+      }
+    };
+
+    registerPlugins();
+  }, [registerPlugin]);
 
   if (!config) {
     return null;
@@ -59,7 +95,10 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange} >
-      <DialogContent data-testid="settings-dialog" className="max-h-[80vh] flex flex-col p-0">
+      <DialogContent 
+        data-testid="settings-dialog" 
+        className="max-h-[80vh] flex flex-col p-0"
+      >
         <DialogHeader className="p-4 pb-0">
           <DialogTitle>{t("toplevel.title")}</DialogTitle>
         </DialogHeader>
@@ -104,6 +143,22 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
               </Button>
             </div>
           </div>
+          
+          
+          {/* Plugin Management */}
+          <div className="space-y-4 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">🔌 Plugin Management</Label>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Dynamic Plugin Cards */}
+              {plugins.map(plugin => (
+                <plugin.component key={plugin.id} />
+              ))}
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="log-level" className="transition-all-ease hover:scale-[1.01] cursor-pointer">{t("toplevel.log_level")}</Label>
             <Combobox

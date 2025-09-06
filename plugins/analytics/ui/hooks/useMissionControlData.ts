@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { MissionControlData, RawMissionControlData } from '@/types/missionControl';
-import { missionControlAPI } from '@/lib/missionControlAPI';
+import type { MissionControlData, RawMissionControlData } from '@plugins/analytics/ui/types/missionControl';
+import { missionControlAPI } from '@plugins/analytics/ui/lib/missionControlAPI';
 
 interface UseMissionControlDataOptions {
   interval?: number; // milliseconds for polling

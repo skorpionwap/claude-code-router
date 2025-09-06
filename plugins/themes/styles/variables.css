@@ -24,27 +24,45 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Light Theme Variables */
+/* Light Theme Variables - Enhanced Modern */
 .theme-light {
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.2 0 0);
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0 0);
+  --card-foreground: oklch(0.12 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.5 0.15 220);
+  --popover-foreground: oklch(0.12 0 0);
+  --primary: oklch(0.55 0.18 230);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0 0);
-  --secondary-foreground: oklch(0.2 0 0);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.92 0 0);
-  --accent-foreground: oklch(0.2 0 0);
-  --destructive: oklch(0.65 0.2 25);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.15 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.15 0 0);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.5 0.15 220);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.94 0 0);
+  --ring: oklch(0.55 0.18 230);
+  
+  /* Enhanced Semantic Colors */
+  --success: oklch(0.6 0.2 145);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.7 0.18 85);
+  --warning-foreground: oklch(0.15 0 0);
+  --info: oklch(0.6 0.2 220);
+  --info-foreground: oklch(0.98 0 0);
+  
+  /* Modern Light Theme Variables */
+  --highlight-color: var(--primary);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --component-bg: var(--card);
+  --component-border: var(--border);
+  --input-bg: var(--input);
+  --notification-bg: var(--card);
+  --notification-border: var(--border);
   
   /* Status colors */
   --success: oklch(0.6 0.15 145);
@@ -64,29 +82,60 @@
   --toast-border: oklch(0.85 0 0);
   --button-shadow: rgba(0, 0, 0, 0.1);
   --input-focus-ring: rgba(79, 124, 255, 0.2);
+  
+  /* Glassmorphism variables for light theme */
+  --glass-bg: var(--card);
+  --glass-border: 1px solid var(--border);
+  --glass-blur: blur(0px);
+  --glass-shadow: var(--shadow-md);
+  --highlight-color: var(--primary);
 }
 
-/* Dark Theme Variables */
+/* Dark Theme Variables - Enhanced Professional */
 .theme-dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.9 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.9 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.9 0 0);
-  --primary: oklch(0.65 0.15 200);
-  --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.25 0 0);
-  --secondary-foreground: oklch(0.9 0 0);
-  --muted: oklch(0.25 0 0);
+  --background: oklch(0.1 0 0);
+  --foreground: oklch(0.92 0 0);
+  --card: oklch(0.16 0 0);
+  --card-foreground: oklch(0.92 0 0);
+  --popover: oklch(0.16 0 0);
+  --popover-foreground: oklch(0.92 0 0);
+  --primary: oklch(0.68 0.18 210);
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.22 0 0);
+  --secondary-foreground: oklch(0.92 0 0);
+  --muted: oklch(0.22 0 0);
   --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.28 0 0);
-  --accent-foreground: oklch(0.9 0 0);
-  --destructive: oklch(0.7 0.19 22);
-  --destructive-foreground: oklch(0.9 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.22 0 0);
-  --ring: oklch(0.65 0.15 200);
+  --accent: oklch(0.26 0 0);
+  --accent-foreground: oklch(0.92 0 0);
+  --destructive: oklch(0.72 0.22 22);
+  --destructive-foreground: oklch(0.92 0 0);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.2 0 0);
+  --ring: oklch(0.68 0.18 210);
+  
+  /* Enhanced Semantic Colors */
+  --success: oklch(0.7 0.22 145);
+  --success-foreground: oklch(0.1 0 0);
+  --warning: oklch(0.75 0.2 85);
+  --warning-foreground: oklch(0.1 0 0);
+  --info: oklch(0.7 0.22 220);
+  --info-foreground: oklch(0.1 0 0);
+  
+  /* Professional Dark Theme Variables */
+  --highlight-color: var(--primary);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --component-bg: var(--card);
+  --component-border: var(--border);
+  --input-bg: var(--input);
+  --notification-bg: var(--card);
+  --notification-border: var(--border);
+  
+  /* Glassmorphism elements for dark */
+  --glass-bg: var(--card);
+  --glass-border: 1px solid var(--border);
+  --glass-blur: blur(8px);
+  --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   
   /* Status colors */
   --success: oklch(0.7 0.15 145);
@@ -106,29 +155,77 @@
   --toast-border: oklch(0.35 0 0);
   --button-shadow: rgba(0, 0, 0, 0.3);
   --input-focus-ring: rgba(99, 179, 237, 0.3);
+  
+  /* Glassmorphism variables for dark theme */
+  --glass-bg: var(--card);
+  --glass-border: 1px solid var(--border);
+  --glass-blur: blur(0px);
+  --glass-shadow: var(--shadow-md);
+  --highlight-color: var(--primary);
 }
 
-/* Advanced Theme Variables - Glassmorphism */
+/* Advanced Theme Variables - Enhanced Glassmorphism */
 .theme-advanced {
-  --background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(20,40,70,0.95));
-  --foreground: oklch(0.95 0 0);
-  --card: rgba(255, 255, 255, 0.1);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: rgba(255, 255, 255, 0.15);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.75 0.2 340);
-  --primary-foreground: oklch(0.95 0 0);
-  --secondary: rgba(255, 255, 255, 0.2);
-  --secondary-foreground: oklch(0.95 0 0);
+  /* Core Theme Colors - Enhanced for better depth and sophistication */
+  --background: oklch(0.08 0.05 280);
+  --foreground: oklch(0.95 0.02 270);
+  --card: rgba(255, 255, 255, 0.12);
+  --card-foreground: oklch(0.92 0.02 270);
+  --popover: rgba(255, 255, 255, 0.18);
+  --popover-foreground: oklch(0.95 0.02 270);
+  --primary: oklch(0.7 0.25 280);
+  --primary-foreground: oklch(0.08 0.05 280);
+  --secondary: rgba(255, 255, 255, 0.22);
+  --secondary-foreground: oklch(0.85 0.03 270);
   --muted: rgba(255, 255, 255, 0.1);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: rgba(255, 255, 255, 0.15);
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.65 0.25 15);
-  --destructive-foreground: oklch(0.95 0 0);
-  --border: rgba(255, 255, 255, 0.2);
+  --muted-foreground: oklch(0.65 0.05 280);
+  --accent: oklch(0.75 0.2 320);
+  --accent-foreground: oklch(0.08 0.05 280);
+  --destructive: oklch(0.7 0.3 20);
+  --destructive-foreground: oklch(0.95 0.02 270);
+  --border: rgba(255, 255, 255, 0.25);
   --input: rgba(255, 255, 255, 0.15);
-  --ring: oklch(0.75 0.2 340);
+  --ring: oklch(0.7 0.25 280);
+  
+  /* Enhanced Semantic Colors - Professional Grade */
+  --success: oklch(0.65 0.25 145);
+  --success-foreground: oklch(0.95 0.02 270);
+  --warning: oklch(0.75 0.2 85);
+  --warning-foreground: oklch(0.15 0 0);
+  --info: oklch(0.7 0.25 220);
+  --info-foreground: oklch(0.95 0.02 270);
+  
+  /* Advanced Space Theme Specific Variables - Superior Quality */
+  --primary-color: rgba(45, 45, 75, 0.95);
+  --secondary-color: rgba(55, 65, 95, 0.9);
+  --accent-color: rgba(75, 85, 130, 0.95);
+  --highlight-color: #e94560;
+  --highlight-gradient: linear-gradient(135deg, #e94560, #ff6b9d);
+  --text-primary: oklch(0.95 0.02 270);
+  --text-secondary: oklch(0.7 0.03 280);
+  
+  /* Professional Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-bg-strong: rgba(255, 255, 255, 0.15);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+  --glass-border-strong: 1px solid rgba(255, 255, 255, 0.3);
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  
+  /* Enhanced Component Variables */
+  --component-bg: rgba(255, 255, 255, 0.1);
+  --component-border: rgba(255, 255, 255, 0.25);
+  --input-bg: rgba(255, 255, 255, 0.15);
+  --button-primary: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  --button-secondary: rgba(255, 255, 255, 0.12);
+  --notification-bg: rgba(255, 255, 255, 0.12);
+  --notification-border: rgba(255, 255, 255, 0.3);
+  
+  /* Navigation & Layout Variables */
+  --nav-bg: rgba(255, 255, 255, 0.1);
+  --nav-active: var(--highlight-gradient);
+  --nav-hover: rgba(255, 255, 255, 0.15);
+  --dashboard-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
   
   /* Status colors with transparency */
   --success: rgba(74, 222, 128, 0.8);
@@ -148,6 +245,16 @@
   --glass-border: 1px solid rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --glass-gradient: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Advanced theme space gradient colors */
+  --primary-color: rgba(30, 30, 50, 0.95);
+  --secondary-color: rgba(20, 40, 70, 0.95);
+  --accent-color: rgba(40, 20, 60, 0.95);
+  --text-primary: oklch(0.95 0 0);
+  --text-secondary: oklch(0.7 0 0);
+  --highlight-color: linear-gradient(45deg, #e94560, #ff6b9d);
+  --highlight-gradient: linear-gradient(45deg, #e94560, #ff6b9d);
   
   /* Specific component colors */
   --toast-background: rgba(255, 255, 255, 0.1);

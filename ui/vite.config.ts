@@ -14,4 +14,10 @@ export default defineConfig({
       "@plugins": path.resolve(__dirname, "../plugins"),
     },
   },
+  build: {
+    rollupOptions: {
+      // Asigură-te că dependencies din UI sunt accesibile pentru plugins
+      external: [],
+    }
+  }
 })

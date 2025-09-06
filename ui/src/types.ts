@@ -1,3 +1,8 @@
+export interface RouteConfig {
+  path: string;
+  provider: string;
+}
+
 export interface ProviderTransformer {
   use: (string | (string | Record<string, unknown> | { max_tokens: number })[])[];
   [key: string]: any; // Allow for model-specific transformers
@@ -52,11 +57,22 @@ export interface StatusLineConfig {
   fontFamily?: string;
 }
 
+export interface PluginsConfig {
+  themes?: {
+    enabled: boolean;
+    activeTheme: 'light' | 'dark' | 'advanced';
+    availableThemes: ('light' | 'dark' | 'advanced')[];
+    persistUserChoice?: boolean;
+    autoApplySystemTheme?: boolean;
+  };
+}
+
 export interface Config {
   Providers: Provider[];
   Router: RouterConfig;
   transformers: Transformer[];
   StatusLine?: StatusLineConfig;
+  plugins?: PluginsConfig;
   // Top-level settings
   LOG: boolean;
   LOG_LEVEL: string;
@@ -71,3 +87,15 @@ export interface Config {
 }
 
 export type AccessLevel = 'restricted' | 'full';
+
+// Plugin UI Registry Types
+export interface PluginUIRegistry {
+  headerButtons: Array<React.ComponentType>;
+}
+
+// Extend Window interface
+declare global {
+  interface Window {
+    __PLUGIN_UI_REGISTRY__?: PluginUIRegistry;
+  }
+}

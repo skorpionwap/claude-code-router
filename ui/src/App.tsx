@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SettingsDialog } from "@/components/SettingsDialog";
@@ -8,8 +8,16 @@ import { Router } from "@/components/Router";
 import { JsonEditor } from "@/components/JsonEditor";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
+import { PluginProvider } from "@/contexts/PluginContext";
 import { api } from "@/lib/api";
 import { Settings, Languages, Save, RefreshCw, FileJson, CircleArrowUp } from "lucide-react";
+
+// Lazy load MissionControlTab from plugin
+const MissionControlTab = React.lazy(() => 
+  import('@plugins/analytics/ui/components/dashboard/tabs/MissionControlTab')
+    .then(module => ({ default: module.MissionControlTab }))
+    .catch(() => ({ default: () => <div>Analytics plugin not available</div> }))
+);
 import {
   Popover,
   PopoverContent,
@@ -32,6 +40,8 @@ function App() {
   const { config, error } = useConfig();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'analytics'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   // 版本检查状态
@@ -41,6 +51,25 @@ function App() {
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [hasCheckedUpdate, setHasCheckedUpdate] = useState(false);
   const hasAutoCheckedUpdate = useRef(false);
+
+  // Listen for analytics plugin events
+  useEffect(() => {
+    const handleOpenMissionControl = () => {
+      setActiveTab('analytics');
+    };
+
+    const handleCloseMissionControl = () => {
+      setActiveTab('dashboard');
+    };
+
+    document.addEventListener('open-mission-control', handleOpenMissionControl);
+    document.addEventListener('close-mission-control', handleCloseMissionControl);
+
+    return () => {
+      document.removeEventListener('open-mission-control', handleOpenMissionControl);
+      document.removeEventListener('close-mission-control', handleCloseMissionControl);
+    };
+  }, []);
 
   const saveConfig = async () => {
     // Handle case where config might be null or undefined
@@ -266,9 +295,27 @@ function App() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 font-sans">
+    <PluginProvider>
+      <div className="h-screen bg-gray-50 font-sans">
       <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-        <h1 className="text-xl font-semibold text-gray-800">{t('app.title')}</h1>
+        <div className="flex items-center gap-6">
+          <h1 className="text-xl font-semibold text-gray-800">{t('app.title')}</h1>
+          
+          {/* Tab indicator (only shows when on Analytics) */}
+          {activeTab === 'analytics' && (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span className="text-sm font-medium text-blue-700">Analytics Mode</span>
+              <button
+                className="text-xs text-gray-500 hover:text-gray-700 ml-2"
+                onClick={() => setActiveTab('dashboard')}
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
+          )}
+        </div>
+        
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)} className="transition-all-ease hover:scale-110">
             <Settings className="h-5 w-5" />
@@ -331,18 +378,35 @@ function App() {
           </Button>
         </div>
       </header>
+      
       <main className="flex h-[calc(100vh-4rem)] gap-4 p-4 overflow-hidden">
-        <div className="w-3/5">
-          <Providers />
-        </div>
-        <div className="flex w-2/5 flex-col gap-4">
-          <div className="h-3/5">
-            <Router />
+        {activeTab === 'analytics' ? (
+          <div className="w-full h-full overflow-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-2xl">📊</span>
+              <h2 className="text-2xl font-bold text-gray-800">Analytics</h2>
+            </div>
+            <div className="h-full overflow-auto">
+              <Suspense fallback={<div>Loading Analytics...</div>}>
+                <MissionControlTab />
+              </Suspense>
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <Transformers />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="w-3/5">
+              <Providers />
+            </div>
+            <div className="flex w-2/5 flex-col gap-4">
+              <div className="h-3/5">
+                <Router />
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <Transformers />
+              </div>
+            </div>
+          </>
+        )}
       </main>
       <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <JsonEditor 
@@ -398,6 +462,7 @@ function App() {
         />
       )}
     </div>
+    </PluginProvider>
   );
 }
 

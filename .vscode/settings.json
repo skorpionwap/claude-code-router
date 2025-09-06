@@ -1,4 +1,4 @@
 {
     "git.ignoreLimitWarning": true,
-    "claudeCodeChat.permissions.yoloMode": false
+    "claudeCodeChat.permissions.yoloMode": true
 }

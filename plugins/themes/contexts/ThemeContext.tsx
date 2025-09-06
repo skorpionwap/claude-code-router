@@ -203,16 +203,7 @@ export const ThemeProvider: React.FC<{
         documentElement.style.removeProperty(property);
       });
       
-      // Disable layout enhancer when plugin is disabled
-      const initLayoutEnhancer = async () => {
-        try {
-          const { layoutEnhancer } = await import('../scripts/layout-enhancer');
-          layoutEnhancer.setEnabled(false);
-        } catch (error) {
-          console.warn('Layout enhancer not available:', error);
-        }
-      };
-      initLayoutEnhancer();
+      // Layout enhancer removed - using pure CSS approach
       
       return;
     }
@@ -234,21 +225,7 @@ export const ThemeProvider: React.FC<{
     // Apply layout classes for navigation
     applyLayoutClasses();
 
-    // Initialize layout enhancer
-    const initLayoutEnhancer = async () => {
-      try {
-        const { layoutEnhancer } = await import('../scripts/layout-enhancer');
-        layoutEnhancer.setEnabled(true);
-        
-        // Give it a moment for the theme classes to be applied
-        setTimeout(() => {
-          layoutEnhancer.applyProgressiveEnhancements();
-        }, 100);
-      } catch (error) {
-        console.warn('Layout enhancer not available:', error);
-      }
-    };
-    initLayoutEnhancer();
+    // Using pure CSS approach for layout transformations
 
     // Unify with TailwindCSS dark mode
     if (currentTheme === 'dark' || currentTheme === 'advanced') {

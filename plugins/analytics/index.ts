@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { analyticsRoutes } from './routes/analytics';
 import { missionControlRoutes } from './routes/mission-control';
 import { analytics } from './manager';
