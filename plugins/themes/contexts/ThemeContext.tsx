@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { 
+import type { 
   ThemeType, 
   ThemeDefinition, 
   ThemePluginConfig, 
@@ -131,9 +131,38 @@ export const ThemeProvider: React.FC<{
   
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(pluginConfig.activeTheme);
 
-  // Load theme from localStorage on mount
+  // Load theme from config first, then localStorage
   useEffect(() => {
-    if (pluginConfig.persistUserChoice) {
+    if (initialConfig) {
+      setPluginConfig(prev => ({ ...prev, ...initialConfig }));
+      if (initialConfig.activeTheme) {
+        setCurrentTheme(initialConfig.activeTheme);
+      }
+    } else {
+      // Load configuration from server if no initial config provided
+      const loadServerConfig = async () => {
+        try {
+          const response = await fetch('/api/config');
+          if (response.ok) {
+            const serverConfig = await response.json();
+            if (serverConfig.plugins?.themes) {
+              setPluginConfig(prev => ({ ...prev, ...serverConfig.plugins.themes }));
+              if (serverConfig.plugins.themes.activeTheme) {
+                setCurrentTheme(serverConfig.plugins.themes.activeTheme);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to load server config for themes:', error);
+        }
+      };
+      loadServerConfig();
+    }
+  }, [initialConfig]);
+
+  // Load theme from localStorage on mount (only if not overridden by config)
+  useEffect(() => {
+    if (pluginConfig.persistUserChoice && !initialConfig?.activeTheme) {
       try {
         const savedTheme = localStorage.getItem('claude-router-theme-plugin');
         if (savedTheme) {
@@ -149,13 +178,45 @@ export const ThemeProvider: React.FC<{
         console.warn('Failed to load theme plugin data from localStorage:', error);
       }
     }
-  }, [pluginConfig.persistUserChoice]);
+  }, [pluginConfig.persistUserChoice, initialConfig?.activeTheme]);
 
   // Apply theme to document element
   useEffect(() => {
-    if (!pluginConfig.enabled) return;
-
     const documentElement = document.documentElement;
+    
+    if (!pluginConfig.enabled) {
+      // Remove all theme classes when plugin is disabled
+      documentElement.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
+      documentElement.classList.remove('themes-plugin-active');
+      documentElement.classList.remove('dark');
+      
+      // Remove any CSS custom properties that might have been set
+      const themeProperties = [
+        '--background', '--foreground', '--card', '--card-foreground',
+        '--popover', '--popover-foreground', '--primary', '--primary-foreground',
+        '--secondary', '--secondary-foreground', '--muted', '--muted-foreground',
+        '--accent', '--accent-foreground', '--destructive', '--destructive-foreground',
+        '--border', '--input', '--ring', '--gradient', '--glass-bg', '--glass-blur'
+      ];
+      
+      themeProperties.forEach(property => {
+        documentElement.style.removeProperty(property);
+      });
+      
+      // Disable layout enhancer when plugin is disabled
+      const initLayoutEnhancer = async () => {
+        try {
+          const { layoutEnhancer } = await import('../scripts/layout-enhancer');
+          layoutEnhancer.setEnabled(false);
+        } catch (error) {
+          console.warn('Layout enhancer not available:', error);
+        }
+      };
+      initLayoutEnhancer();
+      
+      return;
+    }
+
     const theme = THEME_DEFINITIONS[currentTheme];
     
     // Remove all theme classes
@@ -163,6 +224,38 @@ export const ThemeProvider: React.FC<{
     
     // Add new theme class
     documentElement.classList.add(`theme-${currentTheme}`);
+    
+    // Add plugin active indicator for CSS layout override
+    documentElement.classList.add('themes-plugin-active');
+    
+    // Check and apply analytics integration
+    checkAnalyticsStatus();
+    
+    // Apply layout classes for navigation
+    applyLayoutClasses();
+
+    // Initialize layout enhancer
+    const initLayoutEnhancer = async () => {
+      try {
+        const { layoutEnhancer } = await import('../scripts/layout-enhancer');
+        layoutEnhancer.setEnabled(true);
+        
+        // Give it a moment for the theme classes to be applied
+        setTimeout(() => {
+          layoutEnhancer.applyProgressiveEnhancements();
+        }, 100);
+      } catch (error) {
+        console.warn('Layout enhancer not available:', error);
+      }
+    };
+    initLayoutEnhancer();
+
+    // Unify with TailwindCSS dark mode
+    if (currentTheme === 'dark' || currentTheme === 'advanced') {
+      documentElement.classList.add('dark');
+    } else {
+      documentElement.classList.remove('dark');
+    }
     
     // Apply CSS custom properties
     Object.entries(theme.colors).forEach(([property, value]) => {
@@ -204,19 +297,132 @@ export const ThemeProvider: React.FC<{
   const setTheme = (theme: ThemeType) => {
     if (pluginConfig.availableThemes.includes(theme)) {
       setCurrentTheme(theme);
-      setPluginConfig(prev => ({ ...prev, activeTheme: theme }));
+      const newConfig = { ...pluginConfig, activeTheme: theme };
+      setPluginConfig(newConfig);
+      
+      // Sync to server - fire and forget
+      syncConfigToServer(newConfig);
     }
   };
 
   const isPluginEnabled = () => pluginConfig.enabled;
 
   const togglePlugin = (enabled: boolean) => {
-    setPluginConfig(prev => ({ ...prev, enabled }));
+    const newConfig = { ...pluginConfig, enabled };
+    setPluginConfig(newConfig);
     
     if (!enabled) {
-      // Remove all theme classes when disabled
+      // Remove all theme classes and CSS properties when disabled
       const documentElement = document.documentElement;
       documentElement.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
+      documentElement.classList.remove('themes-plugin-active');
+      documentElement.classList.remove('dark');
+      
+      // Remove theme CSS custom properties
+      const themeProperties = [
+        '--background', '--foreground', '--card', '--card-foreground',
+        '--popover', '--popover-foreground', '--primary', '--primary-foreground',
+        '--secondary', '--secondary-foreground', '--muted', '--muted-foreground',
+        '--accent', '--accent-foreground', '--destructive', '--destructive-foreground',
+        '--border', '--input', '--ring', '--gradient', '--glass-bg', '--glass-blur'
+      ];
+      
+      themeProperties.forEach(property => {
+        documentElement.style.removeProperty(property);
+      });
+    }
+    
+    // Sync to server - fire and forget
+    syncConfigToServer(newConfig);
+  };
+
+  const syncConfigToServer = async (config: ThemePluginConfig) => {
+    try {
+      // Get current main config from server
+      const response = await fetch('/api/config');
+      if (response.ok) {
+        const mainConfig = await response.json();
+        
+        // Update the themes section
+        const updatedConfig = {
+          ...mainConfig,
+          plugins: {
+            ...mainConfig.plugins,
+            themes: config
+          }
+        };
+        
+        // Save back to server
+        await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedConfig)
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to sync theme config to server:', error);
+    }
+  };
+  
+  const checkAnalyticsStatus = () => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
+    const documentElement = document.documentElement;
+    
+    // Check for analytics plugin indicators
+    const analyticsEnabled = 
+      localStorage.getItem('analytics-enabled') === 'true' ||
+      document.querySelector('[data-analytics="true"]') ||
+      window.location.search.includes('analytics=true') ||
+      // Check if Mission Control tab exists
+      document.querySelector('[class*="mission-control"]') ||
+      // Check for analytics plugin global
+      (window as any).__ANALYTICS_PLUGIN__;
+
+    if (analyticsEnabled) {
+      documentElement.setAttribute('data-analytics', 'enabled');
+      console.log('📊 Analytics detected - enabling Mission Control navigation');
+    } else {
+      documentElement.removeAttribute('data-analytics');
+    }
+  };
+  
+  const applyLayoutClasses = () => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
+    // Apply nav-tabs class to tab containers
+    const tabContainers = document.querySelectorAll('[role="tablist"], .tabs-container, [data-tabs]');
+    tabContainers.forEach(container => {
+      container.classList.add('nav-tabs');
+      if (currentTheme !== 'advanced') {
+        container.classList.add('modern-tab-container');
+      }
+    });
+    
+    // Apply nav-tab class to individual tabs
+    const tabs = document.querySelectorAll('[role="tab"], .tab, [data-tab]');
+    tabs.forEach(tab => {
+      tab.classList.add('nav-tab');
+      if (currentTheme !== 'advanced') {
+        tab.classList.add('modern-tab');
+      }
+    });
+    
+    // Create Mission Control tab if analytics enabled and doesn't exist
+    if (document.documentElement.hasAttribute('data-analytics')) {
+      const tabContainer = document.querySelector('[role="tablist"], .nav-tabs');
+      if (tabContainer && !document.querySelector('.mission-control-tab, [data-tab="mission-control"]')) {
+        const missionControlTab = document.createElement('button');
+        missionControlTab.className = 'nav-tab mission-control-tab';
+        missionControlTab.setAttribute('data-tab', 'mission-control');
+        missionControlTab.textContent = '🎯 Mission Control';
+        missionControlTab.addEventListener('click', () => {
+          // Navigate to mission control
+          const event = new CustomEvent('navigate-mission-control');
+          document.dispatchEvent(event);
+        });
+        tabContainer.appendChild(missionControlTab);
+      }
     }
   };
 

@@ -1,15 +1,73 @@
 /**
  * Themes Plugin - Main CSS File
  * Unified styling system for Light, Dark, and Advanced themes
+ * NOW WITH COMPLETE ADVANCED THEME COMPONENTS
  */
 
 @import './variables.css';
 @import './components.css';
+@import './advanced-complete.css';
+@import './layout-transformations.css';
+@import './component-integration.css';
+@import './advanced-animations.css'; */
+
 
 /* Plugin activation styles */
 .themes-plugin-active {
   /* Indicate that themes plugin is active */
   --themes-plugin-enabled: 1;
+}
+
+/* Override Tailwind CSS variables with high specificity for our themes */
+html.theme-light {
+  --background: oklch(0.98 0 0) !important;
+  --foreground: oklch(0.2 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --card-foreground: oklch(0.15 0 0) !important;
+  --primary: oklch(0.5 0.15 220) !important;
+  --primary-foreground: oklch(0.98 0 0) !important;
+  --secondary: oklch(0.94 0 0) !important;
+  --secondary-foreground: oklch(0.2 0 0) !important;
+  --muted: oklch(0.94 0 0) !important;
+  --muted-foreground: oklch(0.5 0 0) !important;
+  --accent: oklch(0.92 0 0) !important;
+  --accent-foreground: oklch(0.2 0 0) !important;
+  --border: oklch(0.9 0 0) !important;
+  --input: oklch(0.92 0 0) !important;
+}
+
+html.theme-dark {
+  --background: oklch(0.12 0 0) !important;
+  --foreground: oklch(0.9 0 0) !important;
+  --card: oklch(0.18 0 0) !important;
+  --card-foreground: oklch(0.9 0 0) !important;
+  --primary: oklch(0.65 0.15 200) !important;
+  --primary-foreground: oklch(0.12 0 0) !important;
+  --secondary: oklch(0.25 0 0) !important;
+  --secondary-foreground: oklch(0.9 0 0) !important;
+  --muted: oklch(0.25 0 0) !important;
+  --muted-foreground: oklch(0.65 0 0) !important;
+  --accent: oklch(0.28 0 0) !important;
+  --accent-foreground: oklch(0.9 0 0) !important;
+  --border: oklch(0.25 0 0) !important;
+  --input: oklch(0.22 0 0) !important;
+}
+
+html.theme-advanced {
+  --background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(20,40,70,0.95)) !important;
+  --foreground: oklch(0.95 0 0) !important;
+  --card: rgba(255, 255, 255, 0.1) !important;
+  --card-foreground: oklch(0.95 0 0) !important;
+  --primary: oklch(0.75 0.2 340) !important;
+  --primary-foreground: oklch(0.95 0 0) !important;
+  --secondary: rgba(255, 255, 255, 0.2) !important;
+  --secondary-foreground: oklch(0.95 0 0) !important;
+  --muted: rgba(255, 255, 255, 0.1) !important;
+  --muted-foreground: oklch(0.7 0 0) !important;
+  --accent: rgba(255, 255, 255, 0.15) !important;
+  --accent-foreground: oklch(0.95 0 0) !important;
+  --border: rgba(255, 255, 255, 0.2) !important;
+  --input: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Global body styling for each theme */
@@ -211,19 +269,17 @@
 }
 
 /* Theme plugin utilities */
-.themes-plugin-selector {
-  /* Custom styling for the theme selector component */
-  .theme-option {
-    @apply transition-all duration-200 ease-out;
-  }
-  
-  .theme-option:hover {
-    @apply scale-105;
-  }
-  
-  .theme-option.selected {
-    @apply ring-2 ring-blue-500;
-  }
+.themes-plugin-selector .theme-option {
+  transition: all 0.2s ease-out;
+}
+
+.themes-plugin-selector .theme-option:hover {
+  transform: scale(1.05);
+}
+
+.themes-plugin-selector .theme-option.selected {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 /* Animation keyframes for advanced theme */
@@ -243,6 +299,181 @@
 
 .theme-advanced .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* 
+ * Forțăm aplicarea stilurilor pentru a înlocui cele hardcodate din componentele autorului
+ * Aceste reguli au prioritate foarte mare pentru a suprascrie stilurile existente
+ */
+
+/* Forțăm aplicarea culorilor de fundal */
+.theme-light .bg-background,
+.theme-light .bg-white,
+.theme-light .bg-gray-50 {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-dark .bg-background,
+.theme-dark .bg-white,
+.theme-dark .bg-gray-50,
+.theme-dark .bg-gray-900,
+.theme-dark .bg-gray-800 {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-advanced .bg-background,
+.theme-advanced .bg-white,
+.theme-advanced .bg-gray-50,
+.theme-advanced .bg-gray-900,
+.theme-advanced .bg-gray-800 {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Forțăm aplicarea culorilor de card */
+.theme-light .bg-card,
+.theme-light .bg-white,
+.theme-light .rounded-lg,
+.theme-light .border {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .bg-card,
+.theme-dark .bg-white,
+.theme-dark .rounded-lg,
+.theme-dark .border {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-advanced .bg-card,
+.theme-advanced .bg-white,
+.theme-advanced .rounded-lg,
+.theme-advanced .border {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+}
+
+/* Forțăm aplicarea culorilor de text */
+.theme-light .text-foreground,
+.theme-light .text-gray-900,
+.theme-light .text-gray-800,
+.theme-light .text-black {
+  color: var(--foreground) !important;
+}
+
+.theme-light .text-muted-foreground,
+.theme-light .text-gray-500,
+.theme-light .text-gray-400 {
+  color: var(--muted-foreground) !important;
+}
+
+.theme-dark .text-foreground,
+.theme-dark .text-gray-900,
+.theme-dark .text-gray-800,
+.theme-dark .text-black {
+  color: var(--foreground) !important;
+}
+
+.theme-dark .text-muted-foreground,
+.theme-dark .text-gray-500,
+.theme-dark .text-gray-400 {
+  color: var(--muted-foreground) !important;
+}
+
+.theme-advanced .text-foreground,
+.theme-advanced .text-gray-900,
+.theme-advanced .text-gray-800,
+.theme-advanced .text-black {
+  color: var(--foreground) !important;
+}
+
+.theme-advanced .text-muted-foreground,
+.theme-advanced .text-gray-500,
+.theme-advanced .text-gray-400 {
+  color: var(--muted-foreground) !important;
+}
+
+/* Forțăm aplicarea butoanelor */
+.theme-light .btn-primary,
+.theme-light .bg-blue-500 {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+}
+
+.theme-light .btn-secondary,
+.theme-light .bg-gray-200 {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .btn-primary,
+.theme-dark .bg-blue-500 {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+}
+
+.theme-dark .btn-secondary,
+.theme-dark .bg-gray-200,
+.theme-dark .bg-gray-700,
+.theme-dark .bg-gray-800 {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-advanced .btn-primary,
+.theme-advanced .bg-blue-500 {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+}
+
+.theme-advanced .btn-secondary,
+.theme-advanced .bg-gray-200,
+.theme-advanced .bg-gray-700,
+.theme-advanced .bg-gray-800 {
+  background: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
+}
+
+/* Forțăm aplicarea inputurilor */
+.theme-light .input-base,
+.theme-light input,
+.theme-light .border {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .input-base,
+.theme-dark input,
+.theme-dark .border {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-advanced .input-base,
+.theme-advanced input,
+.theme-advanced .border {
+  background: var(--input) !important;
+  color: var(--foreground) !important;
+  border: var(--glass-border) !important;
+  backdrop-filter: var(--glass-blur) !important;
 }
 
 /* Compatibility with existing components */

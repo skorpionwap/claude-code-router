@@ -5,14 +5,12 @@
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import ThemeSelector from './components/ThemeSelector';
-import { 
-  ThemeType, 
-  ThemePluginConfig, 
+import type {
+  ThemeType,
+  ThemePluginConfig,
   ThemePluginAPI,
-  ThemeDefinition 
-} from './types';
-
-// Export components for external use
+  ThemeDefinition
+} from './types';// Export components for external use
 export { ThemeProvider, useTheme, ThemeSelector };
 export type { ThemeType, ThemePluginConfig, ThemeDefinition };
 
@@ -58,8 +56,10 @@ class ThemesPluginAPI implements ThemePluginAPI {
       // Mark as registered
       this.isRegistered = true;
       
-      // Expose global API
-      window.__THEMES_PLUGIN__ = this;
+      // Expose global API (browser only)
+      if (typeof window !== 'undefined') {
+        window.__THEMES_PLUGIN__ = this;
+      }
       
       console.log(`✅ Themes Plugin v${this.version} registered successfully`);
     } catch (error) {
@@ -81,8 +81,10 @@ class ThemesPluginAPI implements ThemePluginAPI {
       // Remove plugin styles
       this.removePluginStyles();
       
-      // Clean up global API
-      delete window.__THEMES_PLUGIN__;
+      // Clean up global API (browser only)
+      if (typeof window !== 'undefined') {
+        delete window.__THEMES_PLUGIN__;
+      }
       
       this.isRegistered = false;
       
@@ -113,8 +115,8 @@ class ThemesPluginAPI implements ThemePluginAPI {
       this.applyThemeToDocument();
     }
     
-    // Save to localStorage if persistence is enabled
-    if (this.currentConfig.persistUserChoice) {
+    // Save to localStorage if persistence is enabled (browser only)
+    if (this.currentConfig.persistUserChoice && typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem('claude-router-theme-plugin', JSON.stringify({
           activeTheme: this.currentConfig.activeTheme,
@@ -135,7 +137,13 @@ class ThemesPluginAPI implements ThemePluginAPI {
       return;
     }
     
+    const previousTheme = this.currentConfig.activeTheme;
     this.setConfig({ activeTheme: theme });
+    
+    // Theme change is handled by ThemeContext through layout enhancer
+    if (previousTheme !== theme) {
+      console.log(`🎨 Theme changed from ${previousTheme} to ${theme}`);
+    }
   }
   
   /**
@@ -153,10 +161,11 @@ class ThemesPluginAPI implements ThemePluginAPI {
   }
   
   /**
-   * Apply theme classes to a specific element
+   * Apply theme classes to a specific element (browser only)
    */
   applyToElement(element: HTMLElement): void {
     if (!this.isRegistered || !this.currentConfig.enabled) return;
+    if (typeof window === 'undefined') return; // Skip in Node.js
     
     // Remove existing theme classes
     element.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
@@ -174,11 +183,17 @@ class ThemesPluginAPI implements ThemePluginAPI {
   }
   
   /**
-   * Private: Load plugin CSS files
+   * Private: Load plugin CSS files (browser only)
    */
   private loadPluginStyles(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      console.log('Themes plugin: CSS loading skipped (Node.js environment)');
+      return;
+    }
+    
     const cssFiles = [
-      '/plugins/themes/styles/themes.css'
+      '/plugins/themes/styles/themes.css',
+      '/plugins/themes/styles/advanced-animations.css'
     ];
     
     cssFiles.forEach((cssFile) => {
@@ -194,6 +209,7 @@ class ThemesPluginAPI implements ThemePluginAPI {
       document.head.appendChild(link);
     });
   }
+
   
   /**
    * Private: Remove plugin CSS files
@@ -204,10 +220,14 @@ class ThemesPluginAPI implements ThemePluginAPI {
   }
   
   /**
-   * Private: Apply theme to document
+   * Private: Apply theme to document (browser only)
    */
   private applyThemeToDocument(): void {
     if (!this.currentConfig.enabled) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      console.log('Themes plugin: Document theming skipped (Node.js environment)');
+      return;
+    }
     
     const documentElement = document.documentElement;
     
@@ -219,12 +239,45 @@ class ThemesPluginAPI implements ThemePluginAPI {
     
     // Add plugin active indicator
     documentElement.classList.add('themes-plugin-active');
+    
+    // Check and set analytics status
+    this.checkAnalyticsStatus();
+  }
+
+  /**
+   * Check if analytics plugin is enabled and update HTML attributes
+   */
+  private checkAnalyticsStatus(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
+    // Check for analytics plugin indicators
+    const analyticsEnabled = 
+      localStorage.getItem('analytics-enabled') === 'true' ||
+      document.querySelector('[data-analytics="true"]') ||
+      window.location.search.includes('analytics=true') ||
+      // Check if Mission Control tab exists
+      document.querySelector('[class*="mission-control"]') ||
+      // Check for analytics plugin global
+      (window as any).__ANALYTICS_PLUGIN__;
+
+    if (analyticsEnabled) {
+      document.documentElement.setAttribute('data-analytics', 'enabled');
+      console.log('📊 Analytics detected - notifying analytics plugin');
+      // Notify analytics plugin to show its button
+      window.dispatchEvent(new CustomEvent('themes-plugin-analytics-enabled'));
+    } else {
+      document.documentElement.removeAttribute('data-analytics');
+      // Notify analytics plugin to hide its button
+      window.dispatchEvent(new CustomEvent('themes-plugin-analytics-disabled'));
+    }
   }
   
   /**
-   * Private: Remove all theme classes
+   * Private: Remove all theme classes (browser only)
    */
   private removeThemeClasses(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const documentElement = document.documentElement;
     documentElement.classList.remove(
       'theme-light', 
@@ -235,9 +288,15 @@ class ThemesPluginAPI implements ThemePluginAPI {
   }
   
   /**
-   * Initialize from localStorage
+   * Initialize from localStorage (browser only)
    */
   private initializeFromStorage(): void {
+    // Skip localStorage operations in Node.js environment
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      console.log('Themes plugin: localStorage not available (Node.js environment)');
+      return;
+    }
+    
     try {
       const saved = localStorage.getItem('claude-router-theme-plugin');
       if (saved) {
@@ -298,12 +357,30 @@ class ThemesPluginAPI implements ThemePluginAPI {
    */
   private enableAnalyticsPlugin(): void {
     try {
-      // Emit event pentru a semnala că analytics trebuie activat
-      window.dispatchEvent(new CustomEvent('enable-analytics-plugin', {
-        detail: { source: 'themes-plugin' }
-      }));
-      
-      console.log('📊 Analytics plugin activation requested');
+      // Trimite cerere către server pentru a activa pluginul analytics
+      fetch('/api/plugins/analytics/enable', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ source: 'themes-plugin' })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('📊 Analytics plugin activation requested successfully');
+          
+          // Emit event pentru a semnala că analytics a fost activat în UI
+          window.dispatchEvent(new CustomEvent('analytics-plugin-enabled', {
+            detail: { source: 'themes-plugin' }
+          }));
+        } else {
+          console.warn('Failed to enable analytics plugin:', data.error);
+        }
+      })
+      .catch(error => {
+        console.warn('Failed to enable analytics plugin:', error);
+      });
     } catch (error) {
       console.warn('Failed to enable analytics plugin:', error);
     }
@@ -334,6 +411,28 @@ class ThemesPluginAPI implements ThemePluginAPI {
   isEnhancedUIExperienceEnabled(): boolean {
     return this.currentConfig.enabled && (this.currentConfig.enableEnhancedUIExperience || false);
   }
+
+  /**
+   * Enable analytics integration manually
+   */
+  enableAnalyticsIntegration(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('analytics-enabled', 'true');
+      this.checkAnalyticsStatus();
+      console.log('📊 Analytics integration enabled manually');
+    }
+  }
+
+  /**
+   * Disable analytics integration
+   */
+  disableAnalyticsIntegration(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('analytics-enabled');
+      this.checkAnalyticsStatus();
+      console.log('📊 Analytics integration disabled');
+    }
+  }
   
   constructor() {
     this.initializeFromStorage();
@@ -351,7 +450,7 @@ export function initializeThemesPlugin(config?: Partial<ThemePluginConfig>): The
     themesPlugin.setConfig(config);
   }
   
-  if (!window.__THEMES_PLUGIN__) {
+  if (typeof window !== 'undefined' && !window.__THEMES_PLUGIN__) {
     themesPlugin.register();
   }
   
@@ -362,7 +461,7 @@ export function initializeThemesPlugin(config?: Partial<ThemePluginConfig>): The
  * React Hook for using the themes plugin
  */
 export function useThemesPlugin() {
-  const plugin = window.__THEMES_PLUGIN__ || themesPlugin;
+  const plugin = (typeof window !== 'undefined' && window.__THEMES_PLUGIN__) || themesPlugin;
   
   return {
     setTheme: plugin.setTheme.bind(plugin),
