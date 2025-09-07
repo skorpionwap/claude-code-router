@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 export interface PluginSettingsComponent {
@@ -33,7 +33,7 @@ interface PluginProviderProps {
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
   const [plugins, setPlugins] = useState<PluginSettingsComponent[]>([]);
 
-  const registerPlugin = (plugin: PluginSettingsComponent) => {
+  const registerPlugin = useCallback((plugin: PluginSettingsComponent) => {
     setPlugins(prev => {
       const exists = prev.find(p => p.id === plugin.id);
       if (exists) {
@@ -41,13 +41,13 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
       }
       return [...prev, plugin];
     });
-  };
+  }, []);
 
-  const unregisterPlugin = (id: string) => {
+  const unregisterPlugin = useCallback((id: string) => {
     setPlugins(prev => prev.filter(p => p.id !== id));
-  };
+  }, []);
 
-  const togglePlugin = (id: string, enabled: boolean) => {
+  const togglePlugin = useCallback((id: string, enabled: boolean) => {
     setPlugins(prev => 
       prev.map(p => p.id === id ? { ...p, enabled } : p)
     );
@@ -59,7 +59,7 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     window.dispatchEvent(new CustomEvent('plugin-state-changed', {
       detail: { id, enabled }
     }));
-  };
+  }, []);
 
   const contextValue: PluginContextType = {
     plugins,

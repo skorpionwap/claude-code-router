@@ -178,7 +178,7 @@ export const ThemeProvider: React.FC<{
         console.warn('Failed to load theme plugin data from localStorage:', error);
       }
     }
-  }, [pluginConfig.persistUserChoice, initialConfig?.activeTheme]);
+  }, [initialConfig?.activeTheme]); // FIXED: Remove pluginConfig.persistUserChoice to prevent infinite loop
 
   // Apply theme to document element
   useEffect(() => {
@@ -252,7 +252,7 @@ export const ThemeProvider: React.FC<{
         console.warn('Failed to save theme plugin data to localStorage:', error);
       }
     }
-  }, [currentTheme, pluginConfig]);
+  }, [currentTheme, pluginConfig.enabled]); // FIXED: Remove full pluginConfig to prevent infinite loop
 
   // Auto-apply system theme
   useEffect(() => {

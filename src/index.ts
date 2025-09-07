@@ -139,7 +139,7 @@ async function run(options: RunOptions = {}) {
     logger: loggerConfig,
   });
   
-  // Plugin loading system
+  // Plugin loading system - FIXED AND RE-ENABLED
   const pluginsConfig = config.plugins || {};
   if (pluginsConfig.analytics?.enabled) {
     const AnalyticsPlugin = require('../plugins/analytics').default;
@@ -374,7 +374,7 @@ async function run(options: RunOptions = {}) {
     done(null, payload)
   });
   server.addHook("onSend", async (req, reply, payload) => {
-    console.log('主应用onSend')
+    // console.log('主应用onSend') // REMOVED DEBUG LOG
     event.emit('onSend', req, reply, payload);
     return payload;
   })

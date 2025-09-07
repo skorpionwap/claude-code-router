@@ -12,11 +12,18 @@ import { PluginProvider } from "@/contexts/PluginContext";
 import { api } from "@/lib/api";
 import { Settings, Languages, Save, RefreshCw, FileJson, CircleArrowUp } from "lucide-react";
 
-// Lazy load MissionControlTab from plugin
+// Lazy load MissionControlTab from plugin - RE-ENABLED
 const MissionControlTab = React.lazy(() => 
   import('@plugins/analytics/ui/components/dashboard/tabs/MissionControlTab')
     .then(module => ({ default: module.MissionControlTab }))
     .catch(() => ({ default: () => <div>Analytics plugin not available</div> }))
+);
+
+// Lazy load AnalyticsButton from plugin
+const AnalyticsButton = React.lazy(() => 
+  import('@plugins/analytics/ui/AnalyticsButton')
+    .then(module => ({ default: module.AnalyticsButton }))
+    .catch(() => ({ default: () => null }))
 );
 import {
   Popover,
@@ -188,7 +195,7 @@ function App() {
     } finally {
       setIsCheckingUpdate(false);
     }
-  }, [hasCheckedUpdate, isNewVersionAvailable, t]);
+  }, [isNewVersionAvailable, t]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -196,7 +203,7 @@ function App() {
       if (config) {
         setIsCheckingAuth(false);
         // 自动检查更新，但不显示对话框
-        if (!hasCheckedUpdate && !hasAutoCheckedUpdate.current) {
+        if (!hasAutoCheckedUpdate.current) {
           hasAutoCheckedUpdate.current = true;
           checkForUpdates(false);
         }
@@ -226,7 +233,7 @@ function App() {
       } finally {
         setIsCheckingAuth(false);
         // 在获取配置完成后检查更新，但不显示对话框
-        if (!hasCheckedUpdate && !hasAutoCheckedUpdate.current) {
+        if (!hasAutoCheckedUpdate.current) {
           hasAutoCheckedUpdate.current = true;
           checkForUpdates(false);
         }
@@ -245,7 +252,7 @@ function App() {
     return () => {
       window.removeEventListener('unauthorized', handleUnauthorized);
     };
-  }, [config, navigate, hasCheckedUpdate, checkForUpdates]);
+  }, [config, navigate]);
   
   // 执行更新函数
   const performUpdate = async () => {
@@ -296,6 +303,11 @@ function App() {
 
   return (
     <PluginProvider>
+      {/* Analytics Button - self-contained plugin component */}
+      <Suspense fallback={null}>
+        <AnalyticsButton />
+      </Suspense>
+      
       <div className="h-screen bg-gray-50 font-sans">
       <header className="flex h-16 items-center justify-between border-b bg-white px-6">
         <div className="flex items-center gap-6">
@@ -461,7 +473,7 @@ function App() {
           onClose={() => setToast(null)} 
         />
       )}
-    </div>
+      </div>
     </PluginProvider>
   );
 }

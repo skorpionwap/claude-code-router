@@ -28,10 +28,10 @@ interface SettingsDialogProps {
 export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
-  const { plugins, registerPlugin } = usePlugins();
+  const { plugins, registerPlugin } = usePlugins(); // ENABLED FOR TESTING
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
 
-  // Register plugins on mount
+  // Register both themes and analytics plugins - ONLY ONCE
   useEffect(() => {
     const registerPlugins = async () => {
       try {
@@ -60,7 +60,7 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
     };
 
     registerPlugins();
-  }, [registerPlugin]);
+  }, []); // FIXED: Empty dependency array - register only once
 
   if (!config) {
     return null;
@@ -145,10 +145,10 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
           </div>
           
           
-          {/* Plugin Management */}
+          {/* Plugin Management - BOTH PLUGINS ENABLED */}
           <div className="space-y-4 border-t pt-4">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">🔌 Plugin Management</Label>
+              <Label className="text-sm font-medium">🔌 Plugin Management (Fixed)</Label>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
