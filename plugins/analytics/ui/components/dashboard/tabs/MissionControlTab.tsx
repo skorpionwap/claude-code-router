@@ -10,6 +10,7 @@ import type { MissionControlData, ModelStat, HealthHistoryData } from '@plugins/
 import { api } from '@/lib/api';
 import { analyticsAPI } from '@plugins/analytics/ui/lib/analytics';
 import type { RealtimeStats, ModelStats } from '@plugins/analytics/ui/lib/analytics';
+import '@plugins/analytics/styles/mission-control.css';
 
 interface RouteCardData {
   route: string;

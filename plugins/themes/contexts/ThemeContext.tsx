@@ -185,12 +185,12 @@ export const ThemeProvider: React.FC<{
     const documentElement = document.documentElement;
     
     if (!pluginConfig.enabled) {
-      // Remove all theme classes when plugin is disabled
+      // COMPREHENSIVE CLEANUP when plugin is disabled
       documentElement.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
       documentElement.classList.remove('themes-plugin-active');
       documentElement.classList.remove('dark');
       
-      // Remove any CSS custom properties that might have been set
+      // Remove ALL theme CSS custom properties
       const themeProperties = [
         '--background', '--foreground', '--card', '--card-foreground',
         '--popover', '--popover-foreground', '--primary', '--primary-foreground',
@@ -203,10 +203,46 @@ export const ThemeProvider: React.FC<{
         documentElement.style.removeProperty(property);
       });
       
-      // Layout enhancer removed - using pure CSS approach
+      // Remove plugin CSS files completely
+      const pluginStyles = document.querySelectorAll('link[data-themes-plugin="true"]');
+      pluginStyles.forEach(style => {
+        console.log(`🧹 Removing plugin CSS: ${style.getAttribute('href')}`);
+        style.remove();
+      });
       
+      // Reset to system default classes
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isSystemDark) {
+        documentElement.classList.add('dark');
+      }
+      
+      console.log('🔄 Themes plugin disabled - reverted to system defaults');
       return;
     }
+
+    // Load plugin CSS when enabled
+    const loadPluginCSS = () => {
+      const cssFiles = [
+        '/plugins/themes/styles/themes.css',
+        '/plugins/themes/styles/variables.css', 
+        '/plugins/themes/styles/modern-effects.css',
+        '/plugins/themes/styles/components.css'
+      ];
+      
+      cssFiles.forEach(cssFile => {
+        if (!document.querySelector(`link[href="${cssFile}"]`)) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = cssFile;
+          link.setAttribute('data-themes-plugin', 'true');
+          document.head.appendChild(link);
+          console.log(`✅ Loaded plugin CSS: ${cssFile}`);
+        }
+      });
+    };
+
+    // Load CSS first, then apply theme
+    loadPluginCSS();
 
     const theme = THEME_DEFINITIONS[currentTheme];
     
@@ -224,8 +260,6 @@ export const ThemeProvider: React.FC<{
     
     // Apply layout classes for navigation
     applyLayoutClasses();
-
-    // Using pure CSS approach for layout transformations
 
     // Unify with TailwindCSS dark mode
     if (currentTheme === 'dark' || currentTheme === 'advanced') {
@@ -271,6 +305,22 @@ export const ThemeProvider: React.FC<{
     }
   }, [pluginConfig.autoApplySystemTheme, pluginConfig.enabled]);
 
+  // Listen for plugin state changes from PluginContext
+  useEffect(() => {
+    const handlePluginStateChange = (event: CustomEvent) => {
+      const { id, enabled } = event.detail;
+      if (id === 'themes') {
+        console.log('🔌 Received plugin state change from PluginContext:', enabled);
+        if (pluginConfig.enabled !== enabled) {
+          togglePlugin(enabled);
+        }
+      }
+    };
+
+    window.addEventListener('plugin-state-changed', handlePluginStateChange as EventListener);
+    return () => window.removeEventListener('plugin-state-changed', handlePluginStateChange as EventListener);
+  }, [pluginConfig.enabled]);
+
   const setTheme = (theme: ThemeType) => {
     if (pluginConfig.availableThemes.includes(theme)) {
       setCurrentTheme(theme);
@@ -289,13 +339,15 @@ export const ThemeProvider: React.FC<{
     setPluginConfig(newConfig);
     
     if (!enabled) {
-      // Remove all theme classes and CSS properties when disabled
+      // COMPREHENSIVE CLEANUP when disabled
       const documentElement = document.documentElement;
+      
+      // Remove all theme classes
       documentElement.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
       documentElement.classList.remove('themes-plugin-active');
       documentElement.classList.remove('dark');
       
-      // Remove theme CSS custom properties
+      // Remove ALL theme CSS custom properties
       const themeProperties = [
         '--background', '--foreground', '--card', '--card-foreground',
         '--popover', '--popover-foreground', '--primary', '--primary-foreground',
@@ -307,6 +359,28 @@ export const ThemeProvider: React.FC<{
       themeProperties.forEach(property => {
         documentElement.style.removeProperty(property);
       });
+      
+      // REMOVE PLUGIN CSS FILES COMPLETELY
+      const pluginStyles = document.querySelectorAll('link[data-themes-plugin="true"]');
+      pluginStyles.forEach(style => {
+        console.log(`🧹 Completely removing plugin CSS: ${style.getAttribute('href')}`);
+        style.remove();
+      });
+      
+      // Also remove any injected style elements
+      const pluginStyleTags = document.querySelectorAll('style[data-themes-plugin="true"]');
+      pluginStyleTags.forEach(style => style.remove());
+      
+      // Reset to system default
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isSystemDark) {
+        documentElement.classList.add('dark');
+      }
+      
+      console.log('🧹 Themes plugin completely disabled - CSS removed, reverted to system defaults');
+    } else {
+      // Re-apply current theme when enabled
+      console.log('🎨 Themes plugin re-enabled, CSS will be loaded and theme applied:', currentTheme);
     }
     
     // Sync to server - fire and forget

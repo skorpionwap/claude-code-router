@@ -37,9 +37,13 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     setPlugins(prev => {
       const exists = prev.find(p => p.id === plugin.id);
       if (exists) {
-        return prev.map(p => p.id === plugin.id ? plugin : p);
+        // Update existing plugin with current enabled state from localStorage
+        const currentEnabled = localStorage.getItem(`${plugin.id}-enabled`) === 'true';
+        return prev.map(p => p.id === plugin.id ? { ...plugin, enabled: currentEnabled } : p);
       }
-      return [...prev, plugin];
+      // Add new plugin with state from localStorage
+      const currentEnabled = localStorage.getItem(`${plugin.id}-enabled`) === 'true';
+      return [...prev, { ...plugin, enabled: currentEnabled }];
     });
   }, []);
 
@@ -59,6 +63,21 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     window.dispatchEvent(new CustomEvent('plugin-state-changed', {
       detail: { id, enabled }
     }));
+    
+    console.log(`🔌 PluginContext: ${id} toggled to ${enabled}`);
+  }, []);
+
+  // Listen for plugin state changes and sync with localStorage
+  useEffect(() => {
+    const handlePluginStateChange = (event: CustomEvent) => {
+      const { id, enabled } = event.detail;
+      setPlugins(prev => 
+        prev.map(p => p.id === id ? { ...p, enabled } : p)
+      );
+    };
+
+    window.addEventListener('plugin-state-changed', handlePluginStateChange as EventListener);
+    return () => window.removeEventListener('plugin-state-changed', handlePluginStateChange as EventListener);
   }, []);
 
   const contextValue: PluginContextType = {

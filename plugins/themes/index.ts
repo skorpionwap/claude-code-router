@@ -193,7 +193,9 @@ class ThemesPluginAPI implements ThemePluginAPI {
     
     const cssFiles = [
       '/plugins/themes/styles/themes.css',
-      '/plugins/themes/styles/advanced-animations.css'
+      '/plugins/themes/styles/variables.css',
+      '/plugins/themes/styles/modern-effects.css',
+      '/plugins/themes/styles/components.css'
     ];
     
     cssFiles.forEach((cssFile) => {
@@ -207,6 +209,8 @@ class ThemesPluginAPI implements ThemePluginAPI {
       link.href = cssFile;
       link.setAttribute('data-themes-plugin', 'true');
       document.head.appendChild(link);
+      
+      console.log(`✅ Themes plugin CSS loaded: ${cssFile}`);
     });
   }
 
@@ -215,8 +219,22 @@ class ThemesPluginAPI implements ThemePluginAPI {
    * Private: Remove plugin CSS files
    */
   private removePluginStyles(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      console.log('Themes plugin: CSS cleanup skipped (Node.js environment)');
+      return;
+    }
+    
     const pluginStyles = document.querySelectorAll('link[data-themes-plugin="true"]');
-    pluginStyles.forEach(style => style.remove());
+    pluginStyles.forEach(style => {
+      console.log(`🧹 Removing themes plugin CSS: ${style.getAttribute('href')}`);
+      style.remove();
+    });
+    
+    // Also remove any injected style elements
+    const pluginStyleTags = document.querySelectorAll('style[data-themes-plugin="true"]');
+    pluginStyleTags.forEach(style => style.remove());
+    
+    console.log('✅ All themes plugin CSS removed');
   }
   
   /**

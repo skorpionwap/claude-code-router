@@ -1,12 +1,10 @@
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
-import type { ThemeType } from '../types';
 
 interface ThemeOption {
-  id: ThemeType;
+  id: 'light' | 'dark' | 'advanced';
   label: string;
   description: string;
-  icon: string;
   previewColors: {
     primary: string;
     secondary: string;
@@ -16,52 +14,49 @@ interface ThemeOption {
   };
 }
 
-const THEME_OPTIONS: ThemeOption[] = [
+const themeOptions: ThemeOption[] = [
   {
     id: 'light',
-    label: 'Light Theme',
-    description: 'Clean and professional light theme',
-    icon: '☀️',
+    label: 'Classic Light',
+    description: 'Clean and professional',
     previewColors: {
-      primary: '#1e293b',
-      secondary: '#f8fafc',
+      primary: '#ffffff',
+      secondary: '#f3f4f6',
       accent: '#3b82f6',
       background: '#ffffff',
-      border: '#e2e8f0'
+      border: '#e5e7eb'
     }
   },
   {
     id: 'dark',
-    label: 'Dark Theme', 
-    description: 'Elegant and sophisticated dark experience',
-    icon: '🌙',
+    label: 'Classic Dark',
+    description: 'Dark and elegant',
     previewColors: {
-      primary: '#f1f5f9',
-      secondary: '#334155',
+      primary: '#1f2937',
+      secondary: '#374151',
       accent: '#60a5fa',
-      background: '#0f172a',
-      border: '#334155'
+      background: '#111827',
+      border: '#4b5563'
     }
   },
   {
     id: 'advanced',
-    label: 'Advanced Theme',
-    description: 'Spectacular glassmorphism space experience',
-    icon: '🚀',
+    label: '🚀 Advanced Space',
+    description: 'Glassmorphism effects',
     previewColors: {
-      primary: 'rgba(255, 255, 255, 0.95)',
-      secondary: 'rgba(255, 255, 255, 0.25)',
-      accent: '#e94560',
-      background: 'rgba(45,45,75,0.95)',
+      primary: 'rgba(42, 42, 62, 0.9)',
+      secondary: 'rgba(38, 49, 78, 0.8)',
+      accent: 'rgba(31, 68, 112, 0.9)',
+      background: 'linear-gradient(135deg, #2a2a3e, #26314e, #1f4470)',
       border: 'rgba(255, 255, 255, 0.2)'
     }
   }
 ];
 
-const ThemeSelector: React.FC = () => {
+const ThemeSelectorSimple: React.FC = () => {
   const { currentTheme, setTheme, isPluginEnabled } = useTheme();
 
-  const handleThemeChange = (themeId: ThemeType) => {
+  const handleThemeChange = (themeId: 'light' | 'dark' | 'advanced') => {
     if (isPluginEnabled()) {
       setTheme(themeId);
     }
@@ -82,7 +77,7 @@ const ThemeSelector: React.FC = () => {
           Select Theme
         </label>
         <div className="grid grid-cols-2 gap-3">
-          {THEME_OPTIONS.map((option) => (
+          {themeOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => handleThemeChange(option.id)}
@@ -95,8 +90,7 @@ const ThemeSelector: React.FC = () => {
                 }
               `}
             >
-              <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                <span>{option.icon}</span>
+              <div className="text-sm font-medium text-foreground mb-2">
                 {option.label}
               </div>
               
@@ -168,4 +162,4 @@ const ThemeSelector: React.FC = () => {
   );
 };
 
-export default ThemeSelector;
+export default ThemeSelectorSimple;
