@@ -370,7 +370,7 @@ export function MissionControlTab() {
             id: req.id || `req-${i}`,
             timestamp: new Date(req.timestamp).toLocaleTimeString(),
             method: `${req.method} ${req.endpoint}`,
-            model: req.model,
+            model: req.actualModel || req.model,
             status: req.statusCode < 400 ? 'success' : 'error',
             responseTime: req.responseTime,
             tokens: req.tokenCount || 0

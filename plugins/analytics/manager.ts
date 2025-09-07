@@ -598,7 +598,9 @@ class AnalyticsManager {
   private getTopModels(metrics: RequestMetrics[], limit: number) {
     const modelCounts: Record<string, number> = {};
     metrics.forEach(m => {
-      const key = `${m.provider}_${m.model}`;
+      // Use actualModel (the real model used by router) instead of model (original Claude model)
+      const actualModel = m.actualModel || m.model;
+      const key = `${m.provider}_${actualModel}`;
       modelCounts[key] = (modelCounts[key] || 0) + 1;
     });
 

@@ -180,38 +180,63 @@ export function trackingEndMiddleware(request: TrackedRequest, reply: FastifyRep
     (request as any).outputTokens = tokenInfo.outputTokens;
     (request as any).tokenCount = tokenInfo.totalTokens;
 
-    // Get model info from the actual routing (use actual model after routing)
+    // **SOLUTION: Auto-detect actual model and provider from router output**
+    // The router sets req.body.model to the final resolved model (e.g., "openrouter,gpt-4o")
+    // This is our source of truth for what was actually used
+    const routerModel = (request.body as any)?.model || 'unknown';
+    const originalModel = request.modelInfo?.model || 'unknown';
+
     let modelInfo = { model: 'unknown', provider: 'unknown' };
-    
-    // Use the actual model from routing if available
-    if ((request as any).actualModel) {
+    let routeUsed = 'default';
+
+    // Extract real provider and model from router output
+    if (routerModel.includes(',')) {
+      // Format: "provider,model" (e.g., "openrouter,gpt-4o")
+      const [provider, model] = routerModel.split(',');
+      modelInfo = { model, provider };
+      
+      // Auto-detect route used based on model characteristics
+      routeUsed = detectRouteUsed(request, routerModel, originalModel);
+    } else {
+      // Single model name - try to determine provider
       modelInfo = {
-        model: (request as any).actualModel,
-        provider: (request as any).selectedProvider || 'unknown'
+        model: routerModel,
+        provider: detectProviderFromModel(routerModel)
       };
-    } 
-    // Fallback to response model if available
-    else if (responseData?.model) {
-      modelInfo = {
-        model: responseData.model,
-        provider: (request as any).selectedProvider || modelInfo.provider
-      };
-    }
-    // Fallback to original request model
-    else if (request.modelInfo) {
-      modelInfo = request.modelInfo;
+      routeUsed = detectRouteUsed(request, routerModel, originalModel);
     }
 
-    // Determine provider from routing
-    const provider = determineProvider(request, responseData);
+    // Fallback: Use legacy detection methods if auto-detection fails
+    if (modelInfo.model === 'unknown' || modelInfo.provider === 'unknown') {
+      // Use the actual model from routing if available (legacy support)
+      if ((request as any).actualModel) {
+        modelInfo = {
+          model: (request as any).actualModel,
+          provider: (request as any).selectedProvider || modelInfo.provider
+        };
+      } 
+      // Fallback to response model if available
+      else if (responseData?.model) {
+        modelInfo = {
+          model: responseData.model,
+          provider: (request as any).selectedProvider || detectProviderFromModel(responseData.model)
+        };
+      }
+      // Fallback to original request model
+      else if (request.modelInfo) {
+        modelInfo = request.modelInfo;
+      }
+    }
 
-    // Ensure routeUsed is set, default to 'default' if not set
-    const routeUsed = request.routeUsed || 'default';
+    // Ensure routeUsed is set
+    if (request.routeUsed) {
+      routeUsed = request.routeUsed;
+    }
 
     // Track the request with enhanced token tracking for all routes
     analytics.trackRequest({
-      model: modelInfo?.model || 'unknown',
-      provider: modelInfo?.provider || provider,
+      model: modelInfo.model,
+      provider: modelInfo.provider,
       endpoint: request.url,
       method: request.method,
       statusCode: reply.statusCode,
@@ -219,13 +244,13 @@ export function trackingEndMiddleware(request: TrackedRequest, reply: FastifyRep
       tokenCount: tokenInfo.totalTokens,
       inputTokens: tokenInfo.inputTokens,
       outputTokens: tokenInfo.outputTokens,
-      cost: estimateCost(modelInfo?.model || '', tokenInfo),
+      cost: estimateCost(modelInfo.model, tokenInfo),
       userAgent: request.headers['user-agent'],
       ipAddress: request.ip,
       error: reply.statusCode >= 400 ? getErrorMessage(responseData) : undefined,
-      route: routeUsed, // Route tracking - already working for all routes
-      originalModel: (request.body as any)?.model || 'unknown',
-      actualModel: modelInfo?.model || 'unknown'
+      route: routeUsed,
+      originalModel: originalModel,
+      actualModel: modelInfo.model
     });
 
   } catch (error) {
@@ -235,7 +260,56 @@ export function trackingEndMiddleware(request: TrackedRequest, reply: FastifyRep
   done(null, payload);
 }
 
-// Helper to determine provider based on routing
+// **NEW: Auto-detection functions for complete plugin independence**
+
+// Helper to detect provider from model name
+function detectProviderFromModel(model: string): string {
+  if (!model || model === 'unknown') return 'unknown';
+  
+  // Check common provider patterns
+  if (model.includes('claude')) return 'anthropic';
+  if (model.includes('gpt-') || model.includes('openai')) return 'openai';
+  if (model.includes('gemini')) return 'google';
+  if (model.includes('llama')) return 'meta';
+  if (model.includes('mistral')) return 'mistral';
+  if (model.includes('deepseek')) return 'deepseek';
+  
+  // Default fallback
+  return 'unknown';
+}
+
+// Helper to detect which route was used based on request characteristics
+function detectRouteUsed(request: any, finalModel: string, originalModel: string): string {
+  const body = request.body || {};
+  
+  // Check for specific route indicators
+  if (body.thinking) return 'think';
+  if (Array.isArray(body.tools) && body.tools.some((tool: any) => tool.type?.startsWith('web_search'))) {
+    return 'webSearch';
+  }
+  if (originalModel?.includes('haiku')) return 'background';
+  
+  // Check for long context usage (if final model different from default)
+  const tokenCount = (request as any).tokenCount;
+  if (tokenCount && tokenCount > 60000) return 'longContext';
+  
+  // Check for subagent model usage
+  if (Array.isArray(body.system)) {
+    const hasSubagent = body.system.some((item: any) => 
+      item.text && item.text.includes('<CCR-SUBAGENT-MODEL>')
+    );
+    if (hasSubagent) return 'subagent';
+  }
+  
+  // If model was explicitly specified with provider (e.g., "openrouter,gpt-4")
+  if (originalModel !== finalModel && finalModel.includes(',')) {
+    return 'custom';
+  }
+  
+  return 'default';
+}
+
+// Helper to determine provider based on routing (legacy support)
 function determineProvider(request: TrackedRequest, _response: any): string {
     // The provider is now determined by the router and added to the request object
     // Use the value from request.selectedProvider if available

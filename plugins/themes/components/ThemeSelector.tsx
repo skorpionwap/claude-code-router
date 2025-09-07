@@ -23,8 +23,8 @@ const THEME_OPTIONS: ThemeOption[] = [
     description: 'Clean and professional light theme',
     icon: '☀️',
     previewColors: {
-      primary: '#1e293b',
-      secondary: '#f8fafc',
+      primary: '#e5e8eeff',
+      secondary: '#050c13ff',
       accent: '#3b82f6',
       background: '#ffffff',
       border: '#e2e8f0'
@@ -36,8 +36,8 @@ const THEME_OPTIONS: ThemeOption[] = [
     description: 'Elegant and sophisticated dark experience',
     icon: '🌙',
     previewColors: {
-      primary: '#f1f5f9',
-      secondary: '#334155',
+      primary: '#0b0c0cff',
+      secondary: '#eaeff5ff',
       accent: '#60a5fa',
       background: '#0f172a',
       border: '#334155'

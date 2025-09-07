@@ -7,13 +7,24 @@ export interface PluginSettingsComponent {
   description: string;
   component: React.ComponentType<any>;
   enabled: boolean;
+  version?: string;
+  author?: string;
+  category?: 'ui' | 'analytics' | 'performance' | 'security' | 'integration' | 'utility';
+  status?: 'active' | 'inactive' | 'loading' | 'error' | 'updating';
+  lastUpdated?: number;
+  dependencies?: string[];
 }
 
 export interface PluginContextType {
   plugins: PluginSettingsComponent[];
+  isLoading: boolean;
+  error: string | null;
   registerPlugin: (plugin: PluginSettingsComponent) => void;
   unregisterPlugin: (id: string) => void;
-  togglePlugin: (id: string, enabled: boolean) => void;
+  togglePlugin: (id: string, enabled: boolean) => Promise<void>;
+  refreshPlugins: () => Promise<void>;
+  getPluginById: (id: string) => PluginSettingsComponent | undefined;
+  getPluginsByCategory: (category: string) => PluginSettingsComponent[];
 }
 
 const PluginContext = createContext<PluginContextType | undefined>(undefined);
@@ -32,6 +43,8 @@ interface PluginProviderProps {
 
 export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
   const [plugins, setPlugins] = useState<PluginSettingsComponent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const registerPlugin = useCallback((plugin: PluginSettingsComponent) => {
     setPlugins(prev => {
@@ -39,11 +52,21 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
       if (exists) {
         // Update existing plugin with current enabled state from localStorage
         const currentEnabled = localStorage.getItem(`${plugin.id}-enabled`) === 'true';
-        return prev.map(p => p.id === plugin.id ? { ...plugin, enabled: currentEnabled } : p);
+        return prev.map(p => p.id === plugin.id ? { 
+          ...plugin, 
+          enabled: currentEnabled,
+          lastUpdated: Date.now(),
+          status: currentEnabled ? 'active' : 'inactive'
+        } : p);
       }
       // Add new plugin with state from localStorage
       const currentEnabled = localStorage.getItem(`${plugin.id}-enabled`) === 'true';
-      return [...prev, { ...plugin, enabled: currentEnabled }];
+      return [...prev, { 
+        ...plugin, 
+        enabled: currentEnabled,
+        lastUpdated: Date.now(),
+        status: currentEnabled ? 'active' : 'inactive'
+      }];
     });
   }, []);
 
@@ -51,21 +74,74 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
     setPlugins(prev => prev.filter(p => p.id !== id));
   }, []);
 
-  const togglePlugin = useCallback((id: string, enabled: boolean) => {
+  const togglePlugin = useCallback(async (id: string, enabled: boolean): Promise<void> => {
+    // Set loading state
     setPlugins(prev => 
-      prev.map(p => p.id === id ? { ...p, enabled } : p)
+      prev.map(p => p.id === id ? { ...p, status: 'loading' } : p)
     );
     
-    // Save to localStorage
-    localStorage.setItem(`${id}-enabled`, enabled.toString());
-    
-    // Dispatch plugin state change event
-    window.dispatchEvent(new CustomEvent('plugin-state-changed', {
-      detail: { id, enabled }
-    }));
-    
-    console.log(`🔌 PluginContext: ${id} toggled to ${enabled}`);
+    try {
+      // Simulate async operation (API call, etc.)
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setPlugins(prev => 
+        prev.map(p => p.id === id ? { 
+          ...p, 
+          enabled, 
+          status: enabled ? 'active' : 'inactive',
+          lastUpdated: Date.now()
+        } : p)
+      );
+      
+      // Save to localStorage
+      localStorage.setItem(`${id}-enabled`, enabled.toString());
+      
+      // Dispatch plugin state change event
+      window.dispatchEvent(new CustomEvent('plugin-state-changed', {
+        detail: { id, enabled }
+      }));
+      
+      console.log(`🔌 PluginContext: ${id} toggled to ${enabled}`);
+    } catch (err) {
+      setPlugins(prev => 
+        prev.map(p => p.id === id ? { ...p, status: 'error' } : p)
+      );
+      setError(`Failed to toggle plugin ${id}: ${err}`);
+      throw err;
+    }
   }, []);
+
+  const refreshPlugins = useCallback(async (): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate plugin refresh - in real implementation, this would scan for new plugins
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update status for all plugins
+      setPlugins(prev => prev.map(plugin => ({
+        ...plugin,
+        lastUpdated: Date.now(),
+        status: plugin.enabled ? 'active' : 'inactive'
+      })));
+      
+      console.log('🔌 Plugins refreshed successfully');
+    } catch (err) {
+      setError(`Failed to refresh plugins: ${err}`);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const getPluginById = useCallback((id: string): PluginSettingsComponent | undefined => {
+    return plugins.find(p => p.id === id);
+  }, [plugins]);
+
+  const getPluginsByCategory = useCallback((category: string): PluginSettingsComponent[] => {
+    return plugins.filter(p => p.category === category);
+  }, [plugins]);
 
   // Listen for plugin state changes and sync with localStorage
   useEffect(() => {
@@ -82,9 +158,14 @@ export const PluginProvider: React.FC<PluginProviderProps> = ({ children }) => {
 
   const contextValue: PluginContextType = {
     plugins,
+    isLoading,
+    error,
     registerPlugin,
     unregisterPlugin,
-    togglePlugin
+    togglePlugin,
+    refreshPlugins,
+    getPluginById,
+    getPluginsByCategory
   };
 
   return (

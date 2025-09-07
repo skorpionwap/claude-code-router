@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { createRoot } from 'react-dom/client';
+import React, { useState } from "react";
+// Plugin Manager - imported directly from plugins folder  
+const PluginManager = React.lazy(() => import('../../../plugins/core/PluginManager'));
 import {
   Dialog,
   DialogContent,
@@ -14,10 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Combobox } from "@/components/ui/combobox";
 import { useConfig } from "./ConfigProvider";
-import { usePlugins } from "@/contexts/PluginContext";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
 import type { StatusLineConfig } from "@/types";
-import { api } from "@/lib/api";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -28,41 +27,7 @@ interface SettingsDialogProps {
 export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { t } = useTranslation();
   const { config, setConfig } = useConfig();
-  const { plugins, registerPlugin } = usePlugins(); // ENABLED FOR TESTING
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<'general' | 'plugins' | 'advanced'>('general');
-  const [hoveredField, setHoveredField] = useState<string | null>(null);
-
-  // Register both themes and analytics plugins - ONLY ONCE
-  useEffect(() => {
-    const registerPlugins = async () => {
-      try {
-        // Register analytics plugin
-        const { AnalyticsSettings } = await import('@plugins/analytics/ui/AnalyticsSettings');
-        registerPlugin({
-          id: 'analytics',
-          name: 'Analytics',
-          description: 'Real-time analytics and Mission Control dashboard',
-          component: AnalyticsSettings,
-          enabled: localStorage.getItem('analytics-enabled') === 'true'
-        });
-
-        // Register themes plugin
-        const { ThemeSettings } = await import('@plugins/themes/ui/ThemeSettings');
-        registerPlugin({
-          id: 'themes',
-          name: 'Advanced Themes',
-          description: 'Glassmorphism effects and premium theming',
-          component: ThemeSettings,
-          enabled: localStorage.getItem('themes-enabled') === 'true'
-        });
-      } catch (error) {
-        console.warn('Failed to register plugins:', error);
-      }
-    };
-
-    registerPlugins();
-  }, []); // FIXED: Empty dependency array - register only once
 
   if (!config) {
     return null;
@@ -146,19 +111,11 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
             </div>
           </div>
           
-          
-          {/* Plugin Management - BOTH PLUGINS ENABLED */}
-          <div className="space-y-4 border-t pt-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">🔌 Plugin Management</Label>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Dynamic Plugin Cards - Single Column Layout */}
-              {plugins.map(plugin => (
-                <plugin.component key={plugin.id} />
-              ))}
-            </div>
+          {/* Plugin Manager - Single component from plugins folder */}
+          <div className="border-t pt-4">
+            <React.Suspense fallback={<div className="text-sm text-muted-foreground">Loading plugins...</div>}>
+              <PluginManager />
+            </React.Suspense>
           </div>
           
           <div className="space-y-2">
