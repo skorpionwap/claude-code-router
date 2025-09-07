@@ -30,6 +30,8 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
   const { config, setConfig } = useConfig();
   const { plugins, registerPlugin } = usePlugins(); // ENABLED FOR TESTING
   const [isStatusLineConfigOpen, setIsStatusLineConfigOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<'general' | 'plugins' | 'advanced'>('general');
+  const [hoveredField, setHoveredField] = useState<string | null>(null);
 
   // Register both themes and analytics plugins - ONLY ONCE
   useEffect(() => {

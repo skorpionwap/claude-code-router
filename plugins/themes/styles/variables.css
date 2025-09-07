@@ -1,269 +1,297 @@
 /**
- * CSS Variables for Themes Plugin
- * Unified system for 3 themes: Light, Dark, Advanced
+ * Unified Theme Variables System v2.0
+ * Complete restructure for consistent modern experience across all 3 themes
+ * - Light: Professional & clean with subtle shadows and gradients
+ * - Dark: Elegant & sophisticated with enhanced blur effects
+ * - Advanced: Spectacular glassmorphism space theme with cosmic elements
  */
 
-/* Base CSS Variables - Default light theme */
+/* ===========================================
+   BASE SYSTEM VARIABLES (All Themes)
+   =========================================== */
+
 :root {
-  /* Core spacing and dimensions */
-  --radius: 0.625rem;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Modern Border Radius System */
+  --radius-xs: 0.25rem;    /* 4px - small badges */
+  --radius-sm: 0.375rem;   /* 6px - small buttons */
+  --radius-md: 0.5rem;     /* 8px - inputs, regular buttons */
+  --radius-lg: 0.75rem;    /* 12px - cards, containers */
+  --radius-xl: 1rem;       /* 16px - modals, large cards */
+  --radius-2xl: 1.5rem;    /* 24px - special components */
+  --radius-full: 9999px;   /* full circles */
   
-  /* Animation and transitions */
-  --transition-fast: 0.15s ease-out;
-  --transition-normal: 0.3s ease-out;
-  --transition-slow: 0.5s ease-out;
+  /* Consistent Spacing System */
+  --space-xs: 0.25rem;     /* 4px */
+  --space-sm: 0.5rem;      /* 8px */
+  --space-md: 1rem;        /* 16px */
+  --space-lg: 1.5rem;      /* 24px */
+  --space-xl: 2rem;        /* 32px */
+  --space-2xl: 3rem;       /* 48px */
+  --space-3xl: 4rem;       /* 64px */
   
-  /* Box shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  /* Typography Scale */
+  --font-xs: 0.75rem;      /* 12px */
+  --font-sm: 0.875rem;     /* 14px */
+  --font-md: 1rem;         /* 16px */
+  --font-lg: 1.125rem;     /* 18px */
+  --font-xl: 1.25rem;      /* 20px */
+  --font-2xl: 1.5rem;      /* 24px */
+  --font-3xl: 1.875rem;    /* 30px */
+  --font-4xl: 2.25rem;     /* 36px */
+  
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-black: 900;
+  
+  /* Universal Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Universal Easing Functions */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Z-index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
 }
 
-/* Light Theme Variables - Enhanced Modern */
-.theme-light {
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.15 0 0);
+/* ===========================================
+   LIGHT THEME - Professional & Modern
+   =========================================== */
+
+html.theme-light {
+  /* Core Semantic Colors */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0 0);
+  --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.55 0.18 230);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.15 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0.15 0 0);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.94 0 0);
-  --ring: oklch(0.55 0.18 230);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
   
-  /* Enhanced Semantic Colors */
-  --success: oklch(0.6 0.2 145);
-  --success-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.7 0.18 85);
-  --warning-foreground: oklch(0.15 0 0);
-  --info: oklch(0.6 0.2 220);
-  --info-foreground: oklch(0.98 0 0);
+  /* Professional Shadow System */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.1);
   
-  /* Modern Light Theme Variables */
-  --highlight-color: var(--primary);
-  --text-primary: var(--foreground);
-  --text-secondary: var(--muted-foreground);
-  --component-bg: var(--card);
-  --component-border: var(--border);
-  --input-bg: var(--input);
-  --notification-bg: var(--card);
-  --notification-border: var(--border);
+  /* Sophisticated Gradients */
+  --gradient-primary: linear-gradient(135deg, oklch(0.205 0 0), oklch(0.305 0 0));
+  --gradient-card: linear-gradient(135deg, oklch(1 0 0), oklch(0.98 0 0));
+  --gradient-subtle: linear-gradient(135deg, oklch(0.97 0 0), oklch(0.95 0 0));
+  --gradient-accent: linear-gradient(135deg, oklch(0.97 0 0) 0%, oklch(0.94 0 0) 100%);
+  --gradient-hero: linear-gradient(135deg, oklch(0.98 0 0) 0%, oklch(0.96 0 0) 100%);
   
-  /* Status colors */
-  --success: oklch(0.6 0.15 145);
-  --success-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.7 0.15 85);
-  --warning-foreground: oklch(0.2 0 0);
-  --info: oklch(0.6 0.15 220);
-  --info-foreground: oklch(0.98 0 0);
-  
-  /* Interactive states */
-  --hover-opacity: 0.8;
-  --active-opacity: 0.9;
-  --disabled-opacity: 0.5;
-  
-  /* Specific component colors */
-  --toast-background: oklch(1 0 0);
-  --toast-border: oklch(0.85 0 0);
-  --button-shadow: rgba(0, 0, 0, 0.1);
-  --input-focus-ring: rgba(79, 124, 255, 0.2);
-  
-  /* Glassmorphism variables for light theme */
-  --glass-bg: var(--card);
-  --glass-border: 1px solid var(--border);
-  --glass-blur: blur(0px);
-  --glass-shadow: var(--shadow-md);
-  --highlight-color: var(--primary);
-}
-
-/* Dark Theme Variables - Enhanced Professional */
-.theme-dark {
-  --background: oklch(0.1 0 0);
-  --foreground: oklch(0.92 0 0);
-  --card: oklch(0.16 0 0);
-  --card-foreground: oklch(0.92 0 0);
-  --popover: oklch(0.16 0 0);
-  --popover-foreground: oklch(0.92 0 0);
-  --primary: oklch(0.68 0.18 210);
-  --primary-foreground: oklch(0.1 0 0);
-  --secondary: oklch(0.22 0 0);
-  --secondary-foreground: oklch(0.92 0 0);
-  --muted: oklch(0.22 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.26 0 0);
-  --accent-foreground: oklch(0.92 0 0);
-  --destructive: oklch(0.72 0.22 22);
-  --destructive-foreground: oklch(0.92 0 0);
-  --border: oklch(0.22 0 0);
-  --input: oklch(0.2 0 0);
-  --ring: oklch(0.68 0.18 210);
-  
-  /* Enhanced Semantic Colors */
-  --success: oklch(0.7 0.22 145);
-  --success-foreground: oklch(0.1 0 0);
-  --warning: oklch(0.75 0.2 85);
-  --warning-foreground: oklch(0.1 0 0);
-  --info: oklch(0.7 0.22 220);
-  --info-foreground: oklch(0.1 0 0);
-  
-  /* Professional Dark Theme Variables */
-  --highlight-color: var(--primary);
-  --text-primary: var(--foreground);
-  --text-secondary: var(--muted-foreground);
-  --component-bg: var(--card);
-  --component-border: var(--border);
-  --input-bg: var(--input);
-  --notification-bg: var(--card);
-  --notification-border: var(--border);
-  
-  /* Glassmorphism elements for dark */
-  --glass-bg: var(--card);
-  --glass-border: 1px solid var(--border);
+  /* Modern Blur & Glass Effects */
   --glass-blur: blur(8px);
-  --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-strong: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-border-strong: rgba(0, 0, 0, 0.15);
   
-  /* Status colors */
-  --success: oklch(0.7 0.15 145);
-  --success-foreground: oklch(0.12 0 0);
-  --warning: oklch(0.75 0.15 85);
-  --warning-foreground: oklch(0.12 0 0);
-  --info: oklch(0.7 0.15 200);
-  --info-foreground: oklch(0.12 0 0);
+  /* Interactive States */
+  --hover-overlay: rgba(0, 0, 0, 0.02);
+  --focus-ring: oklch(0.708 0 0);
+  --active-scale: 0.98;
   
-  /* Interactive states */
-  --hover-opacity: 0.8;
-  --active-opacity: 0.9;
-  --disabled-opacity: 0.4;
-  
-  /* Specific component colors */
-  --toast-background: oklch(0.22 0 0);
-  --toast-border: oklch(0.35 0 0);
-  --button-shadow: rgba(0, 0, 0, 0.3);
-  --input-focus-ring: rgba(99, 179, 237, 0.3);
-  
-  /* Glassmorphism variables for dark theme */
-  --glass-bg: var(--card);
-  --glass-border: 1px solid var(--border);
-  --glass-blur: blur(0px);
-  --glass-shadow: var(--shadow-md);
-  --highlight-color: var(--primary);
+  /* Status Colors - Professional */
+  --status-success: oklch(0.65 0.2 145);
+  --status-success-bg: oklch(0.65 0.2 145 / 0.1);
+  --status-success-border: oklch(0.65 0.2 145 / 0.3);
+  --status-warning: oklch(0.75 0.15 85);
+  --status-warning-bg: oklch(0.75 0.15 85 / 0.1);
+  --status-warning-border: oklch(0.75 0.15 85 / 0.3);
+  --status-error: oklch(0.65 0.2 25);
+  --status-error-bg: oklch(0.65 0.2 25 / 0.1);
+  --status-error-border: oklch(0.65 0.2 25 / 0.3);
+  --status-info: oklch(0.6 0.2 220);
+  --status-info-bg: oklch(0.6 0.2 220 / 0.1);
+  --status-info-border: oklch(0.6 0.2 220 / 0.3);
 }
 
-/* Advanced Theme Variables - Enhanced Glassmorphism */
-.theme-advanced {
-  /* Core Theme Colors - Enhanced for better depth and sophistication */
+/* ===========================================
+   DARK THEME - Elegant & Sophisticated
+   =========================================== */
+
+html.theme-dark {
+  /* Core Semantic Colors */
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  
+  /* Enhanced Shadow System */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 8px 10px rgba(0, 0, 0, 0.4);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.1);
+  
+  /* Elegant Gradients */
+  --gradient-primary: linear-gradient(135deg, oklch(0.922 0 0), oklch(0.822 0 0));
+  --gradient-card: linear-gradient(135deg, oklch(0.205 0 0), oklch(0.225 0 0));
+  --gradient-subtle: linear-gradient(135deg, oklch(0.269 0 0), oklch(0.289 0 0));
+  --gradient-accent: linear-gradient(135deg, oklch(0.269 0 0) 0%, oklch(0.32 0 0) 100%);
+  --gradient-hero: linear-gradient(135deg, oklch(0.16 0 0) 0%, oklch(0.2 0 0) 100%);
+  
+  /* Modern Blur & Glass Effects */
+  --glass-blur: blur(12px);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-strong: rgba(255, 255, 255, 0.25);
+  
+  /* Interactive States */
+  --hover-overlay: rgba(255, 255, 255, 0.05);
+  --focus-ring: oklch(0.556 0 0);
+  --active-scale: 0.98;
+  
+  /* Status Colors - Elegant */
+  --status-success: oklch(0.7 0.25 150);
+  --status-success-bg: oklch(0.7 0.25 150 / 0.15);
+  --status-success-border: oklch(0.7 0.25 150 / 0.4);
+  --status-warning: oklch(0.8 0.2 90);
+  --status-warning-bg: oklch(0.8 0.2 90 / 0.15);
+  --status-warning-border: oklch(0.8 0.2 90 / 0.4);
+  --status-error: oklch(0.75 0.25 30);
+  --status-error-bg: oklch(0.75 0.25 30 / 0.15);
+  --status-error-border: oklch(0.75 0.25 30 / 0.4);
+  --status-info: oklch(0.65 0.25 230);
+  --status-info-bg: oklch(0.65 0.25 230 / 0.15);
+  --status-info-border: oklch(0.65 0.25 230 / 0.4);
+}
+
+/* ===========================================
+   ADVANCED THEME - Spectacular Glassmorphism Space
+   =========================================== */
+
+html.theme-advanced {
+  /* Core Semantic Colors - Cosmic Space */
   --background: oklch(0.08 0.05 280);
   --foreground: oklch(0.95 0.02 270);
-  --card: rgba(255, 255, 255, 0.12);
+  --card: rgba(255, 255, 255, 0.15);
   --card-foreground: oklch(0.92 0.02 270);
-  --popover: rgba(255, 255, 255, 0.18);
+  --popover: rgba(255, 255, 255, 0.2);
   --popover-foreground: oklch(0.95 0.02 270);
   --primary: oklch(0.7 0.25 280);
   --primary-foreground: oklch(0.08 0.05 280);
-  --secondary: rgba(255, 255, 255, 0.22);
+  --secondary: rgba(255, 255, 255, 0.26);
   --secondary-foreground: oklch(0.85 0.03 270);
-  --muted: rgba(255, 255, 255, 0.1);
+  --muted: rgba(255, 255, 255, 0.13);
   --muted-foreground: oklch(0.65 0.05 280);
   --accent: oklch(0.75 0.2 320);
   --accent-foreground: oklch(0.08 0.05 280);
   --destructive: oklch(0.7 0.3 20);
   --destructive-foreground: oklch(0.95 0.02 270);
-  --border: rgba(255, 255, 255, 0.25);
-  --input: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.38);
+  --input: rgba(255, 255, 255, 0.2);
   --ring: oklch(0.7 0.25 280);
   
-  /* Enhanced Semantic Colors - Professional Grade */
-  --success: oklch(0.65 0.25 145);
-  --success-foreground: oklch(0.95 0.02 270);
-  --warning: oklch(0.75 0.2 85);
-  --warning-foreground: oklch(0.15 0 0);
-  --info: oklch(0.7 0.25 220);
-  --info-foreground: oklch(0.95 0.02 270);
+  /* Spectacular Space Background */
+  --space-bg: linear-gradient(135deg, oklch(0.08 0.05 280) 0%, oklch(0.12 0.08 260) 35%, oklch(0.1 0.06 300) 70%, oklch(0.09 0.07 320) 100%);
+  --nebula-glow: radial-gradient(circle at 25% 25%, rgba(123, 97, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 64, 129, 0.2) 0%, transparent 50%);
   
-  /* Advanced Space Theme Specific Variables - Superior Quality */
-  --primary-color: rgba(45, 45, 75, 0.95);
-  --secondary-color: rgba(55, 65, 95, 0.9);
-  --accent-color: rgba(75, 85, 130, 0.95);
-  --highlight-color: #e94560;
-  --highlight-gradient: linear-gradient(135deg, #e94560, #ff6b9d);
-  --text-primary: oklch(0.95 0.02 270);
-  --text-secondary: oklch(0.7 0.03 280);
+  /* Cosmic Shadow System with Glow */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px rgba(123, 97, 255, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 16px rgba(123, 97, 255, 0.15);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 24px rgba(123, 97, 255, 0.2);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 32px rgba(123, 97, 255, 0.25);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.8), 0 0 48px rgba(123, 97, 255, 0.3);
+  --shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.9), 0 0 64px rgba(123, 97, 255, 0.4);
+  --shadow-glow: 0 0 40px rgba(123, 97, 255, 0.5), 0 0 80px rgba(123, 97, 255, 0.3);
   
-  /* Professional Glassmorphism Variables */
-  --glass-bg: rgba(255, 255, 255, 0.12);
-  --glass-bg-strong: rgba(255, 255, 255, 0.15);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-  --glass-border-strong: 1px solid rgba(255, 255, 255, 0.3);
+  /* Spectacular Cosmic Gradients */
+  --gradient-primary: linear-gradient(135deg, oklch(0.7 0.25 280), oklch(0.8 0.3 260), oklch(0.75 0.28 300));
+  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.18));
+  --gradient-subtle: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.15));
+  --gradient-accent: linear-gradient(135deg, oklch(0.75 0.2 320) 0%, oklch(0.85 0.25 300) 50%, oklch(0.8 0.23 280) 100%);
+  --gradient-hero: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.15) 100%);
+  --gradient-cosmic: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  
+  /* Advanced Glassmorphism Effects */
   --glass-blur: blur(20px);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-bg-strong: rgba(255, 255, 255, 0.25);
+  --glass-bg-ultra: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-border-strong: rgba(255, 255, 255, 0.4);
+  --glass-border-ultra: rgba(255, 255, 255, 0.6);
   
-  /* Enhanced Component Variables */
-  --component-bg: rgba(255, 255, 255, 0.1);
-  --component-border: rgba(255, 255, 255, 0.25);
-  --input-bg: rgba(255, 255, 255, 0.15);
-  --button-primary: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  --button-secondary: rgba(255, 255, 255, 0.12);
-  --notification-bg: rgba(255, 255, 255, 0.12);
-  --notification-border: rgba(255, 255, 255, 0.3);
+  /* Interactive States - Space Magic */
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --focus-ring: oklch(0.7 0.25 280);
+  --active-scale: 0.95;
+  --hover-glow: 0 0 20px rgba(123, 97, 255, 0.4);
   
-  /* Navigation & Layout Variables */
-  --nav-bg: rgba(255, 255, 255, 0.1);
-  --nav-active: var(--highlight-gradient);
-  --nav-hover: rgba(255, 255, 255, 0.15);
-  --dashboard-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
-  
-  /* Status colors with transparency */
-  --success: rgba(74, 222, 128, 0.8);
-  --success-foreground: oklch(0.95 0 0);
-  --warning: rgba(251, 191, 36, 0.8);
-  --warning-foreground: oklch(0.15 0 0);
-  --info: rgba(96, 165, 250, 0.8);
-  --info-foreground: oklch(0.95 0 0);
-  
-  /* Interactive states */
-  --hover-opacity: 0.9;
-  --active-opacity: 0.95;
-  --disabled-opacity: 0.3;
-  
-  /* Glassmorphism specific */
-  --glass-blur: blur(20px);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --glass-gradient: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  
-  /* Advanced theme space gradient colors */
-  --primary-color: rgba(30, 30, 50, 0.95);
-  --secondary-color: rgba(20, 40, 70, 0.95);
-  --accent-color: rgba(40, 20, 60, 0.95);
-  --text-primary: oklch(0.95 0 0);
-  --text-secondary: oklch(0.7 0 0);
-  --highlight-color: linear-gradient(45deg, #e94560, #ff6b9d);
-  --highlight-gradient: linear-gradient(45deg, #e94560, #ff6b9d);
-  
-  /* Specific component colors */
-  --toast-background: rgba(255, 255, 255, 0.1);
-  --toast-border: rgba(255, 255, 255, 0.3);
-  --button-shadow: rgba(233, 69, 96, 0.3);
-  --input-focus-ring: rgba(233, 69, 96, 0.4);
-  
-  /* Animated gradients */
-  --gradient-primary: linear-gradient(45deg, #e94560, #ff6b9d);
-  --gradient-secondary: linear-gradient(45deg, #667eea, #764ba2);
-  --gradient-accent: linear-gradient(45deg, #f093fb, #f5576c);
+  /* Status Colors - Neon Space */
+  --status-success: oklch(0.75 0.3 155);
+  --status-success-bg: oklch(0.75 0.3 155 / 0.25);
+  --status-success-border: oklch(0.75 0.3 155 / 0.5);
+  --status-warning: oklch(0.85 0.25 95);
+  --status-warning-bg: oklch(0.85 0.25 95 / 0.25);
+  --status-warning-border: oklch(0.85 0.25 95 / 0.5);
+  --status-error: oklch(0.8 0.3 35);
+  --status-error-bg: oklch(0.8 0.3 35 / 0.25);
+  --status-error-border: oklch(0.8 0.3 35 / 0.5);
+  --status-info: oklch(0.7 0.3 240);
+  --status-info-bg: oklch(0.7 0.3 240 / 0.25);
+  --status-info-border: oklch(0.7 0.3 240 / 0.5);
+}
+
+/* ===========================================
+   RESPONSIVE BREAKPOINTS
+   =========================================== */
+
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 }

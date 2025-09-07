@@ -5,18 +5,72 @@ export function AnalyticsSettings() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   useEffect(() => {
-    // Simple check from localStorage only
-    const enabled = localStorage.getItem('analytics-enabled') === 'true';
-    setIsEnabled(enabled);
+    // Load config from server first, fallback to localStorage
+    const loadConfig = async () => {
+      try {
+        const response = await fetch('/api/config');
+        if (response.ok) {
+          const config = await response.json();
+          const serverEnabled = config.plugins?.analytics?.enabled === true;
+          setIsEnabled(serverEnabled);
+          
+          // Sync localStorage with server config
+          localStorage.setItem('analytics-enabled', serverEnabled.toString());
+        } else {
+          // Fallback to localStorage if server config fails
+          const enabled = localStorage.getItem('analytics-enabled') === 'true';
+          setIsEnabled(enabled);
+        }
+      } catch (error) {
+        // Fallback to localStorage if server is unavailable
+        const enabled = localStorage.getItem('analytics-enabled') === 'true';
+        setIsEnabled(enabled);
+      }
+    };
+    
+    loadConfig();
   }, []);
 
   const handleToggle = async (checked: boolean) => {
     setIsEnabled(checked);
     
-    // Simple localStorage save only
+    // Save to localStorage for immediate UI feedback
     localStorage.setItem('analytics-enabled', checked.toString());
     
-    // console.log(`Analytics ${checked ? 'enabled' : 'disabled'}`); // REMOVED DEBUG LOG
+    // Sync to server config - same as Themes plugin
+    await syncConfigToServer(checked);
+  };
+
+  const syncConfigToServer = async (enabled: boolean) => {
+    try {
+      // Get current main config from server
+      const response = await fetch('/api/config');
+      if (response.ok) {
+        const mainConfig = await response.json();
+        
+        // Update the analytics section
+        const updatedConfig = {
+          ...mainConfig,
+          plugins: {
+            ...mainConfig.plugins,
+            analytics: {
+              enabled
+            }
+          }
+        };
+        
+        // Save back to server
+        await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedConfig)
+        });
+        
+        console.log(`✅ Analytics config synced to server: ${enabled}`);
+      }
+    } catch (error) {
+      console.warn('Failed to sync analytics config to server:', error);
+    }
   };
 
   return (
@@ -37,8 +91,11 @@ export function AnalyticsSettings() {
       
       <div className="border-t pt-3">
         {isEnabled ? (
-          <div className="p-2 text-center text-green-600 text-xs">
-            ✅ Analytics enabled
+          <div className="space-y-2">
+            <div className="p-2 text-center text-green-600 text-xs">
+              ✅ Analytics enabled
+            </div>
+            
           </div>
         ) : (
           <div className="p-2 text-center text-muted-foreground text-xs">
