@@ -15,6 +15,7 @@ import { useConfig } from "./ConfigProvider";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
 import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
+import ThemeSelector from "@/components/ui/ThemeSelector";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -213,6 +214,20 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
             />
           </div>
         </div>
+
+        {/* Theme Settings Section */}
+        <div className="space-y-4 border-t pt-4">
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">
+              Theme Settings
+            </Label>
+            <div className="text-sm text-muted-foreground">
+              Choose your preferred theme and variant
+            </div>
+          </div>
+          <ThemeSelector />
+        </div>
+
         <DialogFooter className="p-4 pt-0">
           <Button
             onClick={() => onOpenChange(false)}

@@ -1,4 +1,9 @@
 import type { Config, Provider, Transformer } from '@/types';
+import { mockApi, mockConfig } from './mockApi';
+
+// Check if we're in development mode and should use mock data
+const isDevelopment = import.meta.env.DEV;
+const useMockData = isDevelopment && window.location.hostname === 'localhost';
 
 // API Client Class for handling requests with baseUrl and apikey authentication
 class ApiClient {
@@ -129,22 +134,37 @@ class ApiClient {
 
   // Config-specific methods
   async getConfig(): Promise<Config> {
+    if (useMockData) {
+      return mockApi.getConfig();
+    }
     return this.get<Config>('/config');
   }
 
   async updateConfig(config: Partial<Config>): Promise<{ success: boolean; message?: string }> {
+    if (useMockData) {
+      return mockApi.updateConfig(config);
+    }
     return this.put<{ success: boolean; message?: string }>('/config', config);
   }
 
   async restartService(): Promise<{ success: boolean; message?: string }> {
+    if (useMockData) {
+      return mockApi.restartService();
+    }
     return this.get<{ success: boolean; message?: string }>('/restart');
   }
 
   async checkForUpdates(): Promise<{ hasUpdate: boolean; version?: string; latestVersion?: string; changelog?: string }> {
+    if (useMockData) {
+      return mockApi.checkForUpdates();
+    }
     return this.get<{ hasUpdate: boolean; version?: string; latestVersion?: string; changelog?: string }>('/updates/check');
   }
 
   async performUpdate(): Promise<{ success: boolean; message?: string }> {
+    if (useMockData) {
+      return mockApi.performUpdate();
+    }
     return this.post<{ success: boolean; message?: string }>('/updates/perform');
   }
 

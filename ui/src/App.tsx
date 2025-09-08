@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useConfig } from "@/components/ConfigProvider";
+import { useTheme } from "@/contexts/ThemeContext";
 import api from "@/lib/api";
 import { Toast } from "@/components/ui/toast";
 import {
@@ -19,11 +20,13 @@ import "@/styles/animations.css";
 import "@/styles/dashboard.css";
 import "@/styles/dashboard-theme.css";
 import "@/styles/charts-enhancement.css";
+import "@/styles/themes.css";
 
 function App() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { config, error } = useConfig();
+  const { theme } = useTheme();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -236,16 +239,20 @@ function App() {
   
   if (isCheckingAuth) {
     return (
-      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
-        <div className="text-gray-500">Loading application...</div>
+      <div className="app-layout">
+        <div className="app-main flex items-center justify-center min-h-screen">
+          <div className="text-muted-foreground animate-pulse">Loading application...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
-        <div className="text-red-500">Error: {error.message}</div>
+      <div className="app-layout">
+        <div className="app-main flex items-center justify-center min-h-screen">
+          <div className="text-error">Error: {error.message}</div>
+        </div>
       </div>
     );
   }
@@ -253,25 +260,83 @@ function App() {
   // Handle case where config is null or undefined
   if (!config) {
     return (
-      <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
-        <div className="text-gray-500">Loading configuration...</div>
+      <div className="app-layout">
+        <div className="app-main flex items-center justify-center min-h-screen">
+          <div className="text-muted-foreground animate-pulse">Loading configuration...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <DashboardWrapper
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onSaveConfig={saveConfig}
-        onSaveAndRestart={saveConfigAndRestart}
-      >
-        <Dashboard 
+    <div className="app-layout">
+      {/* Centered Top Bar */}
+      <header className="app-header">
+        <div className="app-header-content">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Claude Code Router
+            </h1>
+            <span className="text-sm text-muted-foreground hidden md:inline">
+              Enhanced AI Proxy Dashboard
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {/* Language Selector */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => i18n.changeLanguage('en')}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                  i18n.language.startsWith('en') 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary-hover'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => i18n.changeLanguage('zh')}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                  i18n.language.startsWith('zh') 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary-hover'
+                }`}
+              >
+                中文
+              </button>
+            </div>
+
+            {/* Theme Indicator */}
+            <div className="text-xs text-muted-foreground hidden lg:block">
+              {theme.variant === 'advanced' && '✨'} {theme.variant} {theme.mode}
+            </div>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="btn-primary"
+            >
+              Settings
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="app-main">
+        <DashboardWrapper
           onOpenSettings={() => setIsSettingsOpen(true)}
           onSaveConfig={saveConfig}
           onSaveAndRestart={saveConfigAndRestart}
-        />
-      </DashboardWrapper>
+        >
+          <Dashboard 
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            onSaveConfig={saveConfig}
+            onSaveAndRestart={saveConfigAndRestart}
+          />
+        </DashboardWrapper>
+      </main>
       
       {/* Settings Dialog */}
       <SettingsDialog isOpen={isSettingsOpen} onOpenChange={setIsSettingsOpen} />

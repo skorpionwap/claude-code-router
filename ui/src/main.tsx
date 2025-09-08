@@ -6,11 +6,14 @@ import './styles/dashboard.css'
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
 import { ConfigProvider } from '@/components/ConfigProvider';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ConfigProvider>
-      <RouterProvider router={router} />
-    </ConfigProvider>
+    <ThemeProvider>
+      <ConfigProvider>
+        <RouterProvider router={router} />
+      </ConfigProvider>
+    </ThemeProvider>
   </StrictMode>,
 )

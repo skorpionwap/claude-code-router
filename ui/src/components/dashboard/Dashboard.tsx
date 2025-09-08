@@ -48,7 +48,7 @@ export function Dashboard({
   };
 
   return (
-    <div className={`dashboard-bg min-h-screen text-white ${className}`}>
+    <div className={`min-h-screen text-foreground ${className}`}>
       <div className="max-w-7xl mx-auto p-6">
         {/* Top Control Bar */}
         <motion.div 
