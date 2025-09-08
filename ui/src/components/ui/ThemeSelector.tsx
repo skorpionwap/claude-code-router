@@ -1,11 +1,10 @@
 import React from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme, type ThemeName } from '../../contexts/ThemeContext';
 
 interface ThemeOption {
   id: string;
   label: string;
-  mode: 'light' | 'dark';
-  variant: 'classic' | 'advanced';
+  name: ThemeName;
   previewColors: {
     primary: string;
     secondary: string;
@@ -13,72 +12,56 @@ interface ThemeOption {
     background: string;
     border: string;
   };
+  description: string;
 }
 
 const themeOptions: ThemeOption[] = [
   {
-    id: 'classic-light',
-    label: 'Classic Light',
-    mode: 'light',
-    variant: 'classic',
+    id: 'light',
+    label: 'Light',
+    name: 'light',
+    description: 'Clean and bright interface',
     previewColors: {
       primary: '#ffffff',
-      secondary: '#f3f4f6',
+      secondary: '#f8fafc',
       accent: '#3b82f6',
       background: '#ffffff',
-      border: '#e5e7eb'
+      border: '#e2e8f0'
     }
   },
   {
-    id: 'classic-dark',
-    label: 'Classic Dark',
-    mode: 'dark',
-    variant: 'classic',
+    id: 'dark',
+    label: 'Dark',
+    name: 'dark',
+    description: 'Elegant dark mode for low-light environments',
     previewColors: {
-      primary: '#1f2937',
-      secondary: '#374151',
+      primary: '#1e293b',
+      secondary: '#334155',
       accent: '#60a5fa',
-      background: '#111827',
-      border: '#4b5563'
+      background: '#0f172a',
+      border: '#475569'
     }
   },
   {
-    id: 'advanced-light',
-    label: 'Advanced Light',
-    mode: 'light',
-    variant: 'advanced',
+    id: 'advanced',
+    label: 'Advanced',
+    name: 'advanced',
+    description: 'Vibrant glassmorphism with gradients',
     previewColors: {
-      primary: 'rgba(255, 255, 255, 0.1)',
-      secondary: 'rgba(243, 244, 246, 0.05)',
-      accent: 'rgba(59, 130, 246, 0.8)',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: 'rgba(229, 231, 235, 0.1)'
-    }
-  },
-  {
-    id: 'advanced-dark',
-    label: 'Advanced Dark',
-    mode: 'dark',
-    variant: 'advanced',
-    previewColors: {
-      primary: 'rgba(31, 41, 55, 0.1)',
-      secondary: 'rgba(55, 65, 81, 0.05)',
-      accent: 'rgba(96, 165, 250, 0.8)',
-      background: 'rgba(17, 24, 39, 0.05)',
-      border: 'rgba(75, 85, 99, 0.1)'
+      primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      secondary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      accent: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+      border: 'rgba(255, 255, 255, 0.3)'
     }
   }
 ];
 
 const ThemeSelector: React.FC = () => {
-  const { theme, setTheme } = useTheme();
-  const currentThemeId = `${theme.variant}-${theme.mode}`;
+  const { theme, setThemeName } = useTheme();
 
-  const handleThemeChange = (themeOption: ThemeOption) => {
-    setTheme({
-      mode: themeOption.mode,
-      variant: themeOption.variant
-    });
+  const handleThemeChange = (themeName: ThemeName) => {
+    setThemeName(themeName);
   };
 
   return (
@@ -87,46 +70,62 @@ const ThemeSelector: React.FC = () => {
         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Select Theme
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-4">
           {themeOptions.map((option) => (
             <button
               key={option.id}
-              onClick={() => handleThemeChange(option)}
+              onClick={() => handleThemeChange(option.name)}
               className={`
-                relative p-3 rounded-lg border-2 transition-all duration-200
-                hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                ${currentThemeId === option.id 
-                  ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' 
+                relative p-4 rounded-xl border-2 transition-all duration-300
+                hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+                ${theme.name === option.name 
+                  ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg' 
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }
               `}
             >
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-                {option.label}
-              </div>
-              
-              {/* Theme Preview */}
-              <div className="space-y-1">
-                <div 
-                  className="h-4 rounded transition-colors duration-200"
-                  style={{ backgroundColor: option.previewColors.primary }}
-                />
-                <div 
-                  className="h-4 rounded transition-colors duration-200"
-                  style={{ backgroundColor: option.previewColors.secondary }}
-                />
-                <div 
-                  className="h-4 rounded transition-colors duration-200"
-                  style={{ backgroundColor: option.previewColors.accent }}
-                />
+              <div className="flex items-center justify-between">
+                <div className="text-left">
+                  <div className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                    {option.label}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {option.description}
+                  </div>
+                </div>
+                
+                {/* Theme Preview */}
+                <div className="flex space-x-2">
+                  <div 
+                    className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600"
+                    style={{ 
+                      background: option.previewColors.primary,
+                      boxShadow: option.name === 'advanced' ? '0 4px 12px rgba(102, 126, 234, 0.4)' : 'none'
+                    }}
+                  />
+                  <div 
+                    className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600"
+                    style={{ 
+                      background: option.previewColors.secondary,
+                      boxShadow: option.name === 'advanced' ? '0 4px 12px rgba(240, 147, 251, 0.4)' : 'none'
+                    }}
+                  />
+                  <div 
+                    className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-600"
+                    style={{ 
+                      background: option.previewColors.accent,
+                      boxShadow: option.name === 'advanced' ? '0 4px 12px rgba(79, 172, 254, 0.4)' : 'none'
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Selected indicator */}
-              {currentThemeId === option.id && (
-                <div className="absolute top-2 right-2">
-                  <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+              {theme.name === option.name && (
+                <div className="absolute top-3 right-3">
+                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <svg 
-                      className="w-2 h-2 text-white" 
+                      className="w-3 h-3 text-white" 
                       fill="currentColor" 
                       viewBox="0 0 20 20"
                     >
@@ -140,14 +139,14 @@ const ThemeSelector: React.FC = () => {
                 </div>
               )}
 
-              {/* Glassmorphism indicator for advanced themes */}
-              {option.variant === 'advanced' && (
-                <div className="absolute bottom-1 right-1">
+              {/* Special indicator for advanced theme */}
+              {option.name === 'advanced' && (
+                <div className="absolute bottom-2 right-2">
                   <div 
-                    className="w-2 h-2 rounded-full border border-gray-400"
+                    className="w-3 h-3 rounded-full"
                     style={{ 
-                      background: `linear-gradient(45deg, ${option.previewColors.accent}, ${option.previewColors.primary})`,
-                      boxShadow: '0 0 4px rgba(0,0,0,0.2)'
+                      background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                      boxShadow: '0 0 8px rgba(102, 126, 234, 0.6)'
                     }}
                   />
                 </div>
@@ -157,12 +156,15 @@ const ThemeSelector: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+      <div className="text-xs text-gray-500 dark:text-gray-400 mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <p>
-          <span className="font-medium">Current Theme:</span> {theme.variant} {theme.mode}
+          <span className="font-medium">Current Theme:</span> {theme.name}
         </p>
         <p className="mt-1">
-          Glassmorphism effects are available in Advanced themes.
+          {theme.name === 'advanced' ? 
+            'Glassmorphism effects and gradients are active.' : 
+            'Switch to Advanced theme for enhanced visual effects.'
+          }
         </p>
       </div>
     </div>

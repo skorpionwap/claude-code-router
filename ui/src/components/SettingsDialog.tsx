@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Combobox } from "@/components/ui/combobox";
+import ThemeSelector from "@/components/ui/ThemeSelector";
 import { useConfig } from "./ConfigProvider";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
 import { useState } from "react";
@@ -77,6 +78,13 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
               {t("toplevel.log")}
             </Label>
           </div>
+          
+          {/* Theme Configuration */}
+          <div className="space-y-2 border-t pt-4">
+            <h3 className="text-lg font-semibold mb-3">Theme Settings</h3>
+            <ThemeSelector />
+          </div>
+          
           {/* StatusLine Configuration */}
           <div className="space-y-2 border-t pt-4">
             <div className="flex items-center justify-between">

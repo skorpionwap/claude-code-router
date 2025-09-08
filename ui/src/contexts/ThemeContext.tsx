@@ -1,31 +1,27 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
-// TypeScript types
-export type ThemeMode = 'light' | 'dark';
-export type ThemeVariant = 'classic' | 'advanced';
+// TypeScript types for the modernized theme system
+export type ThemeName = 'light' | 'dark' | 'advanced';
 
 export interface Theme {
-  mode: ThemeMode;
-  variant: ThemeVariant;
+  name: ThemeName;
 }
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  setThemeMode: (mode: ThemeMode) => void;
-  setThemeVariant: (variant: ThemeVariant) => void;
+  setThemeName: (name: ThemeName) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const defaultTheme: Theme = {
-  mode: 'light',
-  variant: 'classic'
+  name: 'light'
 };
 
 const getThemeClasses = (theme: Theme): string => {
-  return `theme-${theme.mode} theme-${theme.variant}`;
+  return `theme-${theme.name}`;
 };
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -38,10 +34,17 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (savedTheme) {
         const parsedTheme = JSON.parse(savedTheme);
         // Validate the parsed theme
-        if (parsedTheme.mode && parsedTheme.variant && 
-            ['light', 'dark'].includes(parsedTheme.mode) && 
-            ['classic', 'advanced'].includes(parsedTheme.variant)) {
+        if (parsedTheme.name && ['light', 'dark', 'advanced'].includes(parsedTheme.name)) {
           setThemeState(parsedTheme);
+        } else if (parsedTheme.mode && parsedTheme.variant) {
+          // Migration from old theme system
+          if (parsedTheme.mode === 'light' && parsedTheme.variant === 'classic') {
+            setThemeState({ name: 'light' });
+          } else if (parsedTheme.mode === 'dark' && parsedTheme.variant === 'classic') {
+            setThemeState({ name: 'dark' });
+          } else if (parsedTheme.variant === 'advanced') {
+            setThemeState({ name: 'advanced' });
+          }
         }
       }
     } catch (error) {
@@ -54,15 +57,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const documentElement = document.documentElement;
     
     // Remove all theme classes
-    documentElement.classList.remove('theme-light', 'theme-dark', 'theme-classic', 'theme-advanced');
+    documentElement.classList.remove('theme-light', 'theme-dark', 'theme-advanced');
     
-    // Add new theme classes
-    const classes = getThemeClasses(theme);
-    classes.split(' ').forEach(cls => {
-      if (cls.trim()) {
-        documentElement.classList.add(cls.trim());
-      }
-    });
+    // Add new theme class
+    const themeClass = getThemeClasses(theme);
+    documentElement.classList.add(themeClass);
     
     // Save theme to localStorage
     try {
@@ -76,19 +75,14 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setThemeState(newTheme);
   };
 
-  const setThemeMode = (mode: ThemeMode) => {
-    setThemeState(prev => ({ ...prev, mode }));
-  };
-
-  const setThemeVariant = (variant: ThemeVariant) => {
-    setThemeState(prev => ({ ...prev, variant }));
+  const setThemeName = (name: ThemeName) => {
+    setThemeState({ name });
   };
 
   const value: ThemeContextType = {
     theme,
     setTheme,
-    setThemeMode,
-    setThemeVariant
+    setThemeName
   };
 
   return (
