@@ -15,9 +15,10 @@
  */
 
 /* Import unified system files */
-@import './variables.css';     /* Theme-specific color variables and design tokens */
-@import './modern-effects.css'; /* Unified visual effects and animations */
-@import './components.css';     /* Consistent component styling */
+@import './layout-transformations.css'; /* Layout and spacing improvements */
+@import './component-integration.css'; /* Component-level overrides */
+@import './advanced-animations.css'; /* Smooth animations and transitions */
+@import './advanced-complete.css'; /* Advanced theme cosmic effects */
 
 /* ===========================================
    THEME SYSTEM ACTIVATION
