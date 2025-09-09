@@ -21,19 +21,14 @@ import "@/styles/dashboard-theme.css";
 import "@/styles/charts-enhancement.css";
 // Import theme plugin IT orchestrator
 import { ItOrchestrator } from "@/plugins/themes/components/it-orchestrator";
-import { ThemeSelectorSimple } from "@/plugins/themes/components/ThemeSelectorSimple";
 
 function App() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { config, error } = useConfig();
-  
-  // Theme testing bypass mode
-  const [themeTestMode, setThemeTestMode] = useState(true);
-  
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(false); // Set to false for theme testing
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
   // 版本检查状态
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -249,7 +244,7 @@ function App() {
     );
   }
 
-  if (error && !themeTestMode) {
+  if (error) {
     return (
       <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
         <div className="text-red-500">Error: {error.message}</div>
@@ -258,71 +253,10 @@ function App() {
   }
 
   // Handle case where config is null or undefined
-  if (!config && !themeTestMode) {
+  if (!config) {
     return (
       <div className="h-screen bg-gray-50 font-sans flex items-center justify-center">
         <div className="text-gray-500">Loading configuration...</div>
-      </div>
-    );
-  }
-
-  // Theme testing mode - bypass API requirements
-  if (themeTestMode) {
-    return (
-      <div className="h-screen bg-background text-foreground">
-        {/* Theme Plugin IT Orchestrator - Global coordination component */}
-        <ItOrchestrator />
-        
-        <div className="plugin-layout-centered">
-          <header className="p-4 bg-card border-b border-border">
-            <h1 className="text-2xl font-bold">Theme Plugin Test</h1>
-            <p className="text-muted-foreground">Testing centered layout and theme consistency</p>
-          </header>
-          
-          <main className="p-6 space-y-6">
-            <div className="card p-4">
-              <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
-              <ThemeSelectorSimple />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="card p-4">
-                <h3 className="text-lg font-semibold mb-2">Sample Card 1</h3>
-                <p className="text-muted-foreground mb-3">This demonstrates theme consistency.</p>
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded">Primary Button</button>
-              </div>
-              
-              <div className="card p-4">
-                <h3 className="text-lg font-semibold mb-2">Sample Card 2</h3>
-                <p className="text-muted-foreground mb-3">All components should match the active theme.</p>
-                <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded">Secondary Button</button>
-              </div>
-            </div>
-            
-            {/* Notification test */}
-            <div className="notification p-4 rounded border">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="font-medium">Sample Notification</span>
-              </div>
-              <p className="text-sm mt-1">This notification should respect the active theme colors.</p>
-            </div>
-            
-            <button 
-              onClick={() => setToast({ message: 'Test notification with current theme!', type: 'success' })}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded mr-4"
-            >
-              Test Notification
-            </button>
-            
-            <button 
-              onClick={() => setThemeTestMode(false)}
-              className="px-4 py-2 bg-destructive text-destructive-foreground rounded"
-            >
-              Exit Theme Test Mode
-            </button>
-          </main>
-        </div>
       </div>
     );
   }

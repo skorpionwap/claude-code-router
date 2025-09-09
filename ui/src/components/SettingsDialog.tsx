@@ -15,6 +15,7 @@ import { useConfig } from "./ConfigProvider";
 import { StatusLineConfigDialog } from "./StatusLineConfigDialog";
 import { useState } from "react";
 import type { StatusLineConfig } from "@/types";
+import { ThemeSelectorSimple } from "@/plugins/themes/components/ThemeSelectorSimple";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -211,6 +212,16 @@ export function SettingsDialog({ isOpen, onOpenChange }: SettingsDialogProps) {
               onChange={(e) => setConfig({ ...config, APIKEY: e.target.value })}
               className="transition-all-ease focus:scale-[1.01]"
             />
+          </div>
+          
+          {/* Theme Selector Section */}
+          <div className="space-y-2">
+            <Label className="transition-all-ease hover:scale-[1.01] cursor-pointer">
+              {t("settings.theme", "Theme")}
+            </Label>
+            <div className="border rounded-md p-3">
+              <ThemeSelectorSimple />
+            </div>
           </div>
         </div>
         <DialogFooter className="p-4 pt-0">
