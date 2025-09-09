@@ -1,0 +1,542 @@
+/**
+ * Advanced Animations & Effects
+ * Spectacular visual effects for theme transformations
+ */
+
+/* ============================================================ */
+/* GLASSMORPHISM NAVIGATION EFFECTS                           */
+/* ============================================================ */
+
+.theme-advanced-nav {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-advanced-nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  animation: nav-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes nav-shine {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.theme-glass-tabs {
+  position: relative;
+  z-index: 10;
+}
+
+.theme-glass-tab {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-glass-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(233, 69, 96, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.theme-glass-tab:hover::before {
+  left: 100%;
+}
+
+.theme-glass-tab.active {
+  background: var(--highlight-gradient);
+  border-color: var(--highlight-color);
+  box-shadow: 
+    0 8px 32px rgba(233, 69, 96, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.theme-tab-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ============================================================ */
+/* DASHBOARD GRID ANIMATIONS                                  */
+/* ============================================================ */
+
+.theme-dashboard-grid {
+  animation: grid-fade-in 0.8s ease-out;
+}
+
+@keyframes grid-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-dashboard-section {
+  animation: section-slide-in 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.theme-dashboard-section:nth-child(1) { animation-delay: 0.1s; }
+.theme-dashboard-section:nth-child(2) { animation-delay: 0.2s; }
+.theme-dashboard-section:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes section-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.theme-dashboard-section-title {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-dashboard-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--highlight-gradient, var(--primary));
+  transition: width 0.8s ease;
+}
+
+.theme-dashboard-section:hover .theme-dashboard-section-title::after {
+  width: 100%;
+}
+
+/* ============================================================ */
+/* GLASSMORPHISM CARD EFFECTS                                 */
+/* ============================================================ */
+
+.theme-glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+}
+
+.theme-glass-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  border-color: rgba(233, 69, 96, 0.3);
+}
+
+.theme-provider-glass {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-provider-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg,
+    rgba(233, 69, 96, 0.1),
+    rgba(255, 107, 157, 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.theme-provider-glass:hover::after {
+  opacity: 1;
+}
+
+.theme-router-glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================ */
+/* FLOATING ANIMATIONS                                        */
+/* ============================================================ */
+
+.theme-float-animation {
+  animation: theme-float 6s ease-in-out infinite;
+}
+
+@keyframes theme-float {
+  0%, 100% { 
+    transform: translateY(0px) rotateX(0deg); 
+  }
+  25% { 
+    transform: translateY(-10px) rotateX(2deg); 
+  }
+  50% { 
+    transform: translateY(-5px) rotateX(0deg); 
+  }
+  75% { 
+    transform: translateY(-15px) rotateX(-2deg); 
+  }
+}
+
+/* Stagger the floating animation for multiple elements */
+.theme-float-animation:nth-child(2) { animation-delay: -1s; }
+.theme-float-animation:nth-child(3) { animation-delay: -2s; }
+.theme-float-animation:nth-child(4) { animation-delay: -3s; }
+
+/* ============================================================ */
+/* PARTICLE EFFECTS                                           */
+/* ============================================================ */
+
+.theme-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.theme-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, 
+    rgba(233, 69, 96, 0.8) 0%, 
+    rgba(255, 107, 157, 0.6) 50%, 
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: particle-float linear infinite;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.theme-particle:nth-child(2n) {
+  background: radial-gradient(circle, 
+    rgba(59, 130, 246, 0.6) 0%, 
+    rgba(147, 197, 253, 0.4) 50%, 
+    transparent 100%
+  );
+  animation-direction: reverse;
+}
+
+.theme-particle:nth-child(3n) {
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, 0.8) 0%, 
+    transparent 100%
+  );
+}
+
+/* ============================================================ */
+/* GRADIENT ANIMATIONS                                        */
+/* ============================================================ */
+
+.theme-gradient-animation {
+  position: relative;
+  background: linear-gradient(135deg, 
+    rgba(45, 45, 75, 0.95),
+    rgba(55, 65, 95, 0.9),
+    rgba(75, 85, 130, 0.95)
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ============================================================ */
+/* THEME DECORATION ELEMENTS                                  */
+/* ============================================================ */
+
+.theme-decoration {
+  position: fixed;
+  pointer-events: none;
+  z-index: -2;
+}
+
+.theme-decoration-light {
+  top: 10%;
+  right: 10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: decoration-pulse 4s ease-in-out infinite;
+}
+
+.theme-decoration-dark {
+  bottom: 20%;
+  left: 15%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle,
+    rgba(139, 92, 246, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: decoration-rotate 12s linear infinite;
+}
+
+@keyframes decoration-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes decoration-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================ */
+/* ADVANCED NAVIGATION BACKGROUND                             */
+/* ============================================================ */
+
+.theme-advanced-nav-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg,
+    rgba(233, 69, 96, 0.1) 0%,
+    rgba(255, 107, 157, 0.05) 50%,
+    rgba(59, 130, 246, 0.1) 100%
+  );
+  opacity: 0.3;
+  animation: background-wave 6s ease-in-out infinite;
+}
+
+@keyframes background-wave {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+  }
+  33% {
+    transform: translateX(-10px) scale(1.05);
+  }
+  66% {
+    transform: translateX(10px) scale(0.95);
+  }
+}
+
+/* ============================================================ */
+/* HOVER EFFECTS & MICRO INTERACTIONS                        */
+/* ============================================================ */
+
+.theme-glass-card {
+  cursor: pointer;
+}
+
+.theme-glass-card:active {
+  transform: translateY(-4px) scale(0.98);
+}
+
+.theme-navigation-tab {
+  position: relative;
+}
+
+.theme-navigation-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--highlight-gradient, var(--primary));
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.theme-navigation-tab:hover::after {
+  width: 80%;
+}
+
+.theme-navigation-tab.active::after {
+  width: 100%;
+  height: 3px;
+  box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
+/* ============================================================ */
+/* RESPONSIVE ANIMATIONS                                      */
+/* ============================================================ */
+
+@media (max-width: 768px) {
+  .theme-float-animation {
+    animation: theme-float-mobile 4s ease-in-out infinite;
+  }
+  
+  @keyframes theme-float-mobile {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .theme-glass-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+  
+  .theme-particles {
+    display: none; /* Disable particles on mobile for performance */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-float-animation,
+  .theme-gradient-animation,
+  .theme-particles,
+  .decoration-pulse,
+  .decoration-rotate {
+    animation: none !important;
+  }
+  
+  .theme-glass-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================ */
+/* LOADING STATES                                            */
+/* ============================================================ */
+
+.theme-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ============================================================ */
+/* THEME TRANSITION EFFECTS                                  */
+/* ============================================================ */
+
+.theme-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle,
+    rgba(233, 69, 96, 0.2) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.theme-transition-overlay.active {
+  opacity: 1;
+}
