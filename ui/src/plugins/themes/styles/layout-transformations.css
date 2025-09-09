@@ -1,0 +1,154 @@
+/*
+ * Layout Transformations Plugin CSS
+ * Handles centered layout and responsive design
+ */
+
+/* Global layout reset and setup */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Centered Layout Container System */
+.centered-layout-wrapper,
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Centering - Multiple selectors to catch different header implementations */
+#root > div > header,
+#root > div > .header,
+#root > div > [role="banner"],
+.app-header,
+header.header,
+.top-bar,
+.navbar {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Main content centering */
+#root > div > main,
+#root > div > .main-content,
+#root > div > div:not(.header):not(header):not(.top-bar):not(.navbar) {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard and content containers */
+.dashboard-container,
+.content-container,
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Force centering for flex containers */
+.flex-container {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-container > * {
+  max-width: 1400px;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1440px) {
+  .centered-layout-wrapper,
+  .app-container {
+    max-width: calc(100vw - 4rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .centered-layout-wrapper,
+  .app-container,
+  #root > div > header,
+  #root > div > .header,
+  #root > div > [role="banner"],
+  .app-header,
+  header.header,
+  .top-bar,
+  .navbar {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  #root > div > main,
+  #root > div > .main-content,
+  #root > div > div:not(.header):not(header):not(.top-bar):not(.navbar) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Remove full-width stretching from components */
+.w-full:not(.keep-full-width) {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Specific override for problematic full-width elements */
+.full-width-override {
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+}
+
+/* Centered layout helper classes */
+.plugin-centered {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.plugin-centered-tight {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.plugin-centered-wide {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Side spacing visualization */
+.show-side-space {
+  background: 
+    linear-gradient(90deg, 
+      rgba(59, 130, 246, 0.1) 0%, 
+      transparent 2rem, 
+      transparent calc(100% - 2rem), 
+      rgba(59, 130, 246, 0.1) 100%
+    );
+}

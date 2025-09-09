@@ -1,0 +1,198 @@
+/*
+ * Advanced Complete Plugin CSS
+ * Complete integration of all theme features
+ */
+
+@import './themes.css';
+@import './layout-transformations.css';
+@import './advanced-animations.css';
+@import './component-integration.css';
+
+/* Plugin root class */
+.claude-code-router-theme-plugin {
+  /* Ensure plugin styles take precedence */
+  position: relative;
+  z-index: 1000;
+}
+
+/* Global overrides for maximum compatibility */
+.claude-code-router-theme-plugin * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* Root application styling */
+#root {
+  background: rgb(var(--background)) !important;
+  color: rgb(var(--foreground)) !important;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* Advanced theme complete integration */
+:root.theme-advanced {
+  /* Enhanced glass morphism */
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+}
+
+:root.theme-advanced.theme-dark {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+}
+
+/* Notification system complete integration */
+.notification-system,
+.toast-container,
+.sonner-toaster {
+  z-index: 9999 !important;
+}
+
+.notification-system * ,
+.toast-container *,
+.sonner-toaster * {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Advanced glassmorphism for notifications */
+:root.theme-advanced .notification-system *,
+:root.theme-advanced .toast-container *,
+:root.theme-advanced .sonner-toaster * {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 8px 32px var(--glass-shadow) !important;
+}
+
+/* Complete button system */
+button:not(.no-theme-plugin) {
+  background: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+button:not(.no-theme-plugin):hover {
+  background: rgb(var(--primary)) !important;
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Advanced button effects */
+:root.theme-advanced button:not(.no-theme-plugin) {
+  backdrop-filter: blur(10px) !important;
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 4px 16px var(--glass-shadow) !important;
+}
+
+/* Complete card system */
+.card:not(.no-theme-plugin),
+.glass-card,
+.bg-card:not(.no-theme-plugin) {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+:root.theme-advanced .card:not(.no-theme-plugin),
+:root.theme-advanced .glass-card,
+:root.theme-advanced .bg-card:not(.no-theme-plugin) {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 8px 32px var(--glass-shadow) !important;
+}
+
+/* Layout system integration */
+.plugin-layout-centered {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Header complete centering */
+header:not(.no-plugin-layout),
+.header:not(.no-plugin-layout),
+[role="banner"]:not(.no-plugin-layout) {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Force application for stubborn elements */
+.force-theme-application * {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border-color: rgb(var(--border)) !important;
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* Dark theme specific overrides */
+:root.theme-dark {
+  color-scheme: dark;
+}
+
+:root.theme-dark img {
+  opacity: 0.9;
+}
+
+:root.theme-dark svg {
+  filter: brightness(0.9);
+}
+
+/* Light theme specific overrides */
+:root.theme-light {
+  color-scheme: light;
+}
+
+/* Responsive design complete */
+@media (max-width: 1440px) {
+  .plugin-layout-centered,
+  header:not(.no-plugin-layout),
+  .header:not(.no-plugin-layout),
+  [role="banner"]:not(.no-plugin-layout) {
+    max-width: calc(100vw - 4rem) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .plugin-layout-centered,
+  header:not(.no-plugin-layout),
+  .header:not(.no-plugin-layout),
+  [role="banner"]:not(.no-plugin-layout) {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Debug mode for development */
+.plugin-debug .plugin-layout-centered {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 2px dashed rgba(59, 130, 246, 0.3) !important;
+}
+
+.plugin-debug header:not(.no-plugin-layout),
+.plugin-debug .header:not(.no-plugin-layout) {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border: 2px dashed rgba(34, 197, 94, 0.3) !important;
+}

@@ -1,0 +1,212 @@
+/*
+ * Component Integration Plugin CSS
+ * Ensures all UI components respect the active theme
+ */
+
+/* Notification components */
+.toast, .notification, .alert, .sonner-toast,
+[role="alert"], [role="status"], [role="alertdialog"] {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Toast specific styling */
+.sonner-toast {
+  background: rgb(var(--card)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  color: rgb(var(--card-foreground)) !important;
+}
+
+.sonner-toast-success {
+  background: rgb(var(--card)) !important;
+  border-left: 3px solid #10b981 !important;
+}
+
+.sonner-toast-error {
+  background: rgb(var(--card)) !important;
+  border-left: 3px solid rgb(var(--destructive)) !important;
+}
+
+.sonner-toast-warning {
+  background: rgb(var(--card)) !important;
+  border-left: 3px solid #f59e0b !important;
+}
+
+.sonner-toast-info {
+  background: rgb(var(--card)) !important;
+  border-left: 3px solid rgb(var(--primary)) !important;
+}
+
+/* Button components - preserve existing styling but add theme support */
+button:not(.no-theme):not([class*="bg-"]):not([class*="text-"]):not(.btn-custom) {
+  background: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+button:not(.no-theme):not([class*="bg-"]):not([class*="text-"]):not(.btn-custom):hover {
+  background: rgb(var(--primary)) !important;
+  opacity: 0.9;
+}
+
+/* Secondary buttons */
+button.btn-secondary,
+button[class*="secondary"] {
+  background: rgb(var(--secondary)) !important;
+  color: rgb(var(--secondary-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Dialog and Modal components */
+.dialog-content, .modal-content, .popup-content,
+[role="dialog"], [role="alertdialog"] {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Dialog overlay */
+.dialog-overlay, .modal-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+:root.theme-light .dialog-overlay,
+:root.theme-light .modal-overlay {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+:root.theme-dark .dialog-overlay,
+:root.theme-dark .modal-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Input components */
+input:not(.no-theme), textarea:not(.no-theme), select:not(.no-theme) {
+  background: rgb(var(--background)) !important;
+  color: rgb(var(--foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+input:not(.no-theme):focus, 
+textarea:not(.no-theme):focus, 
+select:not(.no-theme):focus {
+  border-color: rgb(var(--ring)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--ring), 0.2) !important;
+}
+
+/* Card components */
+.card, .panel, .widget, .container:not(.no-theme) {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Table components */
+table:not(.no-theme) {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+}
+
+table:not(.no-theme) th {
+  background: rgb(var(--muted)) !important;
+  color: rgb(var(--muted-foreground)) !important;
+  border-bottom: 1px solid rgb(var(--border)) !important;
+}
+
+table:not(.no-theme) td {
+  border-bottom: 1px solid rgb(var(--border)) !important;
+}
+
+table:not(.no-theme) tr:hover {
+  background: rgb(var(--muted)) !important;
+}
+
+/* Navigation components */
+nav:not(.no-theme), .navbar:not(.no-theme), .menu:not(.no-theme) {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--card-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Link components */
+a:not(.no-theme) {
+  color: rgb(var(--primary)) !important;
+}
+
+a:not(.no-theme):hover {
+  color: rgb(var(--primary)) !important;
+  opacity: 0.8;
+}
+
+/* Badge and Tag components */
+.badge, .tag, .chip {
+  background: rgb(var(--muted)) !important;
+  color: rgb(var(--muted-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Progress components */
+.progress-bar, .progress {
+  background: rgb(var(--muted)) !important;
+}
+
+.progress-bar-fill, .progress-fill {
+  background: rgb(var(--primary)) !important;
+}
+
+/* Dropdown and Select components */
+.dropdown-menu, .select-menu, .combobox-menu {
+  background: rgb(var(--popover)) !important;
+  color: rgb(var(--popover-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dropdown-item, .select-item, .combobox-item {
+  color: rgb(var(--popover-foreground)) !important;
+}
+
+.dropdown-item:hover, .select-item:hover, .combobox-item:hover {
+  background: rgb(var(--accent)) !important;
+  color: rgb(var(--accent-foreground)) !important;
+}
+
+/* Tooltip components */
+.tooltip, [role="tooltip"] {
+  background: rgb(var(--popover)) !important;
+  color: rgb(var(--popover-foreground)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--muted)) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border)) !important;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--foreground)) !important;
+  opacity: 0.6;
+}
+
+/* Focus indicators */
+*:focus-visible {
+  outline: 2px solid rgb(var(--ring)) !important;
+  outline-offset: 2px;
+}
+
+/* Text selection */
+::selection {
+  background: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-foreground)) !important;
+}
