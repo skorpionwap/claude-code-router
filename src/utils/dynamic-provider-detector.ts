@@ -3,7 +3,10 @@
  * Detectează automat provider-ii disponibili și poate schimba între ei
  */
 
-import { info, error, warn } from './log';
+// Simple logging functions since log utility was removed
+const info = (...args: any[]) => console.log('[INFO]', ...args);
+const error = (...args: any[]) => console.error('[ERROR]', ...args);
+const warn = (...args: any[]) => console.warn('[WARN]', ...args);
 
 export interface DetectedProvider {
   name: string;
