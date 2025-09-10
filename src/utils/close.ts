@@ -5,8 +5,9 @@ import { join } from 'path';
 
 export async function closeService() {
     const PID_FILE = join(HOME_DIR, '.claude-code-router.pid');
+    const isRunning = await isServiceRunning()
     
-    if (!isServiceRunning()) {
+    if (!isRunning) {
         console.log("ℹ️  No service is currently running.");
         // Still try to cleanup any remaining processes
         await forceCleanupAllProcesses();
@@ -17,10 +18,6 @@ export async function closeService() {
     if (refCount > 0 && !force) {
         console.log(`⚠️  Other processes are still using the service (count: ${refCount}). Keeping it running.`);
         console.log("💡 Use force cleanup if needed: run './cleanup.sh' or restart with 'ccr restart'");
-        return;
-    }
-
-    if (getReferenceCount() > 0) {
         return;
     }
 

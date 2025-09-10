@@ -13,6 +13,8 @@ I am seeking funding support for this project to better sustain its development.
 
 ![](blog/images/claude-code.png)
 
+![](blog/images/roadmap.svg)
+
 ## ✨ Features
 
 - **Model Routing**: Route requests to different models based on your needs (e.g., background tasks, thinking, long context).
@@ -572,6 +574,8 @@ A huge thank you to all our sponsors for their generous support!
 - @\*更
 - @\*.
 - @F\*t
-
+- @\*政
+- @\*铭
+- @\*叶
 
 (If your name is masked, please contact me via my homepage email to update it with your GitHub username.)

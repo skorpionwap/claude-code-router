@@ -6,11 +6,12 @@ import { Transformers } from "@/components/Transformers";
 import { Providers } from "@/components/Providers";
 import { Router } from "@/components/Router";
 import { JsonEditor } from "@/components/JsonEditor";
+import { LogViewer } from "@/components/LogViewer";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/components/ConfigProvider";
 import { PluginProvider } from "@/contexts/PluginContext";
 import { api } from "@/lib/api";
-import { Settings, Languages, Save, RefreshCw, FileJson, CircleArrowUp } from "lucide-react";
+import { Settings, Languages, Save, RefreshCw, FileJson, CircleArrowUp, FileText } from "lucide-react";
 
 // Lazy load MissionControlTab from plugin - RE-ENABLED
 const MissionControlTab = React.lazy(() => 
@@ -47,6 +48,7 @@ function App() {
   const { config, error } = useConfig();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
+  const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'dashboard' | 'analytics'>('dashboard');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -335,6 +337,9 @@ function App() {
           <Button variant="ghost" size="icon" onClick={() => setIsJsonEditorOpen(true)} className="transition-all-ease hover:scale-110">
             <FileJson className="h-5 w-5" />
           </Button>
+          <Button variant="ghost" size="icon" onClick={() => setIsLogViewerOpen(true)} className="transition-all-ease hover:scale-110">
+            <FileText className="h-5 w-5" />
+          </Button>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="transition-all-ease hover:scale-110">
@@ -424,6 +429,11 @@ function App() {
       <JsonEditor 
         open={isJsonEditorOpen} 
         onOpenChange={setIsJsonEditorOpen} 
+        showToast={(message, type) => setToast({ message, type })} 
+      />
+      <LogViewer 
+        open={isLogViewerOpen} 
+        onOpenChange={setIsLogViewerOpen} 
         showToast={(message, type) => setToast({ message, type })} 
       />
       {/* 版本更新对话框 */}
