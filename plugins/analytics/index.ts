@@ -27,6 +27,8 @@ export default class AnalyticsPlugin {
       trackingStartMiddleware(request, reply, done);
     });
     server.addHook('onSend', (request: any, reply: any, payload: any, done: any) => {
+      // Pass config to tracking middleware
+      (request as any)._pluginConfig = config;
       trackingEndMiddleware(request, reply, payload, done);
     });
     console.log('✅ Analytics tracking middleware registered');
