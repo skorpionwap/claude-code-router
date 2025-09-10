@@ -4,6 +4,54 @@ import { get_encoding } from "tiktoken";
 
 const enc = get_encoding("cl100k_base");
 
+// Helper to detect which route was actually used (mirrors router.ts logic)
+function detectRouteUsed(request: TrackedRequest, config: any, tokenCount: number): string {
+  const body = request.body as any;
+  
+  if (!config?.Router) return 'default';
+  
+  // Check for long context (same logic as router.ts)
+  const longContextThreshold = config.Router.longContextThreshold || 60000;
+  if (tokenCount > longContextThreshold && config.Router.longContext) {
+    return 'longContext';
+  }
+  
+  // Check for CCR-SUBAGENT-MODEL in system
+  if (body?.system?.length > 1 && 
+      body?.system[1]?.text?.includes('<CCR-SUBAGENT-MODEL>')) {
+    return 'subagent';
+  }
+  
+  // Check for haiku -> background routing
+  if (body?.model?.startsWith("claude-3-5-haiku") && config.Router.background) {
+    return 'background';
+  }
+  
+  // Check for thinking mode
+  if (body?.thinking && config.Router.think) {
+    return 'think';
+  }
+  
+  // Check for web search tools
+  if (Array.isArray(body?.tools) && 
+      body.tools.some((tool: any) => tool.type?.startsWith("web_search")) &&
+      config.Router.webSearch) {
+    return 'webSearch';
+  }
+  
+  // Check for image routing (if there are image-related tools or content)
+  if (body?.tools?.some((tool: any) => tool.name?.includes('image') || tool.type?.includes('image')) ||
+      body?.messages?.some((msg: any) => 
+        Array.isArray(msg.content) && msg.content.some((c: any) => c.type === 'image')
+      )) {
+    if (config.Router.image) {
+      return 'image';
+    }
+  }
+  
+  return 'default';
+}
+
 interface TrackedRequest extends FastifyRequest {
   startTime?: number;
   modelInfo?: {
@@ -228,7 +276,8 @@ export function trackingEndMiddleware(request: TrackedRequest, reply: FastifyRep
       }
     }
     
-    const routeUsed = 'default'; // Keep it simple
+    // **DETECT ACTUAL ROUTE USED - Based on router.ts logic**
+    const routeUsed = detectRouteUsed(request, config, tokenInfo.totalTokens);
 
     // Track the request with enhanced token tracking for all routes
     analytics.trackRequest({
