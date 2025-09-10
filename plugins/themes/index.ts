@@ -180,6 +180,22 @@ class ThemesPluginAPI implements ThemePluginAPI {
   cleanup(): void {
     this.removeThemeClasses();
     this.removePluginStyles();
+    
+    // ENHANCED: Remove dynamic CSS variables and force style recalculation
+    if (typeof document !== 'undefined') {
+      const rootStyles = document.documentElement.style;
+      const propertiesToRemove: string[] = [];
+      for (let i = 0; i < rootStyles.length; i++) {
+        const property = rootStyles[i];
+        if (property && (property.startsWith('--theme-') || property.startsWith('--themes-plugin-'))) {
+          propertiesToRemove.push(property);
+        }
+      }
+      propertiesToRemove.forEach(prop => rootStyles.removeProperty(prop));
+      
+      // Force style recalculation
+      document.documentElement.offsetHeight;
+    }
   }
   
   /**
@@ -195,7 +211,9 @@ class ThemesPluginAPI implements ThemePluginAPI {
       '/plugins/themes/styles/themes.css',
       '/plugins/themes/styles/variables.css',
       '/plugins/themes/styles/modern-effects.css',
-      '/plugins/themes/styles/components.css'
+      '/plugins/themes/styles/components.css',
+      '/plugins/themes/styles/notifications.css',
+      '/plugins/themes/styles/centered-layout.css'
     ];
     
     cssFiles.forEach((cssFile) => {
@@ -241,7 +259,6 @@ class ThemesPluginAPI implements ThemePluginAPI {
    * Private: Apply theme to document (browser only)
    */
   private applyThemeToDocument(): void {
-    if (!this.currentConfig.enabled) return;
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       console.log('Themes plugin: Document theming skipped (Node.js environment)');
       return;
@@ -249,17 +266,20 @@ class ThemesPluginAPI implements ThemePluginAPI {
     
     const documentElement = document.documentElement;
     
-    // Remove all theme classes
+    // FIXED: Always remove theme classes first, regardless of enabled state
     this.removeThemeClasses();
     
-    // Add current theme class
-    documentElement.classList.add(`theme-${this.currentConfig.activeTheme}`);
-    
-    // Add plugin active indicator
-    documentElement.classList.add('themes-plugin-active');
-    
-    // Check and set analytics status
-    this.checkAnalyticsStatus();
+    // Only apply theme if enabled
+    if (this.currentConfig.enabled) {
+      // Add current theme class
+      documentElement.classList.add(`theme-${this.currentConfig.activeTheme}`);
+      
+      // Add plugin active indicator
+      documentElement.classList.add('themes-plugin-active');
+      
+      // Check and set analytics status
+      this.checkAnalyticsStatus();
+    }
   }
 
   /**

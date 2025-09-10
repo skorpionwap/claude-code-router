@@ -1,6 +1,7 @@
 // Plugin Manager - STANDALONE în plugins/ folder
 // Zero dependențe externe, auto-contained
 import React, { useState, useEffect } from 'react';
+import { themesPlugin } from '../themes/index';
 
 interface Plugin {
   id: string;
@@ -21,46 +22,72 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ className = "" }) 
   const [loading, setLoading] = useState(true);
 
   // Auto-discovery plugins din folderul plugins/
-  useEffect(() => {
-    const discoverPlugins = async () => {
-      const discoveredPlugins: Plugin[] = [];
-
-      // Analytics Plugin
+    useEffect(() => {
+    const initializePlugins = async () => {
+      setLoading(true);
       try {
-        const { AnalyticsSettings } = await import('../analytics/ui/AnalyticsSettings');
-        discoveredPlugins.push({
-          id: 'analytics',
-          name: 'Analytics & Mission Control',
-          description: 'Real-time analytics and Mission Control dashboard',
-          enabled: localStorage.getItem('analytics-enabled') === 'true',
-          version: '1.0.0',
-          component: AnalyticsSettings
-        });
-      } catch (error) {
-        console.warn('Analytics plugin not available:', error);
-      }
+        // 1. Fetch the source of truth for state from the server
+        const response = await fetch('/api/plugins/getState');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch plugin state: ${response.statusText}`);
+        }
+        const serverState = await response.json();
 
-      // Themes Plugin  
-      try {
-        const { ThemeSettings } = await import('../themes/ui/ThemeSettings');
-        discoveredPlugins.push({
-          id: 'themes',
-          name: 'Advanced Themes',
-          description: 'Glassmorphism effects and premium theming',
-          enabled: localStorage.getItem('themes-enabled') === 'true',
-          version: '1.0.0',
-          component: ThemeSettings
-        });
-      } catch (error) {
-        console.warn('Themes plugin not available:', error);
-      }
+        // 2. Discover available plugins by trying to import them
+        const discoveredPlugins: Plugin[] = [];
 
-      setPlugins(discoveredPlugins);
-      setLoading(false);
+        // Analytics Plugin
+        try {
+          const { AnalyticsSettings } = await import('../analytics/ui/AnalyticsSettings');
+          discoveredPlugins.push({
+            id: 'analytics',
+            name: 'Analytics & Mission Control',
+            description: 'Real-time analytics and Mission Control dashboard',
+            // 3. Combine discovered plugin with server state
+            enabled: serverState.analytics?.enabled ?? false,
+            version: '1.0.0',
+            component: AnalyticsSettings
+          });
+        } catch (error) {
+          // Plugin not found, do nothing
+        }
+
+        // Themes Plugin
+        try {
+          const { ThemeSettings } = await import('../themes/ui/ThemeSettings');
+          discoveredPlugins.push({
+            id: 'themes',
+            name: 'Advanced Themes',
+            description: 'Glassmorphism effects and premium theming',
+            // 3. Combine discovered plugin with server state
+            enabled: serverState.themes?.enabled ?? false,
+            version: '1.0.0',
+            component: ThemeSettings
+          });
+        } catch (error) {
+          // Plugin not found, do nothing
+        }
+
+        setPlugins(discoveredPlugins);
+      } catch (error) {
+        console.error('Failed to initialize plugins:', error);
+        setPlugins([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    discoverPlugins();
+    initializePlugins();
   }, []);
+
+  useEffect(() => {
+    const analyticsPlugin = plugins.find(p => p.id === 'analytics');
+    if (analyticsPlugin?.enabled) {
+      document.documentElement.setAttribute('data-analytics', 'enabled');
+    } else {
+      document.documentElement.removeAttribute('data-analytics');
+    }
+  }, [plugins]);
 
   const togglePlugin = async (pluginId: string) => {
     const plugin = plugins.find(p => p.id === pluginId);
@@ -68,28 +95,47 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ className = "" }) 
 
     const newEnabled = !plugin.enabled;
     
-    // Update localStorage
-    localStorage.setItem(`${pluginId}-enabled`, newEnabled.toString());
-    
+    if (newEnabled && pluginId === 'analytics') {
+      document.documentElement.setAttribute('data-analytics', 'enabled');
+    } else if (!newEnabled) {
+      if (pluginId === 'themes') {
+        // FIXED: Properly disable themes plugin by updating its config
+        themesPlugin.setConfig({ enabled: false });
+        themesPlugin.cleanup();
+      } else if (pluginId === 'analytics') {
+        document.documentElement.removeAttribute('data-analytics');
+      }
+    }
+        
     // Update server config
     try {
-      const configResponse = await fetch('/api/config');
-      const config = await configResponse.json();
-      
-      if (!config.plugins) config.plugins = {};
-      if (!config.plugins[pluginId]) config.plugins[pluginId] = {};
-      config.plugins[pluginId].enabled = newEnabled;
-      
-      await fetch('/api/config', {
+      await fetch('/api/plugins/setState', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config)
+        body: JSON.stringify({ pluginId, enabled: newEnabled })
       });
 
       // Dispatch event pentru cross-tab sync
       window.dispatchEvent(new CustomEvent(`plugin-${pluginId}-toggled`, {
         detail: { enabled: newEnabled }
       }));
+      
+      // FIXED: Dispatch backwards-compatible events for analytics plugin
+      if (pluginId === 'analytics') {
+        window.dispatchEvent(new CustomEvent('analytics-toggle-changed', {
+          detail: { enabled: newEnabled }
+        }));
+        window.dispatchEvent(new CustomEvent('analytics-config-changed', {
+          detail: { enabled: newEnabled }
+        }));
+        
+        // Sync to localStorage for compatibility
+        if (newEnabled) {
+          localStorage.setItem('analytics-enabled', 'true');
+        } else {
+          localStorage.removeItem('analytics-enabled');
+        }
+      }
 
       // Update local state
       setPlugins(prev => prev.map(p => 
@@ -97,7 +143,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ className = "" }) 
       ));
 
     } catch (error) {
-      console.error('Failed to update plugin config:', error);
+      console.error('Failed to update plugin state:', error);
     }
   };
 
@@ -158,7 +204,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ className = "" }) 
           {/* Plugin Settings - doar dacă e enabled */}
           {plugin.enabled && plugin.component && (
             <div className="ml-4 pl-4 border-l border-border">
-              <plugin.component />
+              <plugin.component isEnabled={plugin.enabled} />
             </div>
           )}
         </div>

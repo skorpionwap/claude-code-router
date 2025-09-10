@@ -17,11 +17,11 @@ export function PluginThemeWrapper({ children }: PluginThemeWrapperProps) {
   useEffect(() => {
     const checkPluginStatus = async () => {
       try {
-        // Check server config first
-        const response = await fetch('/api/config');
+        // Check runtime plugin state first (authoritative during session)
+        const response = await fetch('/api/plugins/getState');
         if (response.ok) {
-          const config = await response.json();
-          const enabled = config.plugins?.themes?.enabled === true;
+          const state = await response.json();
+          const enabled = state.themes?.enabled === true;
           setIsEnabled(enabled);
         } else {
           // Fallback to localStorage
@@ -40,14 +40,13 @@ export function PluginThemeWrapper({ children }: PluginThemeWrapperProps) {
 
     // Listen for plugin state changes
     const handlePluginChange = (event: CustomEvent) => {
-      const { id, enabled } = event.detail;
-      if (id === 'themes') {
-        setIsEnabled(enabled);
-      }
+      const { enabled } = event.detail;
+      setIsEnabled(enabled);
     };
 
-    window.addEventListener('plugin-state-changed', handlePluginChange as EventListener);
-    return () => window.removeEventListener('plugin-state-changed', handlePluginChange as EventListener);
+    // Listen for the correct event from PluginManager
+    window.addEventListener('plugin-themes-toggled', handlePluginChange as EventListener);
+    return () => window.removeEventListener('plugin-themes-toggled', handlePluginChange as EventListener);
   }, []);
 
   if (isLoading) {

@@ -18,6 +18,8 @@
 @import './variables.css';     /* Theme-specific color variables and design tokens */
 @import './modern-effects.css'; /* Unified visual effects and animations */
 @import './components.css';     /* Consistent component styling */
+@import './notifications.css';  /* Advanced notification system for all themes */
+@import './centered-layout.css'; /* Centered layout system for modern design */
 
 /* ===========================================
    THEME SYSTEM ACTIVATION

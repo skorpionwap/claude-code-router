@@ -109,15 +109,28 @@ export function AnalyticsButton() {
       }
     };
     
-    // Check if analytics should be active based on config
-    const isAnalyticsActive = () => {
-      // Check localStorage (set by SettingsDialog)
+    // FIXED: Check analytics state with server state as authoritative source
+    const isAnalyticsActive = async (): Promise<boolean> => {
+      // Check server state first (authoritative)
+      try {
+        const response = await fetch('/api/plugins/getState');
+        if (response.ok) {
+          const serverState = await response.json();
+          if (serverState.analytics?.enabled !== undefined) {
+            return serverState.analytics.enabled;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to fetch server plugin state:', error);
+      }
+      
+      // Fallback to localStorage (backwards compatibility)
       const localStorageValue = localStorage.getItem('analytics-enabled');
       if (localStorageValue === 'true') {
         return true;
       }
       
-      // Check config from server
+      // Check config from server (legacy)
       try {
         const configStr = localStorage.getItem('app-config') || '{}';
         const config = JSON.parse(configStr);
@@ -127,9 +140,9 @@ export function AnalyticsButton() {
       }
     };
     
-    // Initialize analytics button based on current state
-    const initializeAnalyticsButton = () => {
-      const isActive = isAnalyticsActive();
+    // FIXED: Initialize analytics button with async state check
+    const initializeAnalyticsButton = async () => {
+      const isActive = await isAnalyticsActive();
       console.log('🔍 Analytics plugin UI: Initializing button, analytics active:', isActive);
       
       if (isActive) {
@@ -140,8 +153,10 @@ export function AnalyticsButton() {
       }
     };
     
-    // Initialize on component mount
-    initializeAnalyticsButton();
+    // Initialize on component mount (async)
+    initializeAnalyticsButton().catch(error => {
+      console.warn('Failed to initialize analytics button:', error);
+    });
     
     // Listen for config changes
     const handleStorageChange = (event: StorageEvent) => {
@@ -153,10 +168,14 @@ export function AnalyticsButton() {
     
     window.addEventListener('storage', handleStorageChange);
     
-    // Also listen for custom events from SettingsDialog
+    // FIXED: Handle analytics toggle events with async state check
     const handleAnalyticsToggle = () => {
       console.log('🔄 Analytics plugin UI: Received toggle change event, updating button visibility');
-      setTimeout(initializeAnalyticsButton, 100);
+      setTimeout(() => {
+        initializeAnalyticsButton().catch(error => {
+          console.warn('Failed to handle analytics toggle:', error);
+        });
+      }, 100);
     };
     
     window.addEventListener('analytics-toggle-changed', handleAnalyticsToggle);

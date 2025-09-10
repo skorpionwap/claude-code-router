@@ -20,6 +20,7 @@ import {SSEParserTransform} from "./utils/SSEParser.transform";
 import {SSESerializerTransform} from "./utils/SSESerializer.transform";
 import {rewriteStream} from "./utils/rewriteStream";
 import JSON5 from "json5";
+import { initStateManager } from '../plugins/core/stateManager';
 import { IAgent } from "./agents/type";
 import agentsManager from "./agents";
 import { EventEmitter } from "node:events";
@@ -139,8 +140,11 @@ async function run(options: RunOptions = {}) {
     logger: loggerConfig,
   });
   
-  // Plugin loading system - FIXED AND RE-ENABLED
-  const pluginsConfig = config.plugins || {};
+  // Initialize state manager FIRST
+  await initStateManager(server.app, config.plugins);
+  
+  // Plugin loading system - Now uses runtime state instead of config.json
+  const pluginsConfig = (server.app as any).pluginState || {};
   if (pluginsConfig.analytics?.enabled) {
     const AnalyticsPlugin = require('../plugins/analytics').default;
     new AnalyticsPlugin().install(server.app, config);

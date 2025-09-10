@@ -139,30 +139,50 @@ export const ThemeProvider: React.FC<{
         setCurrentTheme(initialConfig.activeTheme);
       }
     } else {
-      // Load configuration from server if no initial config provided
+      // Load configuration from runtime plugin state (not static config)
       const loadServerConfig = async () => {
         try {
-          const response = await fetch('/api/config');
+          const response = await fetch('/api/plugins/getState');
           if (response.ok) {
-            const serverConfig = await response.json();
-            if (serverConfig.plugins?.themes) {
-              setPluginConfig(prev => ({ ...prev, ...serverConfig.plugins.themes }));
-              if (serverConfig.plugins.themes.activeTheme) {
-                setCurrentTheme(serverConfig.plugins.themes.activeTheme);
+            const pluginState = await response.json();
+            if (pluginState.themes) {
+              setPluginConfig(prev => ({ ...prev, ...pluginState.themes }));
+              if (pluginState.themes.activeTheme) {
+                setCurrentTheme(pluginState.themes.activeTheme);
               }
             }
           }
         } catch (error) {
-          console.warn('Failed to load server config for themes:', error);
+          console.warn('Failed to load plugin state for themes:', error);
         }
       };
       loadServerConfig();
+      
+      // Set up polling to detect server state changes
+      const pollInterval = setInterval(async () => {
+        try {
+          const response = await fetch('/api/plugins/getState');
+          if (response.ok) {
+            const pluginState = await response.json();
+            const serverEnabled = pluginState.themes?.enabled ?? true;
+            
+            if (serverEnabled !== pluginConfig.enabled) {
+              console.log(`🔄 Server state changed: themes enabled = ${serverEnabled}`);
+              setPluginConfig(prev => ({ ...prev, enabled: serverEnabled }));
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to poll plugin state:', error);
+        }
+      }, 3000); // Poll every 3 seconds (increased from 2s to give more time for sync)
+      
+      return () => clearInterval(pollInterval);
     }
-  }, [initialConfig]);
+  }, [initialConfig, pluginConfig.enabled]);
 
   // Load theme from localStorage on mount (only if not overridden by config)
   useEffect(() => {
-    if (pluginConfig.persistUserChoice && !initialConfig?.activeTheme) {
+    if (pluginConfig.enabled && pluginConfig.persistUserChoice && !initialConfig?.activeTheme) {
       try {
         const savedTheme = localStorage.getItem('claude-router-theme-plugin');
         if (savedTheme) {
@@ -183,6 +203,8 @@ export const ThemeProvider: React.FC<{
   // Apply theme to document element
   useEffect(() => {
     const documentElement = document.documentElement;
+    
+    console.log(`🔌 ThemeProvider useEffect triggered - pluginEnabled: ${pluginConfig.enabled}, currentTheme: ${currentTheme}`);
     
     if (!pluginConfig.enabled) {
       // COMPREHENSIVE CLEANUP when plugin is disabled
@@ -255,8 +277,6 @@ export const ThemeProvider: React.FC<{
     // Add plugin active indicator for CSS layout override
     documentElement.classList.add('themes-plugin-active');
     
-    // Check and apply analytics integration
-    checkAnalyticsStatus();
     
     // Apply layout classes for navigation
     applyLayoutClasses();
@@ -268,10 +288,27 @@ export const ThemeProvider: React.FC<{
       documentElement.classList.remove('dark');
     }
     
-    // Apply CSS custom properties
+    // COMPREHENSIVE CLEANUP: Remove ALL possible theme properties first
+    const allThemeProperties = [
+      '--background', '--foreground', '--card', '--card-foreground',
+      '--popover', '--popover-foreground', '--primary', '--primary-foreground',
+      '--secondary', '--secondary-foreground', '--muted', '--muted-foreground',
+      '--accent', '--accent-foreground', '--destructive', '--destructive-foreground',
+      '--border', '--input', '--ring', '--gradient', '--glass-bg', '--glass-blur'
+    ];
+    
+    allThemeProperties.forEach(property => {
+      documentElement.style.removeProperty(property);
+    });
+    
+    console.log(`🧹 Cleared all theme properties before applying ${currentTheme} theme`);
+    
+    // Apply CSS custom properties for current theme
     Object.entries(theme.colors).forEach(([property, value]) => {
       if (value && typeof value === 'string') {
-        documentElement.style.setProperty(`--${property.replace(/([A-Z])/g, '-$1').toLowerCase()}`, value);
+        const cssProperty = `--${property.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+        documentElement.style.setProperty(cssProperty, value);
+        console.log(`✅ Applied ${cssProperty}: ${value}`);
       }
     });
 
@@ -334,9 +371,12 @@ export const ThemeProvider: React.FC<{
 
   const isPluginEnabled = () => pluginConfig.enabled;
 
-  const togglePlugin = (enabled: boolean) => {
+  const togglePlugin = async (enabled: boolean) => {
     const newConfig = { ...pluginConfig, enabled };
     setPluginConfig(newConfig);
+    
+    // Sync to server IMMEDIATELY to prevent race condition with polling
+    await syncConfigToServer(newConfig);
     
     if (!enabled) {
       // COMPREHENSIVE CLEANUP when disabled
@@ -382,61 +422,21 @@ export const ThemeProvider: React.FC<{
       // Re-apply current theme when enabled
       console.log('🎨 Themes plugin re-enabled, CSS will be loaded and theme applied:', currentTheme);
     }
-    
-    // Sync to server - fire and forget
-    syncConfigToServer(newConfig);
   };
 
   const syncConfigToServer = async (config: ThemePluginConfig) => {
     try {
-      // Get current main config from server
-      const response = await fetch('/api/config');
-      if (response.ok) {
-        const mainConfig = await response.json();
-        
-        // Update the themes section
-        const updatedConfig = {
-          ...mainConfig,
-          plugins: {
-            ...mainConfig.plugins,
-            themes: config
-          }
-        };
-        
-        // Save back to server
-        await fetch('/api/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedConfig)
-        });
-      }
+      // Update runtime plugin state (not static config)
+      await fetch('/api/plugins/setState', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pluginId: 'themes', enabled: config.enabled })
+      });
     } catch (error) {
       console.warn('Failed to sync theme config to server:', error);
     }
   };
   
-  const checkAnalyticsStatus = () => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    
-    const documentElement = document.documentElement;
-    
-    // Check for analytics plugin indicators
-    const analyticsEnabled = 
-      localStorage.getItem('analytics-enabled') === 'true' ||
-      document.querySelector('[data-analytics="true"]') ||
-      window.location.search.includes('analytics=true') ||
-      // Check if Mission Control tab exists
-      document.querySelector('[class*="mission-control"]') ||
-      // Check for analytics plugin global
-      (window as any).__ANALYTICS_PLUGIN__;
-
-    if (analyticsEnabled) {
-      documentElement.setAttribute('data-analytics', 'enabled');
-      console.log('📊 Analytics detected - enabling Mission Control navigation');
-    } else {
-      documentElement.removeAttribute('data-analytics');
-    }
-  };
   
   const applyLayoutClasses = () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
@@ -459,23 +459,47 @@ export const ThemeProvider: React.FC<{
       }
     });
     
-    // Create Mission Control tab if analytics enabled and doesn't exist
-    if (document.documentElement.hasAttribute('data-analytics')) {
+  };
+
+  // Watch for analytics attribute and dynamically add/remove Mission Control tab
+  useEffect(() => {
+    const missionControlManager = (analyticsEnabled: boolean) => {
       const tabContainer = document.querySelector('[role="tablist"], .nav-tabs');
-      if (tabContainer && !document.querySelector('.mission-control-tab, [data-tab="mission-control"]')) {
+      if (!tabContainer) return;
+
+      const existingTab = document.querySelector('.mission-control-tab, [data-tab="mission-control"]');
+
+      if (analyticsEnabled && !existingTab) {
         const missionControlTab = document.createElement('button');
         missionControlTab.className = 'nav-tab mission-control-tab';
         missionControlTab.setAttribute('data-tab', 'mission-control');
         missionControlTab.textContent = '🎯 Mission Control';
         missionControlTab.addEventListener('click', () => {
-          // Navigate to mission control
           const event = new CustomEvent('navigate-mission-control');
           document.dispatchEvent(event);
         });
         tabContainer.appendChild(missionControlTab);
+      } else if (!analyticsEnabled && existingTab) {
+        existingTab.remove();
       }
-    }
-  };
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-analytics') {
+          const analyticsEnabled = document.documentElement.hasAttribute('data-analytics');
+          missionControlManager(analyticsEnabled);
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    // Initial check
+    missionControlManager(document.documentElement.hasAttribute('data-analytics'));
+
+    return () => observer.disconnect();
+  }, []);
 
   const value: ThemeContextType = {
     currentTheme,
