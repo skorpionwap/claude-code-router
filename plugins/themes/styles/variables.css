@@ -212,26 +212,32 @@ html.theme-dark {
    =========================================== */
 
 html.theme-advanced {
-  /* Core Semantic Colors - Cosmic Space */
+  /* Core Semantic Colors - Cosmic Space - Further Enhanced Readability */
   --background: oklch(0.08 0.05 280);
   --foreground: oklch(0.95 0.02 270);
-  --card: rgba(255, 255, 255, 0.15);
+  --card: rgba(255, 255, 255, 0.25);
   --card-foreground: oklch(0.92 0.02 270);
-  --popover: rgba(255, 255, 255, 0.2);
+  --popover: rgba(255, 255, 255, 0.35);
   --popover-foreground: oklch(0.95 0.02 270);
   --primary: oklch(0.7 0.25 280);
   --primary-foreground: oklch(0.08 0.05 280);
-  --secondary: rgba(255, 255, 255, 0.26);
+  --secondary: rgba(255, 255, 255, 0.35);
   --secondary-foreground: oklch(0.85 0.03 270);
-  --muted: rgba(255, 255, 255, 0.13);
+  --muted: rgba(255, 255, 255, 0.23);
   --muted-foreground: oklch(0.65 0.05 280);
   --accent: oklch(0.75 0.2 320);
   --accent-foreground: oklch(0.08 0.05 280);
   --destructive: oklch(0.7 0.3 20);
   --destructive-foreground: oklch(0.95 0.02 270);
-  --border: rgba(255, 255, 255, 0.38);
-  --input: rgba(255, 255, 255, 0.2);
+  --border: rgba(255, 255, 255, 0.47);
+  --input: rgba(255, 255, 255, 0.3);
   --ring: oklch(0.7 0.25 280);
+  
+  /* Special Modal Variables - Cosmic but Readable */
+  --modal-bg: linear-gradient(135deg, rgba(20, 15, 45, 0.92) 0%, rgba(25, 20, 55, 0.88) 50%, rgba(20, 15, 45, 0.92) 100%);
+  --modal-overlay: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(20, 20, 40, 0.9) 50%, rgba(0, 0, 0, 0.85) 100%);
+  --modal-border: rgba(123, 97, 255, 0.4);
+  --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 64px rgba(123, 97, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   
   /* Spectacular Space Background */
   --space-bg: linear-gradient(135deg, oklch(0.08 0.05 280) 0%, oklch(0.12 0.08 260) 35%, oklch(0.1 0.06 300) 70%, oklch(0.09 0.07 320) 100%);
@@ -246,22 +252,22 @@ html.theme-advanced {
   --shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.9), 0 0 64px rgba(123, 97, 255, 0.4);
   --shadow-glow: 0 0 40px rgba(123, 97, 255, 0.5), 0 0 80px rgba(123, 97, 255, 0.3);
   
-  /* Spectacular Cosmic Gradients */
+  /* Spectacular Cosmic Gradients - Enhanced for Better Readability */
   --gradient-primary: linear-gradient(135deg, oklch(0.7 0.25 280), oklch(0.8 0.3 260), oklch(0.75 0.28 300));
-  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.18));
-  --gradient-subtle: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.15));
+  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.38));
+  --gradient-subtle: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.28));
   --gradient-accent: linear-gradient(135deg, oklch(0.75 0.2 320) 0%, oklch(0.85 0.25 300) 50%, oklch(0.8 0.23 280) 100%);
-  --gradient-hero: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.15) 100%);
+  --gradient-hero: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.25) 100%);
   --gradient-cosmic: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
   
-  /* Advanced Glassmorphism Effects */
-  --glass-blur: blur(20px);
-  --glass-bg: rgba(255, 255, 255, 0.15);
-  --glass-bg-strong: rgba(255, 255, 255, 0.25);
-  --glass-bg-ultra: rgba(255, 255, 255, 0.35);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-border-strong: rgba(255, 255, 255, 0.4);
-  --glass-border-ultra: rgba(255, 255, 255, 0.6);
+  /* Advanced Glassmorphism Effects - Further Enhanced for Better Modal Readability */
+  --glass-blur: blur(14px);
+  --glass-bg: rgba(255, 255, 255, 0.28);
+  --glass-bg-strong: rgba(255, 255, 255, 0.38);
+  --glass-bg-ultra: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-border-strong: rgba(255, 255, 255, 0.5);
+  --glass-border-ultra: rgba(255, 255, 255, 0.7);
   
   /* Interactive States - Space Magic */
   --hover-overlay: rgba(255, 255, 255, 0.08);

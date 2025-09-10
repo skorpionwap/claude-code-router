@@ -475,6 +475,12 @@ body {
   animation: fadeIn 0.2s ease-out;
 }
 
+/* Enhanced Modal Overlay for Advanced Theme */
+html.theme-advanced .modal-overlay {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
 /* Modal Content */
 .modal {
   background: var(--gradient-card);
@@ -487,6 +493,32 @@ body {
   max-height: 90vh;
   overflow: hidden;
   animation: slideInUp 0.3s ease-out;
+}
+
+/* Enhanced Modal Content for Advanced Theme */
+html.theme-advanced .modal {
+  background: var(--modal-bg) !important;
+  border: 1px solid var(--modal-border) !important;
+  backdrop-filter: blur(18px) !important;
+  box-shadow: var(--modal-shadow) !important;
+}
+
+/* Enhanced Glassmorphism Components for Advanced Theme */
+html.theme-advanced .input,
+html.theme-advanced .textarea,
+html.theme-advanced .select {
+  background: rgba(255, 255, 255, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+/* Enhanced Cards and Containers for Advanced Theme - exclude modals */
+html.theme-advanced .card:not(.fixed),
+html.theme-advanced .container:not(.fixed),
+html.theme-advanced .panel:not(.fixed) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.28)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(14px) !important;
 }
 
 .modal-header {
@@ -682,4 +714,88 @@ body {
   .table-container {
     overflow-x: auto;
   }
+}
+
+/* ===========================================
+   ADVANCED THEME MODAL FIXES - Cosmic but Readable
+   =========================================== */
+
+/* Target ALL fullscreen modals - LogViewer, JsonEditor, MissionControl */
+html.theme-advanced .fixed.bottom-0.bg-white,
+html.theme-advanced .fixed.z-50.bg-white,
+html.theme-advanced [class*="fixed"][class*="bottom-0"].bg-white,
+html.theme-advanced [class*="fixed"][class*="z-50"].bg-white,
+html.theme-advanced .bg-white.fixed.bottom-0,
+html.theme-advanced .bg-white.fixed.z-50 {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border-top: 1px solid var(--modal-border) !important;
+  box-shadow: var(--modal-shadow) !important;
+}
+
+/* Enhanced targeting for specific modal patterns */
+html.theme-advanced .fixed.bottom-0.left-0.right-0.bg-white,
+html.theme-advanced .fixed.inset-0.bg-white {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* Target overlay backgrounds with multiple patterns */
+html.theme-advanced [class*="fixed"][class*="inset-0"][class*="bg-black"],
+html.theme-advanced .fixed.inset-0[class*="bg-black"] {
+  background: var(--modal-overlay) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Ensure modal headers have cosmic glow */
+html.theme-advanced [class*="fixed"][class*="bg-white"] .border-b,
+html.theme-advanced .fixed.bg-white .border-b {
+  border-color: rgba(123, 97, 255, 0.3) !important;
+  box-shadow: 0 1px 20px rgba(123, 97, 255, 0.2) !important;
+}
+
+/* Keep text readable in modal contexts */
+html.theme-advanced [class*="fixed"][class*="bg-white"] *,
+html.theme-advanced .fixed.bg-white * {
+  color: inherit !important;
+}
+
+/* Additional fix for any remaining bg-white modals */
+html.theme-advanced .bg-white[class*="fixed"] {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* Force all modal overlays to be less transparent */
+html.theme-advanced div[class*="fixed"][class*="inset-0"] {
+  background: var(--modal-overlay) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Comprehensive modal background fix - catches all patterns */
+html.theme-advanced [class~="fixed"][class~="bg-white"],
+html.theme-advanced [class*="fixed bg-white"],
+html.theme-advanced .fixed[class*="bg-white"] {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid var(--modal-border) !important;
+}
+
+/* Nuclear option - force all bg-white with fixed positioning in Advanced theme */
+html.theme-advanced .bg-white.fixed,
+html.theme-advanced .fixed.bg-white,
+html.theme-advanced div[class*="bg-white"][class*="fixed"] {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* Fix for regular modals that are too transparent */
+html.theme-advanced .modal-window,
+html.theme-advanced .dialog,
+html.theme-advanced [role="dialog"],
+html.theme-advanced [class*="modal"] {
+  background: var(--modal-bg) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  border: 1px solid var(--modal-border) !important;
+  box-shadow: var(--modal-shadow) !important;
 }

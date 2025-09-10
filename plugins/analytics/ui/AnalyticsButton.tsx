@@ -64,13 +64,13 @@ export function AnalyticsButton() {
       
       console.log('🔍 Analytics plugin UI: Creating analytics button');
       
-      // Create analytics button
+      // Create analytics button - made consistent with other toolbar buttons
       const analyticsButton = document.createElement('button');
-      analyticsButton.className = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9 px-0 relative group ml-2';
+      analyticsButton.className = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 px-0 relative group transition-all-ease hover:scale-110';
       analyticsButton.setAttribute('data-analytics-plugin-button', 'true');
       analyticsButton.setAttribute('title', 'Analytics Dashboard');
       analyticsButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3 h-5 w-5">
           <path d="M3 3v18h18"/>
           <path d="M18 17V9"/>
           <path d="M13 17V5"/>

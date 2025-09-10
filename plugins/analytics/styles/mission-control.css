@@ -22,6 +22,21 @@
   backdrop-filter: blur(10px);
 }
 
+/* Enhanced Modal Background for Advanced Theme */
+html.theme-advanced .mission-control-header,
+html.theme-advanced .mission-control-route-card,
+html.theme-advanced .mission-control-stat-card {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Enhanced Modal Container for Advanced Theme */
+html.theme-advanced .mission-control-container {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
 .mission-control-header h1 {
   color: var(--foreground, #ffffff);
   font-size: 2rem;
@@ -223,6 +238,48 @@
   transition: all 0.3s ease;
   position: relative;
   backdrop-filter: blur(10px);
+}
+
+/* Route Cards Grid Container - Force correct grid layout */
+.route-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 16px !important;
+}
+
+@media (min-width: 1024px) {
+  .route-cards-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .route-cards-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* Custom Scrollbar for Activity Sections */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.5);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.7);
 }
 
 .mission-control-route-card:hover {
@@ -586,4 +643,46 @@
 
 .mission-control-scroll::-webkit-scrollbar-thumb:hover {
   background: var(--primary, #3b82f6);
+}
+
+/* Route Cards Activity Scroll - Force Vertical Scroll */
+.route-cards-grid .space-y-1 {
+  /* Force scroll container properties */
+  max-height: 128px !important; /* max-h-32 equivalent */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  /* Custom scrollbar for route card activities */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.6) rgba(229, 231, 235, 0.2);
+}
+
+.route-cards-grid .space-y-1::-webkit-scrollbar {
+  width: 6px;
+}
+
+.route-cards-grid .space-y-1::-webkit-scrollbar-track {
+  background: rgba(229, 231, 235, 0.2);
+  border-radius: 3px;
+}
+
+.route-cards-grid .space-y-1::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.6);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.route-cards-grid .space-y-1::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.8);
+}
+
+/* Ensure scroll container has proper dimensions */
+.route-cards-grid .motion-div {
+  height: 192px !important; /* h-48 equivalent */
+  display: flex;
+  flex-direction: column;
+}
+
+.route-cards-grid .motion-div > div:last-child {
+  flex: 1;
+  overflow: hidden;
 }

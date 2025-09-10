@@ -26,6 +26,13 @@ const AnalyticsButton = React.lazy(() =>
     .then(module => ({ default: module.AnalyticsButton }))
     .catch(() => ({ default: () => null }))
 );
+
+// Lazy load MissionControlModal from plugin (similar to LogViewer approach)
+const MissionControlModal = React.lazy(() => 
+  import('@plugins/analytics/ui/components/MissionControlModal')
+    .then(module => ({ default: module.MissionControlModal }))
+    .catch(() => ({ default: ({ open }: { open: boolean }) => open ? <div>Analytics plugin not available</div> : null }))
+);
 import {
   Popover,
   PopoverContent,
@@ -49,6 +56,7 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isJsonEditorOpen, setIsJsonEditorOpen] = useState(false);
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
+  const [isMissionControlModalOpen, setIsMissionControlModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'dashboard' | 'analytics'>('dashboard');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics'>('dashboard');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -64,11 +72,13 @@ function App() {
   // Listen for analytics plugin events
   useEffect(() => {
     const handleOpenMissionControl = () => {
-      setActiveTab('analytics');
+      // Instead of switching tab, open modal (like LogViewer)
+      setIsMissionControlModalOpen(true);
     };
 
     const handleCloseMissionControl = () => {
-      setActiveTab('dashboard');
+      // Close modal
+      setIsMissionControlModalOpen(false);
     };
 
     document.addEventListener('open-mission-control', handleOpenMissionControl);
@@ -436,6 +446,13 @@ function App() {
         onOpenChange={setIsLogViewerOpen} 
         showToast={(message, type) => setToast({ message, type })} 
       />
+      <Suspense fallback={null}>
+        <MissionControlModal 
+          open={isMissionControlModalOpen} 
+          onOpenChange={setIsMissionControlModalOpen} 
+          showToast={(message, type) => setToast({ message, type })} 
+        />
+      </Suspense>
       {/* 版本更新对话框 */}
       <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
         <DialogContent className="max-w-2xl">

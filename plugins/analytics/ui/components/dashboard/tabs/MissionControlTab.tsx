@@ -4,7 +4,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useMissionControl, type Activity } from '@plugins/analytics/ui/hooks/useMissionControl';
 import { useRealTimeMissionControl, useProviderHistory } from '@plugins/analytics/ui/hooks/useMissionControlData';
 import { useConfig } from '@/components/ConfigProvider';
-import { useTheme } from '@plugins/themes/contexts/ThemeContext';
 import { formatResponseTime, formatPercentage, formatTokens, getResponseTimeColor, formatSuccessRate, getErrorRateColor } from '@/lib/formatters';
 import type { MissionControlData, ModelStat, HealthHistoryData } from '@plugins/analytics/ui/types/missionControl';
 import { api } from '@/lib/api';
@@ -71,8 +70,8 @@ export function MissionControlTab() {
   const { data: providerHistory, loading: historyLoading } = useProviderHistory();
   
   // Theme context
-  const { currentTheme, themes } = useTheme();
-  const isAdvanced = false; // TODO: Fix theme variant detection
+  // Independent theme configuration for analytics (when themes plugin is disabled)
+  const isAdvanced = false; // Use standard UI styling for analytics dashboard
   
   // Analytics state
   const { config } = useConfig();
@@ -903,7 +902,7 @@ export function MissionControlTab() {
               )}
               
               {routeCards.length > 0 && (
-                <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+                <div className="route-cards-grid grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {routeCards.map((card, index) => {
                     const color = getRouteColor(card.route);
                     const icon = getRouteIcon(card.route);
@@ -914,7 +913,7 @@ export function MissionControlTab() {
                       <motion.div
                         key={card.route}
                         className={`
-                          relative overflow-hidden rounded-xl border-2 
+                          relative overflow-hidden rounded-xl border-2 h-48
                           ${isAdvanced 
                             ? 'backdrop-blur-sm border-route-card-border hover:border-glass-border-strong transition-all duration-300' 
                             : 'bg-card/90 border-border/50 hover:scale-105 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl'
@@ -933,33 +932,33 @@ export function MissionControlTab() {
                         transition={{ duration: 0.6, delay: index * 0.1 }}
                         whileHover={{ y: -5 }}
                       >
-                        {/* Header */}
-                        <div className="p-6 pb-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-12 h-12 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
-                                <i className={`${icon} text-${color}-400 text-xl`}></i>
+                        {/* Header - more compact */}
+                        <div className="p-4 pb-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-8 h-8 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
+                                <i className={`${icon} text-${color}-400 text-sm`}></i>
                               </div>
                               <div>
-                                <h4 className="text-lg font-bold text-foreground">{card.displayName}</h4>
-                                <p className="text-sm text-muted-foreground">{card.config.description}</p>
+                                <h4 className="text-sm font-bold text-foreground">{card.displayName}</h4>
+                                <p className="text-xs text-muted-foreground truncate max-w-32">{card.config.description}</p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className={`text-3xl font-bold ${scoreColor}`}>
+                              <div className={`text-xl font-bold ${scoreColor}`}>
                                 {card.score}
                               </div>
                               <div className="text-xs text-muted-foreground">Score</div>
                             </div>
                           </div>
                           
-                          {/* Status Badge */}
-                          <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border ${
+                          {/* Status Badge - more compact */}
+                          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${
                             isAdvanced 
                               ? 'bg-glass-bg-strong border-glass-border-strong text-foreground backdrop-blur-sm' 
                               : `${statusColors} ${getStatusBg(card.status)}`
                           }`}>
-                            <div className={`w-3 h-3 rounded-full mr-2 animate-pulse ${getActivityStatusColor(
+                            <div className={`w-2 h-2 rounded-full mr-1 animate-pulse ${getActivityStatusColor(
                               card.status === 'healthy' ? 'success' :
                               card.status === 'warning' ? 'warning' :
                               card.status === 'error' ? 'error' : 'info'
@@ -972,107 +971,101 @@ export function MissionControlTab() {
                           </div>
                         </div>
 
-                        {/* Model Configuration */}
-                        <div className="px-6 pb-4">
-                          <div className="bg-slate-700/50 rounded-lg p-3">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Model Configurat:</span>
-                              <span className={`font-bold text-${color}-400`}>
+                        {/* Model Configuration - more compact */}
+                        <div className="px-3 pb-1">
+                          <div className="bg-slate-700/50 rounded-lg p-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">Model:</span>
+                              <span className={`font-bold text-${color}-400 truncate max-w-20`}>
                                 {card.config.model || 'N/A'}
                               </span>
                             </div>
-                            <div className="flex items-center justify-between text-sm mt-1">
+                            <div className="flex items-center justify-between text-xs mt-1">
                               <span className="text-muted-foreground">Provider:</span>
-                              <span className="font-semibold text-foreground">
+                              <span className="font-semibold text-foreground truncate max-w-20">
                                 {card.config.provider || 'N/A'}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Statistics */}
+                        {/* Statistics - more compact */}
                         {card.stats && (
-                          <div className="px-6 pb-4">
-                            <div className="grid grid-cols-3 gap-3">
-                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                          <div className="px-3 pb-1">
+                            <div className="grid grid-cols-3 gap-1">
+                              <div className={`p-1.5 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
                                 isAdvanced 
                                   ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
                                   : `bg-${color}-500/10 border-${color}-500/20`
-                              }`}>
-                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
-                                  isAdvanced ? 'text-muted-foreground' : `text-${color}-400`
-                                }`}>Requests</div>
-                                <div className="text-lg font-bold text-foreground">
+                              } text-center border`}>
+                                <div className={`text-xs font-bold transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-foreground' : `text-${color}-600`
+                                }`}>
                                   {card.stats.totalRequests.toLocaleString()}
                                 </div>
+                                <div className="text-xs text-muted-foreground">Cereri</div>
                               </div>
-                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                              <div className={`p-1.5 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
                                 isAdvanced 
                                   ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
                                   : 'bg-chart-1/10 border-chart-1/20'
-                              }`}>
-                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
-                                  isAdvanced ? 'text-muted-foreground' : 'text-chart-1'
-                                }`}>Success</div>
-                                <div className="text-lg font-bold text-foreground">
+                              } text-center border`}>
+                                <div className={`text-xs font-bold transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-foreground' : 'text-chart-1'
+                                }`}>
                                   {card.stats.successRate.toFixed(1)}%
                                 </div>
+                                <div className="text-xs text-muted-foreground">Succes</div>
                               </div>
-                              <div className={`p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
+                              <div className={`p-1.5 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${
                                 isAdvanced 
                                   ? 'bg-glass-bg-strong border border-glass-border-strong backdrop-blur-sm' 
                                   : 'bg-primary/10 border-primary/20'
-                              }`}>
-                                <div className={`text-xs mb-1 transition-all duration-200 hover:scale-110 ${
-                                  isAdvanced ? 'text-muted-foreground' : 'text-primary'
-                                }`}>Timp</div>
-                                <div className="text-lg font-bold text-foreground">
+                              } text-center border`}>
+                                <div className={`text-xs font-bold transition-all duration-200 hover:scale-110 ${
+                                  isAdvanced ? 'text-foreground' : 'text-primary'
+                                }`}>
                                   {formatResponseTime(card.stats.avgResponseTime)}
                                 </div>
+                                <div className="text-xs text-muted-foreground">Timp</div>
                               </div>
                             </div>
                           </div>
                         )}
 
 
-                        {/* Recent Activity */}
-                        <div className="px-6 pb-6">
-                          <div className="flex items-center justify-between mb-3">
-                            <h5 className="text-sm font-semibold text-foreground">Activitate Recentă</h5>
+                        {/* Recent Activity - more compact with internal scroll */}
+                        <div className="px-3 pb-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <h5 className="text-xs font-semibold text-foreground">Activitate</h5>
                             <span className="text-xs text-muted-foreground">
-                              {card.recentActivity.length} evenimente
+                              {card.recentActivity.length}
                             </span>
                           </div>
-                          <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                          <div className="space-y-1 max-h-32 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400/60 scrollbar-track-gray-200/20 hover:scrollbar-thumb-gray-500/80">
                             {card.recentActivity.length > 0 ? (
                               card.recentActivity.map((activity, idx) => (
-                                <div key={`${activity.id}-${idx}`} className={`p-3 rounded-lg border transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
+                                <div key={`${activity.id}-${idx}`} className={`p-2 rounded text-xs border transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
                                   isAdvanced ? 'bg-glass-bg/30 border-glass-border/50 backdrop-blur-sm' : 'bg-card/60 border-border/50'
                                 } ${getStatusBg(activity.type === 'success' ? 'healthy' : activity.type === 'error' ? 'error' : 'warning')}`}>
-                                  {/* First row: Status + Time + Model */}
-                                  <div className="flex items-center justify-between text-xs mb-2">
-                                    <div className="flex items-center gap-2">
-                                      <span className={`w-3 h-3 rounded-full animate-pulse shadow-sm ${getActivityStatusColor(activity.type)}`}></span>
-                                      <span className="text-muted-foreground font-mono text-[10px]">
+                                  {/* Single compact row: Status + Time */}
+                                  <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-1">
+                                      <span className={`w-2 h-2 rounded-full ${getActivityStatusColor(activity.type)}`}></span>
+                                      <span className="text-muted-foreground font-mono text-[11px] truncate">
                                         {new Date(activity.timestamp).toLocaleTimeString('ro-RO', {
                                           hour: '2-digit',
-                                          minute: '2-digit',
-                                          second: '2-digit'
+                                          minute: '2-digit'
                                         })}
                                       </span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-[10px]">
-                                      <span className="text-primary font-mono max-w-[60px] truncate transition-all duration-200 hover:scale-110">
-                                        {activity.actualModel}
-                                      </span>
-                                      <span className="text-muted font-mono transition-all duration-200 hover:scale-110">
-                                        {formatResponseTime(activity.responseTime)}
-                                      </span>
-                                    </div>
+                                    <span className="text-primary font-mono text-[11px] truncate">
+                                      {formatResponseTime(activity.responseTime)}
+                                    </span>
                                   </div>
-                                  {/* Second row: Message (truncated) */}
-                                  <div className="text-[11px] text-foreground truncate transition-all duration-200 hover:scale-105" title={activity.message}>
-                                    {activity.message.replace('Request successful', '✓ Success').replace('Request failed', '✗ Failed')}
+                                  {/* Message row */}
+                                  <div className="text-[11px] text-foreground truncate mt-1" title={activity.message}>
+                                    {activity.message.replace('Request successful', '✓').replace('Request failed', '✗')}
                                   </div>
                                 </div>
                               ))
